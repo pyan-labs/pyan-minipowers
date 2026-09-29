@@ -1,0 +1,14 @@
+{
+  "name": "minipowers",
+  "version": "5.10.0",
+  "description": "todo → spec → 구현 → 리뷰 → 기록. spec 파일 하나를 단계 사이의 계약서로 쓰는 네 스킬(spec-design · spec-implement · spec-review · spec-digest)",
+  "author": {
+    "name": "pyan-labs"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Minipowers",
+    "shortDescription": "설계 → 구현 → 리뷰 → 기록을 spec 파일 하나로 잇기",
+    "category": "Productivity"
+  }
+}

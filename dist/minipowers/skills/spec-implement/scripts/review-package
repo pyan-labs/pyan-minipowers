@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# 리뷰 패키지 생성: 커밋 목록 · stat · 문맥 10줄 diff를 파일 하나로.
+# 리뷰어는 이 파일 하나를 읽고, 컨트롤러 컨텍스트에는 diff가 들어가지 않는다.
+# BASE는 dispatch 직전에 기록한 커밋을 쓴다. HEAD~1은 여러 커밋짜리 슬라이스를 자른다.
+#
+# 출처: superpowers subagent-driven-development scripts/review-package (MIT), 경로 변경.
+# Usage: review-package SPEC_FILE BASE HEAD [OUTFILE]
+# Default OUTFILE: <repo-root>/.minipowers/<spec-stem>/work/review-<base7>..<head7>.diff
+set -euo pipefail
+
+if [ $# -lt 3 ] || [ $# -gt 4 ]; then
+  echo "usage: review-package SPEC_FILE BASE HEAD [OUTFILE]" >&2
+  exit 2
+fi
+
+spec=$1
+base=$2
+head=$3
+[ -f "$spec" ] || { echo "no such spec file: $spec" >&2; exit 2; }
+
+git rev-parse --verify --quiet "$base" >/dev/null || { echo "bad BASE: $base" >&2; exit 2; }
+git rev-parse --verify --quiet "$head" >/dev/null || { echo "bad HEAD: $head" >&2; exit 2; }
+
+# 잘못된 브랜치의 HEAD면 범위가 비거나 BASE에 뿌리를 두지 않는다. 둘 다 엉뚱한 패키지를 만든다.
+git merge-base --is-ancestor "$base" "$head" || { echo "HEAD is not a descendant of BASE: ${base}..${head}" >&2; exit 3; }
+[ "$(git rev-list --count "${base}..${head}")" -gt 0 ] || { echo "empty commit range: ${base}..${head}" >&2; exit 3; }
+
+if [ $# -eq 4 ]; then
+  out=$4
+else
+  dir=$("${BASH:-bash}" "$(cd "$(dirname "$0")" && pwd)/workspace" "$spec")
+  out="$dir/review-$(git rev-parse --short "$base")..$(git rev-parse --short "$head").diff"
+fi
+
+{
+  echo "# Review package: ${base}..${head}"
+  echo
+  echo "## Commits"
+  git log --oneline "${base}..${head}"
+  echo
+  echo "## Files changed"
+  git diff --stat "${base}..${head}"
+  echo
+  echo "## Diff"
+  git diff -U10 "${base}..${head}"
+} > "$out"
+
+commits=$(git rev-list --count "${base}..${head}")
+echo "wrote ${out}: ${commits} commit(s), $(wc -c < "$out" | tr -d ' ') bytes"

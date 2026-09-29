@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+# spec의 "### 슬라이스 N: …" 절(같은 레벨이거나 더 높은 다음 제목 전까지)을 파일로 뽑는다.
+# 구현자가 한 번의 Read로 요구사항을 읽고, 컨트롤러 컨텍스트에 본문이 남지 않는다.
+# 과거 plan 파일 호환으로 "### Task N" 제목도 받는다.
+# SPEC_FILE과 같은 폴더의 amendment-<N>.md(이름이 정확히 이 형식인 것만)를 N의 숫자 순서로 보고,
+# spec.md와 각 amendment에 같은 추출을 적용해 슬라이스 N 블록이 있는 마지막 파일의 블록을 쓴다.
+# (amendment가 spec.md의 슬라이스를 대체하거나 새 슬라이스를 추가할 수 있으므로 뒤 파일이 이긴다.)
+#
+# 출처: superpowers subagent-driven-development scripts/task-brief (MIT), 제목 패턴·경로·절 끝 판정·amendment 우선 변경.
+# Usage: slice-brief SPEC_FILE SLICE_NUMBER [OUTFILE]
+# Default OUTFILE: <repo-root>/.minipowers/<spec-stem>/work/slice-<N>-brief.md
+set -euo pipefail
+
+if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+  echo "usage: slice-brief SPEC_FILE SLICE_NUMBER [OUTFILE]" >&2
+  exit 2
+fi
+
+spec=$1
+n=$2
+[ -f "$spec" ] || { echo "no such spec file: $spec" >&2; exit 2; }
+
+if [ $# -eq 3 ]; then
+  out=$3
+else
+  dir=$("${BASH:-bash}" "$(cd "$(dirname "$0")" && pwd)/workspace" "$spec")
+  out="$dir/slice-${n}-brief.md"
+fi
+
+# 코드 펜스 안의 제목은 무시한다. 제목이 "슬라이스 N" 또는 "Task N"으로 시작하고
+# 바로 뒤가 숫자가 아니면(예: 1 vs 10) 그 절을 출력한다.
+# 절은 그 제목과 레벨이 같거나 더 높은(# 개수가 같거나 적은) 다음 제목 앞에서 끝난다.
+# 마지막 슬라이스 뒤의 "## 수용 기준" 같은 상위 절이 brief에 섞이지 않게 하기 위해서다.
+extract_slice() {
+  awk -v n="$n" '
+    /^```/ { infence = !infence }
+    !infence && /^#+[ \t]/ {
+      match($0, /^#+/)
+      level = RLENGTH
+      if ($0 ~ /^#+[ \t]+(슬라이스|Task)[ \t]+[0-9]+/) {
+        inslice = ($0 ~ ("^#+[ \t]+(슬라이스|Task)[ \t]+" n "([^0-9]|$)"))
+        if (inslice) slicelevel = level
+      } else if (inslice && level <= slicelevel) {
+        inslice = 0
+      }
+    }
+    inslice { print }
+  ' "$1"
+}
+
+specdir=$(cd "$(dirname "$spec")" && pwd)
+
+# amendment-<숫자>.md만, 숫자 순서로.
+amend_files=()
+if [ -d "$specdir" ]; then
+  while IFS= read -r name; do
+    amend_files+=("$specdir/$name")
+  done < <(
+    find "$specdir" -maxdepth 1 -type f -name 'amendment-*.md' -exec basename {} \; 2>/dev/null \
+      | grep -E '^amendment-[0-9]+\.md$' \
+      | sed -E 's/^amendment-([0-9]+)\.md$/\1 &/' \
+      | sort -n -k1,1 \
+      | cut -d' ' -f2-
+  )
+fi
+
+candidates=("$spec" "${amend_files[@]}")
+
+found=0
+best_file=""
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+
+for f in "${candidates[@]}"; do
+  extract_slice "$f" > "$tmp.try"
+  if [ -s "$tmp.try" ]; then
+    mv "$tmp.try" "$tmp"
+    best_file=$f
+    found=1
+  else
+    rm -f "$tmp.try"
+  fi
+done
+
+if [ "$found" -ne 1 ]; then
+  echo "slice ${n} not found in ${spec} (no heading matching '슬라이스 ${n}' or 'Task ${n}')" >&2
+  exit 3
+fi
+
+cp "$tmp" "$out"
+
+echo "wrote ${out}: $(wc -l < "$out" | tr -d ' ') lines (from $(basename "$best_file"))"

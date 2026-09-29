@@ -1,0 +1,8 @@
+node_modules/
+.env
+.minipowers/
+.worktrees/
+
+# 개인 로컬 설정
+.claude/settings.local.json
+.vscode/

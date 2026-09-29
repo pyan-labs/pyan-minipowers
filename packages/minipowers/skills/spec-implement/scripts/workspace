@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# spec 하나의 subagent 작업물(brief · report · diff 패키지)이 사는
+# 디렉터리를 만들고 절대경로를 찍는다: <repo-root>/.minipowers/<spec-stem>/work/
+# spec 경로는 docs/minipowers/<stem>/spec.md이므로 stem은 파일명이 아니라 부모 폴더 이름이다.
+#
+# spec마다 디렉터리를 따로 두는 이유: 다른 spec의 작업물을 현재 진행으로 잘못 읽지 않게
+# 구조적으로 막는다. 같은 stem이 다른 폴더에 있을 수 있으므로 spec-path 마커로 소유자를 확인한다.
+#
+# .git/ 아래가 아니라 working tree에 두는 이유: Claude Code가 .git/ 쓰기를 막아
+# 구현자 subagent가 report를 못 쓴다. 프로젝트 루트 .gitignore에 .minipowers/ 줄이 없으면 추가한다.
+#
+# 출처: superpowers subagent-driven-development scripts/sdd-workspace (MIT), 경로·마커명·gitignore 처리 변경.
+# Usage: workspace SPEC_FILE
+set -euo pipefail
+
+if [ $# -ne 1 ]; then
+  echo "usage: workspace SPEC_FILE" >&2
+  exit 2
+fi
+
+spec=$1
+[ -f "$spec" ] || { echo "no such spec file: $spec" >&2; exit 2; }
+
+top=$(git rev-parse --show-toplevel 2>/dev/null) \
+  || { echo "not inside a git repository: $(pwd)" >&2; exit 2; }
+# Windows의 git은 C:/… 형식을 돌려주므로 pwd -P와 같은 형식으로 맞춘다. 다르면 spec-path가 절대경로가 된다.
+root=$(CDPATH= cd -- "$top" && pwd -P)
+base="$root/.minipowers"
+
+spec_dir=$(CDPATH= cd -- "$(dirname "$spec")" && pwd -P)
+spec_abs="$spec_dir/$(basename "$spec")"
+case "$spec_abs" in
+  "$root"/*) spec_id=${spec_abs#"$root"/} ;;
+  *)         spec_id=$spec_abs ;;
+esac
+
+slug=$(basename "$spec_dir")
+[ -n "$slug" ] && [ "$slug" != "." ] && [ "$slug" != ".." ] && [ "$slug" != "/" ] \
+  || { echo "cannot derive a workspace name from: $spec" >&2; exit 2; }
+
+# 마커가 이 spec을 가리키면 소유. 마커가 없으면 새 워크스페이스로 보고 마커를 쓴다.
+owns() {
+  if [ -e "$1/work/spec-path" ]; then
+    [ "$(cat "$1/work/spec-path")" = "$spec_id" ]
+  else
+    mkdir -p "$1/work"
+    printf '%s\n' "$spec_id" > "$1/work/spec-path"
+  fi
+}
+
+dir="$base/$slug"
+if ! owns "$dir"; then
+  parent=$(basename "$(dirname "$spec_dir")")
+  dir="$base/$slug-$parent"
+  if ! owns "$dir"; then
+    n=2
+    while ! owns "$base/$slug-$parent-$n"; do n=$((n + 1)); done
+    dir="$base/$slug-$parent-$n"
+  fi
+fi
+
+# 프로젝트 루트 .gitignore: .minipowers/ 줄이 있으면 건드리지 않고, 없으면 끝 줄바꿈을 확인한 뒤 추가한다.
+gi="$root/.gitignore"
+if [ ! -e "$gi" ]; then
+  printf '.minipowers/\n' > "$gi"
+elif ! grep -qxE '[[:space:]]*/?\.minipowers/?[[:space:]]*' "$gi"; then
+  if [ -s "$gi" ] && [ "$(tail -c 1 "$gi" | od -An -c | tr -d ' ')" != '\n' ]; then
+    printf '\n' >> "$gi"
+  fi
+  printf '.minipowers/\n' >> "$gi"
+fi
+
+CDPATH= cd -- "$dir/work" && pwd

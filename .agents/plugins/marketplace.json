@@ -1,0 +1,19 @@
+{
+  "name": "pyan-minipowers",
+  "interface": {
+    "displayName": "Pyan Minipowers"
+  },
+  "plugins": [
+    {
+      "name": "minipowers",
+      "source": {
+        "source": "local",
+        "path": "./dist/minipowers"
+      },
+      "policy": {
+        "installation": "AVAILABLE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
