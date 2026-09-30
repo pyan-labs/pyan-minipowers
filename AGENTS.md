@@ -8,7 +8,7 @@
 
 | skill | 산출물 |
 |---|---|
-| `spec-design` | `spec.md`, feature 브랜치와 worktree, spec만 든 첫 커밋 |
+| `spec-design` | feature 브랜치와 worktree, 그 안의 `spec.md`. 브랜치의 커밋은 spec.md만 담고 마지막이 승인본 |
 | `spec-implement` | 슬라이스별 커밋, `progress.md`. spec 결함으로 멈추면 후속 todo |
 | `spec-review` | `findings.md` |
 | `spec-digest` | `digest.md`, `docs/minipowers/index.md` |

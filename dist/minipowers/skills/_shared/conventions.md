@@ -6,7 +6,7 @@ minipowers의 네 스킬(spec-design · spec-implement · spec-review · spec-di
 
 ## 작업 위치 결정
 
-spec-implement · spec-review · spec-digest는 시작할 때 이 절로 읽을 spec.md와 작업 위치를 정한다. spec-design은 작업 폴더를 스스로 만들므로 이 절을 쓰지 않는다. 어느 경우든 메인 체크아웃의 브랜치를 바꾸거나 바꾸라고 안내하지 않는다.
+spec-implement · spec-review · spec-digest는 시작할 때 이 절로 읽을 spec.md와 작업 위치를 정한다. spec-design은 인자가 spec 폴더일 때만 이 절을 쓰고, 문제 시나리오에서는 spec-review와 같이 행동한다. todo나 문장을 받으면 작업 폴더를 스스로 만든다. 어느 경우든 메인 체크아웃의 브랜치를 바꾸거나 바꾸라고 안내하지 않는다.
 
 ### 정상 시나리오
 

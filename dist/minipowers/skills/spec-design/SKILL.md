@@ -1,7 +1,7 @@
 ---
 name: spec-design
-description: todo 파일이나 요구 문장 하나를 승인된 docs/minipowers/<stem>/spec.md와 그 spec을 첫 커밋으로 둔 feature 브랜치 worktree로 만든다.
-argument-hint: "<todo 파일 | 요구 문장>"
+description: todo 파일이나 요구 문장 하나를 feature 브랜치 worktree 안의 승인된 docs/minipowers/<stem>/spec.md로 만든다. 승인 전 초안은 그 폴더 경로로 이어받는다.
+argument-hint: "<todo 파일 | 요구 문장 | 승인 전 spec 폴더 docs/minipowers/<stem>/>"
 disable-model-invocation: true
 ---
 
@@ -13,10 +13,9 @@ disable-model-invocation: true
 
 변경의 크기와 관계없이 항상 같다.
 
-- `docs/minipowers/<stem>/spec.md` 파일 하나. 형식은 `./spec-template.md`다.
-- 기준 커밋에서 만든 feature 브랜치 하나.
-- 그 브랜치를 checkout한 worktree 하나. 메인 체크아웃 루트의 `.worktrees/<stem>`이다.
-- 그 브랜치의 첫 커밋 하나. spec.md만 들어 있다.
+- feature 브랜치 하나와 그 브랜치를 checkout한 worktree 하나. 메인 체크아웃 루트의 `.worktrees/<stem>`이다.
+- 그 안의 `docs/minipowers/<stem>/spec.md` 파일 하나. 형식은 `./spec-template.md`다.
+- 브랜치의 커밋은 전부 spec.md만 담는다. 마지막 커밋이 머리말에 기준 커밋과 브랜치를 채운 승인본이다.
 
 변경이 작으면 spec의 각 절이 한 줄이다. 한 줄짜리 수정에도 spec 파일을 만든다.
 
@@ -24,20 +23,39 @@ spec은 뒤 단계(spec-implement, spec-review, spec-digest)가 받는 유일한
 
 ## 1. 인자 해석
 
-인자는 todo 파일 경로 또는 요구를 적은 문장이다.
+인자는 셋 중 하나다.
 
-- 인자가 존재하는 파일 경로이면 그 파일을 읽는다. 원문을 spec 머리말의 "원 요구"에 경로와 함께 `>` 인용으로 옮긴다.
-- 인자가 파일 경로가 아니면 문장으로 받는다. 그 문장을 "원 요구"에 인용한다.
-- 인자가 없으면 "todo 파일 경로나 요구 문장을 넣어 다시 호출한다"고 한 줄로 안내하고 끝낸다.
+- **승인 전 spec 폴더** `docs/minipowers/<stem>/` 또는 그 안의 `spec.md` 경로. 끊긴 세션을 이어받는 경우다. conventions.md "작업 위치 결정"대로 worktree를 찾아 spec.md를 읽는다. 머리말의 `- 기준 커밋:`이 "승인 시 기록"이면 초안이다. 2~4절을 건너뛰고 5절부터 이어간다. 실제 해시이면 승인된 spec이다. "이 spec은 승인됐다. 바꿀 것이 있으면 새 todo로 `/spec-design`을 부른다"고 안내하고 끝낸다.
+- **todo 파일 경로.** 파일을 읽고 원문을 spec 머리말의 "원 요구"에 경로와 함께 `>` 인용으로 옮긴다.
+- **요구를 적은 문장.** 그 문장을 "원 요구"에 인용한다.
 
-## 2. 작업 폴더 만들기
+인자가 없으면 "todo 파일 경로나 요구 문장을 넣어 다시 호출한다"고 한 줄로 안내하고 끝낸다.
 
-1. 날짜를 conventions.md "stem 규칙"의 명령으로 얻는다.
-2. `docs/minipowers/`가 없으면 만든다.
-3. 일련번호와 stem은 conventions.md "stem 규칙"대로 정한다. 주제어는 요구에서 뽑는다.
-4. `docs/minipowers/<stem>/`을 만든다.
+## 2. 시작 상태 확인과 작업 공간 만들기
 
-이 폴더는 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다) 아래 `<메인 체크아웃 루트>/docs/minipowers/<stem>/`에 만든다. 승인 전까지 spec.md 초안은 여기에 커밋하지 않은 채로 둔다. 승인 뒤 8절에서 worktree로 옮긴다.
+모든 git 명령은 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다)에서 실행한다. 메인 체크아웃의 브랜치는 이 스킬 내내 바꾸지 않는다.
+
+1. **깨끗한 상태를 확인한다.** 아래 명령의 출력이 비어 있어야 한다. `docs/minipowers/todo/`는 커밋하지 않는 사용자 파일이라 뺀다.
+   ```bash
+   git status --porcelain -- . ':(exclude)docs/minipowers/todo'
+   ```
+   비어 있지 않으면 브랜치도 폴더도 만들지 않는다. 출력 목록과 함께 다음을 안내하고 끝낸다. 어느 쪽을 할지는 사용자가 정한다.
+   ```
+   커밋할 것:      git add <경로> && git commit
+   잠시 치울 것:   git stash push -u -- <경로>
+   버릴 것:        git checkout -- <경로>   (추적 파일)
+                   git clean -fd <경로>     (추적하지 않는 파일)
+   정리한 뒤 /spec-design <같은 인자>를 다시 부른다.
+   ```
+   spec은 커밋된 코드를 읽고 쓰며 브랜치는 HEAD에서 갈라지므로, 커밋되지 않은 변경이 있으면 spec이 본 코드와 브랜치의 코드가 달라진다.
+2. **기반 브랜치를 확인한다.** 프로젝트 지시 파일이 feature 브랜치의 기반 브랜치를 정했는데(예: `dev`) 현재 브랜치가 다르면, 두 이름을 보고하고 끝낸다. 기반 브랜치를 최신으로 맞추는 것(`git pull --ff-only` 등)도 이 시점에 사용자가 한다.
+3. **stem과 브랜치 이름을 정한다.** 날짜와 일련번호는 conventions.md "stem 규칙"대로 정하고 주제어는 요구에서 뽑는다. 브랜치 이름은 프로젝트 지시 파일의 규칙을 따르고, 없으면 stem을 그대로 쓴다.
+4. **브랜치와 worktree를 만든다.** `.worktrees/`를 처음 만들 때는 conventions.md "gitignore 처리"를 따른다.
+   ```bash
+   git branch <브랜치> HEAD
+   git worktree add .worktrees/<stem> <브랜치>
+   ```
+5. 이후 코드 읽기, 파일 쓰기, 커밋은 모두 `<메인 체크아웃 루트>/.worktrees/<stem>` 안에서 한다. spec.md의 경로는 그 안의 `docs/minipowers/<stem>/spec.md`다. `docs/minipowers/`가 없으면 만든다.
 
 ## 3. 프로젝트에서 읽는 것
 
@@ -46,7 +64,7 @@ spec 초안을 쓰기 전에 다음을 읽는다.
 - **지시 파일.** 프로젝트 루트와 작업 디렉터리의 `CLAUDE.md`, `AGENTS.md`. 코딩 규칙, 테스트 위치, 테스트 명령, 브랜치 이름 규칙이 여기 있다.
 - **전체 테스트 명령.** 지시 파일에 있으면 그것을 쓴다. 없으면 프로젝트 종류로 정해지는 표준 명령(`dotnet test`, `pnpm test`, `pytest`, `go test ./...` 등)을 쓴다.
 - **관련 코드.** 요구가 건드리는 파일, 그 파일을 부르는 곳, 비슷한 일을 하는 기존 코드, 관련 테스트.
-- **이전 spec.** `docs/minipowers/` 안에 같은 영역을 다룬 spec 폴더가 있으면 그 spec.md와 digest.md. todo의 `중단된 작업:` 줄이 spec을 가리키면(conventions.md "중단 todo") 그 폴더의 spec.md, progress.md, findings.md도 읽는다. 폴더는 `.worktrees/<stem>`에 있을 수 있다. 새 spec의 기준 커밋은 승인 시점의 HEAD다. 앞 사이클의 브랜치를 병합할지는 사용자가 todo의 "사용자가 할 일"을 보고 정하며, 이 스킬은 그 브랜치를 보지 않는다.
+- **이전 spec.** `docs/minipowers/` 안에 같은 영역을 다룬 spec 폴더가 있으면 그 spec.md와 digest.md. todo의 `중단된 작업:` 줄이 spec을 가리키면(conventions.md "중단 todo") 그 폴더의 spec.md, progress.md, findings.md도 읽는다. 폴더는 `.worktrees/<stem>`에 있을 수 있다. 새 spec의 기준 커밋은 승인 시점의 메인 체크아웃 HEAD다. 앞 사이클의 브랜치를 병합할지는 사용자가 todo의 "사용자가 할 일"을 보고 정하며, 이 스킬은 그 브랜치를 보지 않는다.
 
 ## 4. spec 초안 쓰기
 
@@ -95,43 +113,34 @@ spec 전체에서 단언을 전부 뽑아 하나씩 grep이나 파일 읽기로 
 
 ## 7. 검토 요청
 
-spec.md를 파일로 저장하고 경로를 알려 사용자에게 검토를 요청한다. 요청 메시지에는 다음을 적는다.
+spec.md만 스테이징해 커밋한다. 커밋 메시지 형식은 프로젝트 지시 파일이 정한 것을 따른다. 그 다음 사용자에게 검토를 요청한다. 요청 메시지에는 다음을 적는다.
 
-- spec 경로
+- spec 경로. worktree 안의 절대경로다
 - 결정의 요지
 - 슬라이스 개수
 - "검증된 전제" 표에서 "확인 방법"이 "미확인"인 행. 없으면 "없음"
-- 현재 브랜치 이름과 HEAD 해시. 승인하면 이 HEAD가 기준 커밋이 된다. 프로젝트 지시 파일이 feature 브랜치의 기반 브랜치를 정했으면(예: `dev`) 그 이름과 동기화 명령도 적어, 사용자가 승인 전에 기반 브랜치를 최신으로 맞출 수 있게 한다
+- 브랜치 이름과 갈라진 커밋(`git merge-base HEAD <브랜치>`). 승인하면 그 시점의 메인 체크아웃 HEAD가 기준 커밋이 되고, 갈라진 뒤 기반 브랜치가 앞으로 갔으면 8절에서 브랜치를 그 위로 옮긴다
+- 이어가는 법: "세션이 끊기면 `/spec-design docs/minipowers/<stem>/`로 이어간다"
+- 버리는 법: "이 spec을 버리려면 `git worktree remove .worktrees/<stem>` 뒤 `git branch -D <브랜치>`"
 
-사용자가 승인하기 전에는 브랜치를 만들지 않고 코드를 쓰지 않는다. 사용자가 고칠 곳을 말하면 spec을 고치고 다시 검토를 요청한다.
+사용자가 승인하기 전에는 코드를 쓰지 않는다. 사용자가 고칠 곳을 말하면 spec을 고치고 spec.md만 커밋한 뒤 다시 검토를 요청한다.
 
 ## 8. 승인 뒤
 
-사용자가 승인하면 다음을 순서대로 한다. 메인 체크아웃은 이 절차 내내 지금 브랜치에 남는다. 메인 체크아웃에서 브랜치를 전환하는 명령은 쓰지 않는다. git 명령과 파일 이동은 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다)에서 실행한다. 아래 경로는 모두 그 루트 기준이다.
+사용자가 승인하면 메인 체크아웃 루트에서 다음을 순서대로 한다.
 
-1. 현재 브랜치를 `git rev-parse --abbrev-ref HEAD`로 확인한다. 프로젝트 지시 파일이 feature 브랜치의 기반 브랜치를 정했는데 현재 브랜치가 그것과 다르면, 브랜치를 만들지 않고 두 이름을 보고하고 끝낸다. 사용자가 기반 브랜치로 옮긴 뒤 다시 승인한다.
-2. 현재 HEAD를 기준 커밋으로 정한다. `git rev-parse HEAD`의 전체 해시와 현재 브랜치 이름을 spec 머리말의 "기준 커밋"에 적는다.
-3. 브랜치 이름을 정한다. 프로젝트 지시 파일에 브랜치 이름 규칙이 있으면 그 규칙을 따르고, 없으면 stem을 그대로 쓴다. 이름을 머리말의 "브랜치"에 적는다.
-4. 기준 커밋에서 feature 브랜치를 만들기만 한다. checkout하지 않는다.
+1. 2절의 2를 다시 확인한다. 현재 브랜치가 기반 브랜치와 다르면 보고하고 끝낸다. 사용자가 옮긴 뒤 다시 승인한다.
+2. 메인 체크아웃 HEAD를 기준 커밋으로 정한다. 그것이 브랜치의 갈라진 커밋과 다르면 브랜치를 그 위로 옮긴다. 브랜치에는 새 폴더의 spec.md 커밋만 있어 충돌하지 않는다. 그래도 실패하면 `git -C .worktrees/<stem> rebase --abort` 뒤 출력과 함께 보고하고 끝낸다.
    ```bash
-   git branch <브랜치> <기준 커밋>
+   BASE=$(git rev-parse HEAD)
+   [ "$(git merge-base HEAD <브랜치>)" = "$BASE" ] || git -C .worktrees/<stem> rebase "$BASE"
    ```
-5. 그 브랜치로 worktree를 만든다. `.worktrees/`를 처음 만들 때는 conventions.md "gitignore 처리"를 따른다.
-   ```bash
-   git worktree add .worktrees/<stem> <브랜치>
-   ```
-6. 메인 체크아웃의 초안 `docs/minipowers/<stem>/spec.md`를 worktree의 같은 경로로 옮긴다. 메인 체크아웃에 남은 빈 `docs/minipowers/<stem>/` 폴더는 지운다. 2절에서 이 스킬이 `docs/minipowers/`를 새로 만들었고 그 폴더가 비었으면 함께 지운다.
-   ```bash
-   mkdir -p .worktrees/<stem>/docs/minipowers/<stem>
-   mv docs/minipowers/<stem>/spec.md .worktrees/<stem>/docs/minipowers/<stem>/spec.md
-   rmdir docs/minipowers/<stem>
-   ```
-7. worktree에서 spec.md 하나만 스테이징해 첫 커밋으로 넣는다. 커밋 메시지 형식은 지시 파일이 정한 것을 따른다.
+3. spec 머리말의 "기준 커밋"에 `$BASE`의 전체 해시와 현재 브랜치 이름을, "브랜치"에 브랜치 이름을 적는다. spec.md만 스테이징해 커밋한다. 이것이 승인 커밋이다.
    ```bash
    git -C .worktrees/<stem> add docs/minipowers/<stem>/spec.md
    git -C .worktrees/<stem> commit
    ```
-8. 브랜치 이름, 커밋 해시, worktree의 절대경로(`<메인 체크아웃 루트>/.worktrees/<stem>`)를 보고한다. 인자가 todo 파일이었으면 다음 단계 줄 바로 위에 아래 한 줄을 쓴다. todo 파일은 커밋하지도 지우지도 않는다.
+4. 브랜치 이름, 승인 커밋 해시, worktree의 절대경로(`<메인 체크아웃 루트>/.worktrees/<stem>`)를 보고한다. 인자가 todo 파일이었으면 다음 단계 줄 바로 위에 아래 한 줄을 쓴다. todo 파일은 커밋하지도 지우지도 않는다.
    ```
    todo 원문은 spec.md "원 요구"에 인용했다. <todo 경로>는 지워도 된다.
    ```
@@ -140,6 +149,6 @@ spec.md를 파일로 저장하고 경로를 알려 사용자에게 검토를 요
    다음 단계: `/spec-implement docs/minipowers/<stem>/`
    ```
 
-첫 커밋 뒤에는 spec.md를 고치지 않는다. 그 뒤 spec에 결함이 드러나거나 요구가 달라지면 그 내용을 새 todo로 적어 이 스킬을 다시 호출해 새 spec을 쓴다. 그 spec의 "원 요구"에는 기존 spec 경로를 적고, 기준 커밋은 새로 호출한 시점의 HEAD다. 사이클이 spec 결함으로 멈췄으면 spec-implement가 그 todo를 `docs/minipowers/todo/<stem>-followup.md`로 이미 써 두었다(conventions.md "중단 todo").
+승인 커밋 뒤에는 spec.md를 고치지 않는다. 그 뒤 spec에 결함이 드러나거나 요구가 달라지면 그 내용을 새 todo로 적어 이 스킬을 다시 호출해 새 spec을 쓴다. 그 spec의 "원 요구"에는 기존 spec 경로를 적는다. 사이클이 spec 결함으로 멈췄으면 spec-implement가 그 todo를 `docs/minipowers/todo/<stem>-followup.md`로 이미 써 두었다(conventions.md "중단 todo").
 
 이 스킬은 병합, push, Pull Request 생성을 하지 않는다.

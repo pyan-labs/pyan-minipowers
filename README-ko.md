@@ -53,7 +53,7 @@ flowchart TB
 
 | 단계 | 호출 | 입력 | 산출물 |
 | --- | --- | --- | --- |
-| 1. 설계 | `/spec-design <todo 파일 또는 문장>` | todo, 코드베이스, 사용자와의 질의응답 | `spec.md`(사용자와 질의응답으로 정하고 승인받은 설계도), feature 브랜치, `.worktrees/<stem>`, 첫 커밋 |
+| 1. 설계 | `/spec-design <todo 파일 또는 문장>` | todo, 코드베이스, 사용자와의 질의응답 | feature 브랜치, `.worktrees/<stem>`, 그 안의 `spec.md`(사용자와 질의응답으로 정하고 승인받은 설계도)와 그 커밋 |
 | 2. 구현 | `/spec-implement <작업 폴더>` | spec, 프로젝트 지시 파일, 소스코드 | 슬라이스별 커밋, `progress.md`. spec 결함으로 멈추면 후속 todo도 |
 | 3. 리뷰 | `/spec-review <작업 폴더>` | spec, `기준 커밋..HEAD` diff | `findings.md`(구현 대화를 모르는 새 세션에서 spec 기준으로 diff를 검토한 지적) |
 | 4. 기록 | `/spec-digest <작업 폴더>` | spec, progress.md, findings.md, 소스코드 | `digest.md`(소스코드로 확인한 결과 중심 기록), `docs/minipowers/index.md`(작업 목록 색인) |
@@ -98,7 +98,7 @@ docs/minipowers/
 
 메인 체크아웃은 기반 브랜치(예: `dev`)에 그대로 남습니다. 작업은 feature 브랜치를 checkout한 두 번째 작업 폴더 `.worktrees/<stem>`에서 합니다(`git worktree`).
 
-1. `/spec-design`은 승인 뒤 feature 브랜치와 `.worktrees/<stem>`을 만들고, 그 안에서 spec.md를 첫 커밋으로 넣습니다. 메인 체크아웃의 브랜치는 바꾸지 않습니다.
+1. `/spec-design`은 시작할 때 메인 체크아웃이 깨끗한지 확인한 뒤 feature 브랜치와 `.worktrees/<stem>`을 만들고, 그 안에서 spec.md를 쓰고 커밋합니다. 승인하면 머리말에 기준 커밋을 채운 커밋을 마지막으로 넣습니다. 메인 체크아웃의 브랜치는 바꾸지 않습니다.
 2. `/spec-implement`, `/spec-review`, `/spec-digest`는 메인 체크아웃에서 불러도 `.worktrees/<stem>`을 찾아 그 안에서 읽고 커밋합니다. 구현 결과는 IDE에서 `.worktrees/<stem>` 폴더를 열어 봅니다.
    - `.worktrees/<stem>`이 없으면 `/spec-implement`가 spec.md를 가진 로컬 브랜치를 찾아 worktree를 다시 만듭니다. `/spec-review`와 `/spec-digest`는 worktree를 만들지 않고, 찾은 브랜치 이름과 함께 `/spec-implement`를 먼저 부르라고 안내합니다.
 3. 새 worktree에는 gitignore된 파일(의존성, `.env` 같은 로컬 설정)이 없습니다. `/spec-implement`는 구현을 시작하기 전에 worktree를 준비합니다. 프로젝트 지시 파일(CLAUDE.md 등)에 `minipowers worktree 복사: .env, src/appsettings.Development.json`처럼 적은 파일을 메인 체크아웃에서 복사하고, 의존성 설치 명령을 돌립니다. 목록에 없는 파일 때문에 테스트가 실패하면 기존 실패로 넘기지 않고 멈춥니다.

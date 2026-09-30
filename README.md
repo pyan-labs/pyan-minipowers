@@ -53,7 +53,7 @@ Solid arrows are the execution order; dashed arrows are the artifact each stage 
 
 | Stage | Invocation | Input | Output |
 | --- | --- | --- | --- |
-| 1. Design | `/spec-design <todo file or sentence>` | the todo, the codebase, Q&A with the user | `spec.md` (the blueprint, settled through Q&A with the user and approved), a feature branch, `.worktrees/<stem>`, the first commit |
+| 1. Design | `/spec-design <todo file or sentence>` | the todo, the codebase, Q&A with the user | a feature branch, `.worktrees/<stem>`, and inside it `spec.md` (the blueprint, settled through Q&A with the user and approved) with its commits |
 | 2. Implement | `/spec-implement <work folder>` | the spec, project instruction files, source code | one commit per slice, `progress.md`; when a spec defect stops it, also a follow-up todo |
 | 3. Review | `/spec-review <work folder>` | the spec, the `base-commit..HEAD` diff | `findings.md` (findings from checking the diff against the spec, in a fresh session that knows nothing of the implementation conversation) |
 | 4. Record | `/spec-digest <work folder>` | the spec, progress.md, findings.md, source code | `digest.md` (a results-focused record verified against the source code), `docs/minipowers/index.md` (an index of the work) |
@@ -98,7 +98,7 @@ One piece of work is one folder. The argument to all four skills is this folder 
 
 The main checkout stays on the base branch (for example `dev`). Work happens in a second working folder, `.worktrees/<stem>`, which has the feature branch checked out (`git worktree`).
 
-1. After approval, `/spec-design` creates the feature branch and `.worktrees/<stem>`, and commits spec.md there as the first commit. It does not change the main checkout's branch.
+1. `/spec-design` first checks that the main checkout is clean, then creates the feature branch and `.worktrees/<stem>` and writes and commits spec.md there. On approval it adds a final commit that fills in the base commit in the header. It does not change the main checkout's branch.
 2. `/spec-implement`, `/spec-review`, and `/spec-digest` find `.worktrees/<stem>` even when called from the main checkout, and read and commit inside it. To look at the implementation in an IDE, open the `.worktrees/<stem>` folder.
    - If `.worktrees/<stem>` is missing, `/spec-implement` finds the local branch that holds spec.md and recreates the worktree. `/spec-review` and `/spec-digest` do not create a worktree; they tell you the branch name they found and ask you to call `/spec-implement` first.
 3. A new worktree has none of the gitignored files (dependencies, local settings such as `.env`). Before implementation starts, `/spec-implement` prepares the worktree: it copies from the main checkout the files listed in a line of the project instruction file (CLAUDE.md and the like) such as `minipowers worktree 복사: .env, src/appsettings.Development.json` (복사 = "copy"), and runs the dependency install command. If a test fails because of a file that is not on the list, it stops instead of writing the failure off as pre-existing.
