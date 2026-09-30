@@ -30,6 +30,7 @@ spec-implement가 쓰는 progress.md의 머리말과 줄 형식이다. 읽는 �
 | `슬라이스 N: RED <테스트 이름> — <실패 요지 한 줄>` | RED 출력을 본 테스트마다 한 줄. inline 방식은 RED를 본 직후 적고, orchestrator 방식은 컨트롤러가 report의 TDD 증거를 옮겨 적는다. 그 슬라이스의 `complete` 줄과 같은 progress.md 커밋에 들어간다 | spec-review · spec-digest |
 | `슬라이스 N: RED 없음 — <테스트를 두지 않는 이유 한 줄>` | 슬라이스의 Files가 모두 테스트를 두지 않는 곳일 때 한 줄 | spec-review · spec-digest |
 | `슬라이스 N: complete (commits <a>..<b>)` | 슬라이스가 끝났을 때. `<a>`는 슬라이스 시작 직전의 커밋(BASE), `<b>`는 슬라이스의 마지막 코드 커밋이다. `git log <a>..<b>`가 그 슬라이스의 커밋이고 progress.md 커밋은 여기 들어가지 않는다 | spec-implement · spec-digest |
+| `슬라이스 N: blocked — <FAIL 항목> — <확인한 결과>` | orchestrator에서 수정 한 번 뒤에도 brief에 명확히 적힌 항목이 구현되지 않았을 때(orchestrator.md 6). 슬라이스의 코드는 BASE로 되돌린 상태다. 다시 부르면 이어서 하기가 이 슬라이스를 처음부터 다시 한다 | spec-implement |
 | `Ruling: <결정> — <근거> — <틀렸다면 잘못되는 것>` | spec을 기준으로 스스로 판정했을 때 | spec-review · spec-digest |
 | `finding <ID>: <sha>` | 수정 모드에서 findings.md의 `<ID>` 항목(예: `I1`, `C2`)을 고친 커밋 | spec-digest |
 | `finding <ID>: 반박 — <근거 file:line>` | 수정 모드에서 findings.md의 `<ID>` 항목이 지금 코드 기준으로 틀렸다고 판단해 고치지 않았을 때 | spec-review · spec-digest |

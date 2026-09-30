@@ -65,14 +65,14 @@ spec 초안을 쓰기 전에 다음을 읽는다.
 - **지시 파일.** 프로젝트 루트와 작업 디렉터리의 `CLAUDE.md`, `AGENTS.md`. 코딩 규칙, 테스트 위치, 테스트 명령, 브랜치 이름 규칙이 여기 있다.
 - **전체 테스트 명령.** 지시 파일에 있으면 그것을 쓴다. 없으면 프로젝트 종류로 정해지는 표준 명령(`dotnet test`, `pnpm test`, `pytest`, `go test ./...` 등)을 쓴다.
 - **관련 코드.** 요구가 건드리는 파일, 그 파일을 부르는 곳, 비슷한 일을 하는 기존 코드, 관련 테스트.
-- **이전 spec.** `docs/minipowers/` 안에 같은 영역을 다룬 spec 폴더가 있으면 그 spec.md와 digest.md. todo의 `중단된 작업:` 줄이 spec을 가리키면(conventions.md "중단 todo") 그 폴더의 spec.md, progress.md, findings.md도 읽는다. 폴더는 `.worktrees/<stem>`에 있을 수 있다. 새 spec의 기준 커밋은 승인 시점의 메인 체크아웃 HEAD다. 앞 사이클의 브랜치를 병합할지는 사용자가 todo의 "사용자가 할 일"을 보고 정하며, 이 스킬은 그 브랜치를 보지 않는다.
+- **이전 spec.** `docs/minipowers/` 안에 같은 영역을 다룬 spec 폴더가 있으면 그 spec.md와 digest.md. todo의 `중단된 작업:` 줄이 spec을 가리키면(conventions.md "중단 todo") 그 폴더의 spec.md, progress.md, findings.md도 읽는다. 폴더는 `.worktrees/<stem>`에 있을 수 있고, worktree가 없으면 todo의 `- 브랜치:` 값으로 `git show <브랜치>:docs/minipowers/<stem>/<파일>`로 읽는다. 새 spec의 기준 커밋은 승인 시점의 메인 체크아웃 HEAD다. 앞 사이클의 브랜치를 병합할지는 사용자가 todo의 "사용자가 할 일"을 보고 정하며, 이 스킬은 그 브랜치를 기준 커밋으로 쓰지 않는다.
 
 ## 4. spec 초안 쓰기
 
 `./spec-template.md`를 `docs/minipowers/<stem>/spec.md`로 옮겨 아홉 절을 채운다. 절 제목은 템플릿의 문자열을 그대로 쓴다. 뒤 단계가 이 문자열로 spec을 찾는다.
 
 - 코드베이스에서 답이 나오는 것은 코드를 읽어 채운다.
-- 머리말의 "기준 커밋"과 "브랜치"는 승인 전까지 템플릿의 자리 표시 문구로 둔다.
+- 머리말의 "브랜치"에는 2절 3에서 정한 브랜치 이름을 초안부터 적는다. 끊긴 세션을 이어받을 때 conventions.md "작업 위치 결정"이 이 값으로 worktree를 찾는다. "기준 커밋"만 승인 전까지 템플릿의 자리 표시 문구로 둔다.
 - "검증된 전제" 표에는 5절의 확인 전까지 단언만 적고, "확인 방법" 칸에 "미확인"이라고 쓴다.
 
 ### 구현 슬라이스 쓰는 법
@@ -120,7 +120,7 @@ spec.md만 스테이징해 커밋한다. 커밋 메시지 형식은 프로젝트
 - 결정의 요지
 - 슬라이스 개수
 - "검증된 전제" 표에서 "확인 방법"이 "미확인"인 행. 없으면 "없음"
-- 브랜치 이름과 갈라진 커밋(`git merge-base HEAD <브랜치>`). 승인하면 그 시점의 메인 체크아웃 HEAD가 기준 커밋이 되고, 갈라진 뒤 기반 브랜치가 앞으로 갔으면 8절에서 브랜치를 그 위로 옮긴다
+- 브랜치 이름과 갈라진 커밋(`git merge-base HEAD <브랜치>`). 승인하면 그 시점의 메인 체크아웃 HEAD가 기준 커밋이 되고, 갈라진 뒤 기반 브랜치가 앞으로 갔으면 8절에서 브랜치를 그 위로 옮긴 뒤 전제를 다시 확인한다. 달라진 것이 있으면 다시 검토를 요청한다
 - 이어가는 법: "세션이 끊기면 `/spec-design docs/minipowers/<stem>/`로 이어간다"
 - 버리는 법: "이 spec을 버리려면 `git worktree remove .worktrees/<stem>` 뒤 `git branch -D <브랜치>`"
 
@@ -136,7 +136,8 @@ spec.md만 스테이징해 커밋한다. 커밋 메시지 형식은 프로젝트
    BASE=$(git rev-parse HEAD)
    [ "$(git merge-base HEAD <브랜치>)" = "$BASE" ] || git -C .worktrees/<stem> rebase "$BASE"
    ```
-3. spec 머리말의 "기준 커밋"에 `$BASE`의 전체 해시와 현재 브랜치 이름을, "브랜치"에 브랜치 이름을 적는다. spec.md만 스테이징해 커밋한다. 이것이 승인 커밋이다.
+   rebase를 했으면 spec이 전제를 확인한 코드와 기준 커밋의 코드가 다르다. worktree에서 5절 전제 확인을 다시 한다. 모두 맞으면 "검증된 전제" 표의 확인 커밋을 `$BASE`로 고치고 3으로 간다. 하나라도 틀리면 spec을 고치고 spec.md만 커밋한 뒤 7절 검토 요청으로 돌아간다. 승인 커밋은 넣지 않는다.
+3. spec 머리말의 "기준 커밋"에 `$BASE`의 전체 해시와 현재 브랜치 이름을 적는다. "브랜치"는 초안에 이미 적혀 있으므로 그대로 둔다. spec.md만 스테이징해 커밋한다. 이것이 승인 커밋이다.
    ```bash
    git -C .worktrees/<stem> add docs/minipowers/<stem>/spec.md
    git -C .worktrees/<stem> commit

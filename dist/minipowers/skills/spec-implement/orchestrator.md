@@ -40,6 +40,7 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
    ```
 3. **progress.md를 확인한다.**
    - 파일이 있고 첫 줄이 이 spec을 가리키면 이전 세션이 진행하던 작업이다. `슬라이스 N: complete` 줄이 있는 슬라이스는 건너뛴다. 묶음이 `동시 시작`만 있고 `병합 완료`가 없으면, 그 묶음에서 complete가 아닌 슬라이스만 다시 처리한다.
+   - `슬라이스 N: blocked` 줄이 있고 그 뒤에 같은 N의 `complete` 줄이 없으면 그 슬라이스를 처음부터 다시 한다. 구현 subagent 프롬프트의 brief 뒤에 blocked 줄의 FAIL 항목을 "이전 시도에서 빠진 것"으로 넣는다.
    - 머리말은 SKILL.md "준비와 기준 테스트"에서 이미 만들어져 있다. 여기서는 `- 준비:`와 `- 기준 테스트:` 줄이 있는지 확인만 한다.
    - 컨텍스트가 압축된 뒤에는 기억보다 progress.md와 `git log`를 믿는다.
 4. **spec을 읽는다.** spec.md의 `## 검증된 전제`, `## 구현 맥락`, `## 구현 슬라이스`, `## 수용 기준`, `## 리뷰 기준`을 읽는다. 슬라이스끼리 Consumes와 Produces가 맞물리는지 대조한다. 어긋난 곳은 spec을 기준으로 판정하고 `Ruling:`으로 남긴다. spec.md는 고치지 않는다.
@@ -116,7 +117,10 @@ BASE는 1에서 기록한 커밋을 쓴다. `HEAD~1`을 쓰지 않는 이유는 
 2. 구현 subagent는 항목마다 고치고 관련 테스트를 다시 돌리고 커밋한다. 틀렸다고 판단한 항목은 고치지 않고 report 끝의 수정 보고에 `반박: <항목> — <근거 file:line>` 줄을 쓴다.
 3. BASE부터 지금 HEAD까지로 diff 패키지를 다시 만들고(4), 검사 subagent를 새로 띄운다(5). 반박 줄이 있으면 검사 subagent 프롬프트의 입력 절 끝에 "report의 반박 줄은 근거 file:line을 열어 확인한다. 근거가 맞으면 그 항목은 PASS다"를 한 줄 더한다.
 
-수정은 한 번이다. 두 번째 검사도 FAIL이면 컨트롤러가 FAIL 항목을 명령으로 직접 확인한다. 항목이 실제로는 충족되어 있으면 `Ruling:`으로 근거를 남기고 7로 간다. 충족되어 있지 않으면 이 슬라이스는 brief대로 끝낼 수 없는 것이다. SKILL.md "spec 결함으로 멈출 때"대로 progress.md에 `spec 결함:` 줄을 적고 todo를 쓰고 끝낸다.
+수정은 한 번이다. 두 번째 검사도 FAIL이면 컨트롤러가 FAIL 항목을 명령으로 직접 확인한다. 항목이 실제로는 충족되어 있으면 `Ruling:`으로 근거를 남기고 7로 간다. 충족되어 있지 않으면 FAIL 항목이 brief에 구현 방법이 정해질 만큼 적혀 있는지 본다.
+
+- 적혀 있지 않으면 spec 결함이다. SKILL.md "spec 결함으로 멈출 때"대로 progress.md에 `spec 결함:` 줄을 적고 todo를 쓰고 끝낸다.
+- 적혀 있으면 구현 실패다. 재시도 한도에 닿은 것이지 spec이 틀린 것이 아니므로 todo를 쓰지 않고 같은 사이클에서 다시 시작할 수 있게 남긴다. 슬라이스의 코드를 BASE로 되돌린다(`<SPEC_WT>`에서 작업했으면 `git -C <SPEC_WT> reset --hard <BASE>`, 슬라이스 worktree였으면 병합하지 않은 것이므로 `cd <ROOT> && git worktree remove --force .worktrees/<stem>-slice-N && git branch -D <브랜치>-slice-N`으로 지운다). progress.md에 `슬라이스 N: blocked — <FAIL 항목> — <확인한 결과>`를 적고 progress.md만 스테이징해 커밋한다. 같은 묶음의 다른 슬라이스는 마저 끝낸다. 그 뒤 다음 묶음으로 가지 않고 마무리 없이 보고하고 끝낸다. 보고에는 FAIL 항목과 확인한 결과, 다시 부르면 이 슬라이스부터 새 subagent로 다시 시작한다는 것을 적는다. 마지막 줄은 `다음 단계: /spec-implement docs/minipowers/<stem>/`다.
 
 ### 7. 완료
 

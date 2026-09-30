@@ -38,7 +38,7 @@ spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마
 
 ### 이어서 하기
 
-`progress.md`가 있으면 이전 세션이 진행하던 작업이다. `슬라이스 N: complete` 줄이 있는 슬라이스는 건너뛰고 다음 슬라이스부터 이어 간다. 기억보다 progress.md와 `git log`를 믿는다.
+`progress.md`가 있으면 이전 세션이 진행하던 작업이다. `슬라이스 N: complete` 줄이 있는 슬라이스는 건너뛰고 다음 슬라이스부터 이어 간다. 기억보다 progress.md와 `git log`를 믿는다. `슬라이스 N: blocked` 줄이 있고 그 뒤에 같은 N의 `complete` 줄이 없으면 그 슬라이스의 코드는 되돌려져 있는 것이다. 그 슬라이스를 처음부터 다시 한다. orchestrator 방식은 orchestrator.md 준비 3대로 blocked 줄의 FAIL 항목을 새 구현 subagent에게 넘긴다.
 
 ### 실행 방식
 
