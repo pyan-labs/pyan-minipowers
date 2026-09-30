@@ -119,7 +119,7 @@ fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 4. spec-digest "1. 시작"의 절 제목·줄 형식 목록(38줄)을 지운다. spec.md 절 제목은 spec-template.md, progress 줄은 progress-format.md, findings 절은 findings-template.md를 가리킨다. "코드 펜스 안의 제목은 치지 않는다"와 "현재 판정은 `## Verdict` 절 하나" 두 문장만 남긴다.
 5. spec-digest "3. 파일별 처리"와 "4. digest.md 작성"에서 줄 형식을 인용하는 곳은 그대로 둔다(어느 줄을 어디로 옮기는지는 읽는 쪽의 규칙이므로).
 
-**바뀌는 파일.** `_shared/progress-format.md`(신규), `spec-implement/SKILL.md`, `spec-review/SKILL.md`, `spec-digest/SKILL.md`. `scripts/assemble-dist.mjs`가 `_shared/`를 파일 단위로 복사하면 그대로, 파일명을 열거하면 추가한다.
+**바뀌는 파일.** `_shared/progress-format.md`(신규), `spec-implement/SKILL.md`, `spec-review/SKILL.md`, `spec-digest/SKILL.md`. `tooling/assemble-dist.mjs`가 `_shared/`를 파일 단위로 복사하면 그대로, 파일명을 열거하면 추가한다.
 
 **예상 효과.** spec-digest 약 40줄 감소. 계약 변경 시 고칠 곳이 한 곳.
 
@@ -155,7 +155,7 @@ fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 
 **결정 기준.** 슬라이스 리뷰가 spec-review 전에 실제로 잡아낸 finding이 있었는지. 없었거나 spec-review가 같은 것을 다시 잡았다면 추천안.
 
-**바뀌는 파일(추천안).** `orchestrator.md`, `reviewer-prompt.md`(삭제), `implementer-prompt.md`, `scripts/review-package`(삭제), `spec-implement/SKILL.md`, `spec-review/SKILL.md`, `findings-template.md`, `spec-digest/SKILL.md`, `digest-template.md`, `README*.md`, `scripts/release.test.mjs`(스크립트 수를 검사하면).
+**바뀌는 파일(추천안).** `orchestrator.md`, `reviewer-prompt.md`(삭제), `implementer-prompt.md`, `scripts/review-package`(삭제), `spec-implement/SKILL.md`, `spec-review/SKILL.md`, `findings-template.md`, `spec-digest/SKILL.md`, `digest-template.md`, `README*.md`, `tooling/release.test.mjs`(스크립트 수를 검사하면).
 
 **예상 효과.** 약 250줄 감소.
 

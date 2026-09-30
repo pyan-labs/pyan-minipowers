@@ -19,7 +19,7 @@ function fixture(t) {
     writeFileSync(join(root, path), content);
   };
   for (const script of ['version-bump.mjs', 'assemble-dist.mjs']) {
-    write(`scripts/${script}`, readFileSync(join(source, 'scripts', script)));
+    write(`tooling/${script}`, readFileSync(join(source, 'tooling', script)));
   }
   for (const name of names) {
     for (const host of ['.claude-plugin', '.codex-plugin']) {
@@ -32,8 +32,8 @@ function fixture(t) {
   write('package.json', JSON.stringify({ private: true, scripts: { dist: 'node build-fixture.mjs' } }));
   write('build-fixture.mjs', `import { existsSync } from 'node:fs';
 if (existsSync('fail-build')) process.exit(1);
-await import('./scripts/assemble-dist.mjs');`);
-  const run = (script, ...args) => spawnSync(process.execPath, [join(root, 'scripts', script), ...args], {
+await import('./tooling/assemble-dist.mjs');`);
+  const run = (script, ...args) => spawnSync(process.execPath, [join(root, 'tooling', script), ...args], {
     cwd: root, encoding: 'utf8', timeout: 30000, windowsHide: true,
   });
   const json = path => JSON.parse(readFileSync(join(root, path), 'utf8'));

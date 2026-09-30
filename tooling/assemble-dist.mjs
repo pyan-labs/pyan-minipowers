@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // dist/ 디렉토리에 배포용 런타임 파일만 조립하는 스크립트
-// 사용: node scripts/assemble-dist.mjs
+// 사용: node tooling/assemble-dist.mjs
 
 import { cp, rm, mkdir, readdir, stat, mkdtemp, rename } from 'fs/promises';
 import { join, dirname } from 'path';

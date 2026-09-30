@@ -47,4 +47,4 @@ origin/dev의 커밋 e2a2876(2026-09-29, "spec 작업을 메인 체크아웃에�
 
 ## 바뀌는 파일
 
-`_shared/conventions.md`, `spec-design/SKILL.md`, `spec-implement/orchestrator.md`, `spec-implement/scripts/workspace`, `README.md`, `README-ko.md`, `scripts/release.test.mjs`.
+`_shared/conventions.md`, `spec-design/SKILL.md`, `spec-implement/orchestrator.md`, `spec-implement/scripts/workspace`, `README.md`, `README-ko.md`, `tooling/release.test.mjs`.
