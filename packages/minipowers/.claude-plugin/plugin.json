@@ -1,7 +1,7 @@
 {
   "name": "minipowers",
   "description": "todo → spec → 구현 → 리뷰 → 기록. 단계마다 남긴 산출물을 다음 단계의 입력으로 쓰는 네 스킬(spec-design · spec-implement · spec-review · spec-digest)",
-  "version": "5.11.9",
+  "version": "5.11.10",
   "author": {
     "name": "pyan-labs"
   }

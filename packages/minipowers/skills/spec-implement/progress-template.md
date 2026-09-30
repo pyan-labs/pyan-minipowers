@@ -19,7 +19,7 @@ spec-implement가 쓰는 progress.md의 머리말과 줄 형식이다. 읽는 �
 
 `- 준비:` 줄은 spec-implement/SKILL.md "준비와 기준 테스트" 1에서 복사한 경로와 돌린 명령을 적는다. 해당하는 것이 없는 쪽은 `없음`이라고 적는다. orchestrator가 슬라이스 worktree를 준비할 때도 이 줄의 목록과 명령을 쓴다.
 
-`- 기준 테스트:` 줄은 spec-implement/SKILL.md "준비와 기준 테스트" 2의 결과다. spec-review와 spec-digest가 읽는다. 실패가 없으면 `실패: 없음`이다. 이 줄이 없는 progress.md는 이 형식 전에 쓴 것이다.
+`- 기준 테스트:` 줄은 spec-implement/SKILL.md "준비와 기준 테스트" 2의 결과다. spec-review와 spec-digest가 읽는다. 실패가 없으면 `실패: 없음`이다.
 
 `- 묶음:` 줄은 orchestrator 방식일 때 의존 관계로 만든 묶음 순서를 적고, inline 방식이면 `없음`이라고 적는다. `- 준비:`와 `- 묶음:` 줄은 orchestrator가 읽는다.
 
