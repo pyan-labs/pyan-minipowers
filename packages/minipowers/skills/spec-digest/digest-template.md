@@ -73,10 +73,6 @@ findings.md `## Verdict` 절의 `Verdict:` 줄과 `Rounds:` 줄을 원문 그대
 
 사람이 직접 확인해야 하는 항목을 한 줄씩 적는다.
 
-### parked
-
-progress.md의 `parked` 줄을 원문 그대로 옮긴다.
-
 ## 관련
 
 - 선행 spec: <spec 본문이 참조하는 다른 `docs/minipowers/<stem>/` 폴더>

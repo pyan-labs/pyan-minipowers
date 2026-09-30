@@ -21,6 +21,7 @@ AGENTS.md와 README-ko.md의 세 원칙을 기준으로 `packages/minipowers/ski
 
 항목 2 뒤(5.11.2): conventions.md 180, spec-implement/SKILL.md 189, spec-review/SKILL.md 220, spec-digest/SKILL.md 216, 나머지 동일. 합계 1,711.
 항목 3 뒤(5.11.5): conventions.md 188, spec-implement/SKILL.md 147 + progress-template.md 47(신규), spec-review/SKILL.md 212, spec-digest/SKILL.md 180, 나머지 동일. 합계 1,690.
+항목 4 뒤(5.11.6): orchestrator.md 184, implementer-prompt.md 105, checker-prompt.md 56(reviewer-prompt.md 155 대체), progress-template.md 42, spec-review/SKILL.md 211, findings-template.md 102, spec-digest/SKILL.md 179, digest-template.md 82, 나머지 동일. 합계 1,569.
 
 fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 
@@ -110,6 +111,12 @@ fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 ---
 
 ## 4. [High] [결정 필요] 슬라이스 리뷰가 spec-review와 겹치고 계약을 무겁게 한다
+
+**처리 완료 (2026-09-30, 5.11.6). 결정: 슬라이스 리뷰를 없애지 않고 "슬라이스 검사"로 줄인다.** 단위 테스트와 통합 테스트의 관계로 본다. 슬라이스 검사는 brief의 Files 범위, Files 누락, Produces, 완료 판정, TDD 증거 다섯 항목만 보고 PASS/FAIL로 답한다. 수용 기준과 리뷰 기준은 넘기지 않는다. 코드 리뷰는 spec-review가 브랜치 전체를 대상으로 한다. 검사 subagent는 orchestrator가 띄우고 모델은 orchestrator.md "모델 선택"이 정한다(`sonnet`). 수정은 한 번이고, 두 번째 FAIL은 컨트롤러가 명령으로 직접 확인해 Ruling 또는 spec 결함 정지로 간다. 검사 결과는 `.minipowers/<stem>/work/slice-N-check.md`에만 남고 progress.md에는 적지 않는다. 그래서 inline과 orchestrator의 progress.md 줄이 같아졌다.
+
+지운 것: `reviewer-prompt.md`(155줄, `checker-prompt.md` 56줄로 대체), progress-template.md의 `fix round`, `withdrawn`, `minor(deferred)`, `parked`, `complete (…, K parked)` 다섯 줄, findings-template.md의 "progress.md 이월 항목" 표와 spec-review의 그 지시, spec-digest의 `### parked` 절과 parked 처리, implementer-prompt.md의 parked 맥락 줄. `DONE_WITH_CONCERNS`의 관찰은 `발견:` 줄로 간다. `review-package` 스크립트는 diff 패키지를 만드는 데 그대로 쓰므로 남겼고 README의 "스크립트 세 개"도 그대로다.
+
+**검증.** `pnpm run test:release` 7개 통과. `parked`, `withdrawn`, `deferred`, `reviewer-prompt`, `수정 라운드`가 스킬 폴더에 남지 않은 것을 grep으로 확인했다. 실제 orchestrator 실행으로 검사 subagent를 띄운 검증은 아니다.
 
 **현상.** orchestrator 방식은 슬라이스마다 리뷰 subagent를 띄우고 수정 라운드를 최대 2회 돈다(`orchestrator.md` 5·6절, `reviewer-prompt.md` 155줄). 여기서 나온 상태가 progress.md 줄 4종(`fix round`, `withdrawn`, `minor(deferred)`, `parked`), spec-review의 "progress.md 이월 항목" 표, spec-digest의 `### parked` 절로 전파된다. 그런데 `spec-review/SKILL.md:132`는 "슬라이스 리뷰에서 이미 본 부분도 다시 본다"고 하고, inline 방식은 슬라이스 리뷰를 하지 않는다(`spec-implement/SKILL.md:92`).
 

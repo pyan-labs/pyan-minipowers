@@ -15,7 +15,7 @@ spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마
 2. conventions.md "작업 위치 결정"대로 `<폴더>`, spec.md, 작업 위치를 정한다. 이하 `<폴더>`는 `docs/minipowers/<stem>/`, `<stem>`은 폴더 이름이다. 작업 위치가 나오지 않으면 그 절의 문제 시나리오를 따른다. worktree를 만드는 경우도 거기 있다. 이후 파일 읽기, 쓰기, 명령, 커밋은 모두 작업 위치에서 한다.
 3. 작업 위치의 spec.md를 전부 읽는다. 머리말의 `- 기준 커밋:`과 `- 브랜치:` 값은 "작업 위치 결정"에서 읽은 것이다. 모드 결정에서 읽는 progress.md와 findings.md도 작업 위치의 것이다.
 4. 프로젝트 지시 파일(CLAUDE.md, AGENTS.md 등)에서 전체 테스트 명령, 테스트 위치, 코딩 규칙, 준비 명령(의존성 설치 등), worktree 복사 목록(`minipowers worktree 복사:` 줄)을 찾는다. spec 머리말의 전체 테스트 명령과 다르면 spec 머리말을 쓴다.
-5. 스크립트는 `bash "<SKILL_DIR>/scripts/<name>" ...`으로 부른다. `<SKILL_DIR>`는 conventions.md "스킬 파일 경로"대로 실제 절대경로로 바꾼다. 보조 문서(orchestrator.md, implementer-prompt.md, reviewer-prompt.md)와 `progress-template.md`도 같은 폴더에 있다.
+5. 스크립트는 `bash "<SKILL_DIR>/scripts/<name>" ...`으로 부른다. `<SKILL_DIR>`는 conventions.md "스킬 파일 경로"대로 실제 절대경로로 바꾼다. 보조 문서(orchestrator.md, implementer-prompt.md, checker-prompt.md)와 `progress-template.md`도 같은 폴더에 있다.
 
 ## 모드 결정
 
@@ -75,7 +75,7 @@ progress.md가 없을 때만 한다. 실행 방식을 정한 직후, 첫 슬라�
 4. 슬라이스의 파일을 경로로 지정해 스테이징하고 커밋한다. progress.md는 이 커밋에 넣지 않는다. 슬라이스 하나가 커밋 하나다.
 5. progress.md에 `슬라이스 N: complete (commits <BASE>..<끝 커밋>)`을 적고, progress.md만 스테이징해 따로 커밋한다. 2의 RED 줄도 이 커밋에 들어간다. 다음 슬라이스의 BASE는 이 커밋이다.
 
-슬라이스 리뷰 없이 완료 판정만 확인한다. 리뷰는 spec-review가 브랜치 전체를 대상으로 한다.
+3의 완료 판정 확인이 orchestrator 방식의 슬라이스 검사에 해당한다. 어느 방식이든 progress.md에 남는 줄은 같다. 코드 리뷰는 spec-review가 브랜치 전체를 대상으로 한다.
 
 ### TDD (inline과 orchestrator 공통)
 

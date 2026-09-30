@@ -1,12 +1,12 @@
-# orchestrator 방식 — 슬라이스마다 구현 subagent와 리뷰 subagent를 띄운다
+# orchestrator 방식 — 슬라이스마다 구현 subagent와 검사 subagent를 띄운다
 
 SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 절차를 진행하는 세션을 **컨트롤러**라고 부른다. 컨트롤러는 subagent를 띄우고, 보고를 받고, 판정하고, progress.md에 기록한다. 코드는 구현 subagent가 고친다.
 
 기본 규칙은 셋이다.
 
-- 슬라이스마다 새 구현 subagent를 띄운다. 이전 슬라이스의 subagent를 이어 쓰는 것은 같은 슬라이스의 수정 라운드뿐이다.
-- brief, report, 리뷰 패키지는 파일로 만들어 경로만 넘긴다.
-- 리뷰는 구현 subagent와 다른 subagent가 한다.
+- 슬라이스마다 새 구현 subagent를 띄운다. 이전 슬라이스의 subagent를 이어 쓰는 것은 같은 슬라이스의 수정뿐이다.
+- brief, report, diff 패키지는 파일로 만들어 경로만 넘긴다.
+- 슬라이스 검사는 구현 subagent와 다른 subagent가 한다. 검사는 슬라이스가 brief대로 끝났는지만 본다. 코드 리뷰는 spec-review가 브랜치 전체를 대상으로 한다.
 
 ## 용어
 
@@ -14,10 +14,11 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
 |---|---|
 | 슬라이스 | spec의 `## 구현 슬라이스` 절에 있는 `### 슬라이스 N: 이름` 하나. Files, Consumes/Produces, 완료 판정 세 항목과 선택 항목 `- 모델:`으로 정의된다 |
 | brief | 슬라이스 하나의 본문을 spec에서 뽑아낸 파일. 구현 subagent가 읽는다 |
-| report | 구현 subagent가 무엇을 했고 어떤 테스트를 돌렸는지 쓴 파일. 리뷰 subagent가 읽는다 |
-| 리뷰 패키지 | 슬라이스의 커밋 목록, 바뀐 파일 목록, 문맥 10줄 diff를 한 파일로 만든 것 |
+| report | 구현 subagent가 무엇을 했고 어떤 테스트를 돌렸는지 쓴 파일. 검사 subagent가 읽는다 |
+| diff 패키지 | 슬라이스의 커밋 목록, 바뀐 파일 목록, 문맥 10줄 diff를 한 파일로 만든 것. `review-package` 스크립트가 만든다 |
+| 검사 | 검사 subagent가 슬라이스 하나를 brief의 Files, Consumes/Produces, 완료 판정과 대조하는 것. 결과는 `<워크스페이스>/slice-N-check.md`에 남고 뒤 단계는 읽지 않는다 |
 | progress.md | `docs/minipowers/<stem>/progress.md`. 진행 기록이다. 줄 형식은 `./progress-template.md` 절이 정한다 |
-| 워크스페이스 | brief, report, 리뷰 패키지가 사는 일회용 디렉터리. `<ROOT>/.minipowers/<stem>/work/`. git이 추적하지 않는다 |
+| 워크스페이스 | brief, report, diff 패키지, 검사 결과가 사는 일회용 디렉터리. `<ROOT>/.minipowers/<stem>/work/`. git이 추적하지 않는다 |
 | Ruling | 컨트롤러가 spec을 기준으로 스스로 내린 판정. progress.md에 `Ruling:` 줄로 남긴다 |
 | 묶음 | 서로 의존하지 않아 동시에 시작하는 슬라이스들 |
 
@@ -46,9 +47,9 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
 ## 슬라이스 하나를 처리하는 순서
 
 ```
-1. BASE 기록 → 2. 구현 subagent → 3. 보고 처리 → 4. 리뷰 패키지 → 5. 리뷰 subagent(빠른 패스)
-   → 깨끗하면 7. 완료
-   → Critical 또는 Important가 있으면 6. 수정 라운드(최대 2회) → 7. 완료
+1. BASE 기록 → 2. 구현 subagent → 3. 보고 처리 → 4. diff 패키지 → 5. 슬라이스 검사
+   → PASS면 7. 완료
+   → FAIL이면 6. 수정(한 번) → 4 → 5 → PASS면 7. 완료, 다시 FAIL이면 6의 마지막 문단
 ```
 
 ### 1. BASE를 기록한다
@@ -73,7 +74,6 @@ slice-brief는 `<SPEC>`에서 `### 슬라이스 N:` 블록을 뽑는다. 출력 
 - brief 경로
 - 앞 슬라이스가 만들어 이 슬라이스가 써야 하는 이름과 시그니처. brief에 없을 수 있다
 - brief에 모호한 부분이 있으면 그에 대한 Ruling
-- 앞 슬라이스에서 parked로 남긴 finding 중 이 슬라이스와 닿는 것
 - report 경로. `<워크스페이스>/slice-N-report.md`
 - 모델. 아래 "모델 선택"대로 고른다
 
@@ -84,7 +84,7 @@ slice-brief는 `<SPEC>`에서 `### 슬라이스 N:` 블록을 뽑는다. 출력 
 | 상태 | 컨트롤러가 할 일 |
 |---|---|
 | `DONE` | `git -C <슬라이스 worktree> log BASE..HEAD`와 `git diff --stat`으로 커밋을 직접 확인하고 4로 간다 |
-| `DONE_WITH_CONCERNS` | 걱정 내용을 읽는다. 완료 판정이나 Files 범위에 관한 것이면 SendMessage로 같은 subagent에게 고치게 한다. 그 밖의 관찰은 `슬라이스 N: minor(deferred):`로 적고 4로 간다 |
+| `DONE_WITH_CONCERNS` | 걱정 내용을 읽는다. 완료 판정이나 Files 범위에 관한 것이면 SendMessage로 같은 subagent에게 고치게 한다. 그 밖의 관찰은 `발견: <내용> — <file:line>`으로 적고 4로 간다 |
 | `NEEDS_CONTEXT` | 빠진 정보를 채워 SendMessage로 이어 가게 한다 |
 | `BLOCKED` | 원인에 맞는 것을 바꾼다. 정보가 부족하면 채운다. spec이 모호하면 판정해 `Ruling:`을 남긴다. 조건을 바꾼 뒤에 다시 띄운다 |
 
@@ -92,11 +92,11 @@ slice-brief는 `<SPEC>`에서 `### 슬라이스 N:` 블록을 뽑는다. 출력 
 
 - RED를 본 테스트마다 `슬라이스 N: RED <테스트 이름> — <실패 요지 한 줄>`을 한 줄씩 적는다.
 - 슬라이스의 Files가 모두 테스트를 두지 않는 곳이면 `슬라이스 N: RED 없음 — <테스트를 두지 않는 이유 한 줄>`을 한 줄 적는다.
-- report에 테스트를 두는 곳의 RED 증거가 없으면 줄을 지어내지 않는다. 리뷰 subagent가 Important finding으로 올린다.
+- report에 테스트를 두는 곳의 RED 증거가 없으면 줄을 지어내지 않는다. 검사 subagent가 검사 항목 5에서 FAIL로 올린다.
 
 report에 `Ruling:` 줄이 있으면 progress.md에 그대로 옮겨 적는다. BLOCKED의 원인이 어느 방향으로 가도 추측인 spec 결함이면 conventions.md 정지 조건 4에 해당한다. SKILL.md "spec 결함으로 멈출 때"대로 todo를 쓰고 끝낸다. 원인이 worktree에 없는 파일(설정, 비밀 값)이면 conventions.md "worktree 준비"의 마지막 문단대로 멈춘다.
 
-### 4. 리뷰 패키지를 만든다
+### 4. diff 패키지를 만든다
 
 ```bash
 cd "<ROOT>" && bash "<SKILL_DIR>/scripts/review-package" "<SPEC>" <BASE> <HEAD sha>
@@ -104,35 +104,23 @@ cd "<ROOT>" && bash "<SKILL_DIR>/scripts/review-package" "<SPEC>" <BASE> <HEAD s
 
 BASE는 1에서 기록한 커밋을 쓴다. `HEAD~1`을 쓰지 않는 이유는 슬라이스 하나가 커밋 여러 개일 수 있기 때문이다. 스크립트가 exit 3으로 끝나면 범위가 비었거나 HEAD가 BASE의 자손이 아니다. worktree와 BASE를 다시 확인한다.
 
-### 5. 리뷰 subagent를 띄운다 (빠른 패스)
+### 5. 슬라이스 검사
 
-[reviewer-prompt.md](reviewer-prompt.md)의 **전체 리뷰 모드**로 띄운다. 넣는 것은 다음이다.
+[checker-prompt.md](checker-prompt.md)를 채워 검사 subagent를 띄운다. 넣는 것은 brief 경로, report 경로, diff 패키지 경로, BASE와 HEAD, 검사 결과 파일 경로 `<워크스페이스>/slice-N-check.md`다. spec의 수용 기준과 리뷰 기준은 넣지 않는다.
 
-- brief 경로 (구현 subagent가 읽은 것과 같은 파일)
-- report 경로
-- 리뷰 패키지 경로
-- spec의 `## 수용 기준`과 `## 리뷰 기준`을 그대로 복사한 것
+검사 항목은 다섯이다. Files 범위, Files 누락, Produces, 완료 판정, TDD 증거. 결과는 `PASS` 또는 `FAIL`과 FAIL 항목 목록이다. 검사 결과는 progress.md에 적지 않는다.
 
-빠른 패스는 그 슬라이스의 brief와 diff만 본다. 기준은 spec의 수용 기준이다. 테스트는 다시 돌리지 않고 report의 출력을 diff와 대조한다. 브랜치 전체의 철저한 리뷰는 spec-review가 한다.
+### 6. 수정 (한 번)
 
-### 6. 수정 라운드
+1. 같은 구현 subagent를 SendMessage로 깨워 FAIL 항목 목록을 그대로 넘긴다. 깨울 수 없으면 brief 경로, report 경로, FAIL 항목을 넣어 같은 모델로 새 구현 subagent를 띄운다.
+2. 구현 subagent는 항목마다 고치고 관련 테스트를 다시 돌리고 커밋한다. 틀렸다고 판단한 항목은 고치지 않고 report 끝의 수정 보고에 `반박: <항목> — <근거 file:line>` 줄을 쓴다.
+3. BASE부터 지금 HEAD까지로 diff 패키지를 다시 만들고(4), 검사 subagent를 새로 띄운다(5). 반박 줄이 있으면 검사 subagent 프롬프트의 입력 절 끝에 "report의 반박 줄은 근거 file:line을 열어 확인한다. 근거가 맞으면 그 항목은 PASS다"를 한 줄 더한다.
 
-수정 라운드에 들어가는 것은 Critical과 Important다. 요구사항 불일치도 리뷰어가 매긴 심각도를 따른다. Minor는 `슬라이스 N: minor(deferred): <한 줄>`로 적어 spec-review에 넘긴다.
-
-한 라운드는 다음 순서다.
-
-1. 같은 구현 subagent를 SendMessage로 깨워 findings를 그대로 넘긴다. 깨울 수 없으면 brief 경로, report 경로, findings를 넣어 같은 모델로 새 구현 subagent를 띄운다.
-2. 구현 subagent는 finding마다 지금 코드 기준으로 맞는지 확인한다. 맞으면 고치고 관련 테스트를 다시 돌린다. 틀렸다고 판단한 finding은 고치지 않고, report 끝의 수정 보고에 `반박: <finding 한 줄> — <근거 file:line>` 줄을 쓴다. 수정 보고는 report 끝에 덧붙인다.
-3. 이전 리뷰가 본 HEAD부터 지금 HEAD까지로 리뷰 패키지를 만든다.
-4. reviewer-prompt.md의 **재리뷰 모드**로 띄운다. 재리뷰 subagent는 반박마다 근거를 코드로 확인해 WITHDRAWN(근거가 맞다) 또는 NOT ADDRESSED(근거가 틀리다)로 판정한다.
-5. WITHDRAWN으로 판정된 finding마다 `슬라이스 N: withdrawn — <finding 한 줄> — <근거 file:line>`을 적는다.
-6. `슬라이스 N: fix round R/2 (해결 X건, 남은 Y건; commits <a>..<b>)`를 적는다. 해결 X건에는 ADDRESSED와 WITHDRAWN을 함께 센다. 줄 형식은 그대로다.
-
-라운드는 최대 2회이고 모델은 바꾸지 않는다. 2회 뒤에도 남은 finding은 컨트롤러가 판정해 finding마다 `슬라이스 N: parked — <finding> — Ruling: <근거>`로 남긴다. parked finding이 뒤 슬라이스와 닿으면 그 슬라이스의 프롬프트 맥락에 넣는다.
+수정은 한 번이다. 두 번째 검사도 FAIL이면 컨트롤러가 FAIL 항목을 명령으로 직접 확인한다. 항목이 실제로는 충족되어 있으면 `Ruling:`으로 근거를 남기고 7로 간다. 충족되어 있지 않으면 이 슬라이스는 brief대로 끝낼 수 없는 것이다. SKILL.md "spec 결함으로 멈출 때"대로 progress.md에 `spec 결함:` 줄을 적고 todo를 쓰고 끝낸다.
 
 ### 7. 완료
 
-`슬라이스 N: complete (commits <BASE>..<끝 커밋>)` 또는 parked가 있으면 `슬라이스 N: complete (commits <BASE>..<끝 커밋>, K parked)`를 적는다.
+`슬라이스 N: complete (commits <BASE>..<끝 커밋>)`을 적는다.
 
 ## 실행 순서 — 의존 관계가 묶음을 정한다
 
@@ -154,7 +142,7 @@ SKILL.md "실행 방식"의 두 규칙으로 의존 관계를 만든다. 서로 
    만든 worktree마다 conventions.md "worktree 준비"를 한다. 복사 목록과 준비 명령은 progress.md 머리말 `- 준비:` 줄과 같다. 새 worktree에는 의존성과 설정 파일이 없어서, 준비 없이 띄우면 구현 subagent의 RED가 구현이 없어서가 아니라 환경 때문에 난 실패가 된다. 준비는 구현 subagent를 띄우기 전에 끝낸다. 이미 있던 worktree를 다시 쓰는 경우에도 한 번 한다. 복사는 있는 파일을 덮어쓰지 않으므로 다시 해도 된다.
 3. 슬라이스마다 구현 subagent를 한 메시지에서 동시에 띄운다. 프롬프트의 worktree 경로와 BASE는 그 슬라이스의 것이다. BASE는 시작점이다.
 4. 슬라이스마다 3~7을 각자의 worktree에서 진행한다.
-5. 리뷰를 끝낸 슬라이스는 `<SPEC_WT>`에서 병합한다. 이 병합은 spec 브랜치 안의 절차이므로 정지 조건의 병합에 해당하지 않는다.
+5. 검사를 통과한 슬라이스는 `<SPEC_WT>`에서 병합한다. 이 병합은 spec 브랜치 안의 절차이므로 정지 조건의 병합에 해당하지 않는다.
    ```bash
    git -C <SPEC_WT> merge --no-ff <브랜치>-slice-N
    ```
@@ -182,12 +170,12 @@ Ruling: <결정> — <근거> — <틀렸다면 잘못되는 것>
 subagent를 띄울 때마다 모델을 지정한다. 지정하지 않으면 세션의 모델을 물려받는다.
 
 - 구현 subagent: spec의 슬라이스에 `- 모델:` 줄이 있으면 그 값(`sonnet`, `opus`, `fable` 중 하나)이다. 값을 감싼 백틱은 떼고 읽는다. 줄이 없으면 슬라이스의 Files에 적힌 파일이 둘 이하일 때 `sonnet`, 셋 이상일 때 `opus`다. 값이 셋 중 하나가 아니면 파일 수 규칙을 쓰고 `Ruling:`으로 남긴다.
-- 리뷰 subagent: 그 슬라이스의 구현 subagent와 같은 모델
-- 수정 라운드: 처음 띄운 구현 subagent와 같은 모델
+- 검사 subagent: `sonnet`. 검사는 brief와 diff, report의 대조이므로 구현 모델보다 큰 모델을 쓰지 않는다
+- 수정: 처음 띄운 구현 subagent와 같은 모델
 
 ## 기다리는 법
 
-subagent를 띄운 뒤에는 progress.md 기록이나 다음 리뷰 패키지 준비처럼 할 일을 하고, 할 일이 없으면 완료 알림을 기다린다. 상태는 알림으로 받는다.
+subagent를 띄운 뒤에는 progress.md 기록이나 다음 diff 패키지 준비처럼 할 일을 하고, 할 일이 없으면 완료 알림을 기다린다. 상태는 알림으로 받는다.
 
 구현 subagent가 테스트를 돌리다 응답 없이 멈춰 있으면, 컨트롤러가 그 worktree에서 테스트 상태를 직접 확인하고 SendMessage로 이어 가게 한다. 작업물은 그대로 남아 있다.
 
