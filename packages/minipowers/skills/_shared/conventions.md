@@ -1,6 +1,6 @@
 # minipowers 공용 규약
 
-minipowers의 네 스킬(spec-design · spec-implement · spec-review · spec-digest)이 공유하는 규칙이다. 각 스킬은 시작할 때 이 문서(`${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`)를 읽는다. 여기 적힌 것을 각 SKILL.md는 반복하지 않고 가리킨다.
+minipowers의 네 스킬(spec-design · spec-implement · spec-review · spec-digest)이 공유하는 규칙이다. 각 스킬은 시작할 때 이 문서(각 SKILL.md 기준 `../_shared/conventions.md`)를 읽는다. 여기 적힌 것을 각 SKILL.md는 반복하지 않고 가리킨다.
 
 프로젝트 지시 파일(CLAUDE.md, AGENTS.md 등)이 이 규약과 다르게 정한 것이 있으면 지시 파일을 따른다.
 
@@ -28,10 +28,11 @@ minipowers의 네 스킬(spec-design · spec-implement · spec-review · spec-di
 
 ## 스킬 파일 경로
 
-Claude Code는 SKILL.md 본문의 `${CLAUDE_PLUGIN_ROOT}`를 플러그인 설치 루트로, `${CLAUDE_SKILL_DIR}`를 그 SKILL.md가 있는 폴더로 치환한다. 현재 작업 디렉터리와 무관하게 같은 경로가 나온다.
+스킬에 딸린 파일은 로드한 SKILL.md가 있는 폴더를 기준으로 찾는다. 프로젝트의 현재 작업 디렉터리나 worktree로 기준을 바꾸지 않는다. 보조 문서에서도 그 문서가 속한 스킬의 SKILL.md를 기준으로 한다.
 
-- 이 규약: `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`
-- 각 스킬의 템플릿, 프롬프트, 스크립트: `${CLAUDE_SKILL_DIR}/<파일>`
+- 이 규약: `../_shared/conventions.md`
+- 각 스킬의 템플릿, 프롬프트, 스크립트: `./<파일>`
+- 명령 예시의 `<SKILL_DIR>`는 그 SKILL.md가 있는 폴더의 절대경로를 뜻하는 자리표시자다. 실행 전에 사용할 셸에서 접근 가능한 실제 경로로 바꾸고, 공백이 있는 경로도 인자 하나가 되도록 인용한다. 호스트의 변수 치환이나 환경변수에 의존하지 않는다.
 
 ## 폴더 구조
 

@@ -135,7 +135,7 @@ Type Claude Code commands in the **chat**, and Codex commands in the **terminal*
 ### Requirements
 
 - The three scripts of spec-implement (`workspace`, `slice-brief`, `review-package`) are bash. On Windows, Git Bash is required.
-- spec-review resolves relative paths to the shared conventions and templates from the directory of the SKILL.md it loaded. The other skills point to the shared conventions as `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md` and to their own folder's templates and scripts as `${CLAUDE_SKILL_DIR}/<file>`. Claude Code substitutes these two variables in the skill body.
+- All four skills resolve shared conventions (`../_shared/conventions.md`) and templates or scripts (`./<file>`) from the directory of the loaded SKILL.md. Replace `<SKILL_DIR>` in commands with the actual absolute path accessible to the shell and quote it. Neither Claude Code nor Codex requires host variable substitution.
 - spec-implement's parallel execution is used only when a tool that launches subagents (Claude Code's Agent) is available. Otherwise a single agent implements in order.
 
 ---

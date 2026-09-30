@@ -26,7 +26,7 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
 - `<ROOT>`: 메인 체크아웃의 절대경로. conventions.md "폴더 구조"의 명령(`git worktree list --porcelain | head -1`)으로 얻는다
 - `<SPEC_WT>`: SKILL.md "작업 공간과 기준 커밋 확인"에서 정한 작업 위치의 절대경로. 대개 `<ROOT>/.worktrees/<stem>`이고, 사용자가 spec 브랜치를 직접 checkout해 둔 경우에는 현재 체크아웃이다
 - `<SPEC>`: `<SPEC_WT>/docs/minipowers/<stem>/spec.md`의 절대경로. 워크스페이스는 spec 경로로 소유를 확인하므로 같은 경로를 계속 써야 같은 워크스페이스가 나온다
-- `${CLAUDE_SKILL_DIR}`: 이 스킬의 SKILL.md가 있는 폴더의 절대경로. Claude Code가 치환한다
+- `<SKILL_DIR>`: conventions.md "스킬 파일 경로"대로 실제 절대경로로 바꾼다
 
 스크립트는 `<ROOT>`에서 실행한다. worktree 안에서 실행하면 `.minipowers/`가 그 worktree 안에 생긴다. 커밋은 SHA로 넘긴다. `<ROOT>`의 `HEAD`는 spec 브랜치의 HEAD가 아닐 수 있다.
 
@@ -35,7 +35,7 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
 1. **작업 공간을 확인한다.** SKILL.md "작업 공간과 기준 커밋 확인"과 "준비와 기준 테스트"를 끝낸 상태여야 한다.
 2. **워크스페이스를 만든다.** 아래 명령이 디렉터리를 만들고 절대경로를 출력한다. 프로젝트 `.gitignore`의 `.minipowers/` 줄도 이 스크립트가 처리한다.
    ```bash
-   cd <ROOT> && bash ${CLAUDE_SKILL_DIR}/scripts/workspace <SPEC>
+   cd "<ROOT>" && bash "<SKILL_DIR>/scripts/workspace" "<SPEC>"
    ```
 3. **progress.md를 확인한다.**
    - 파일이 있고 첫 줄이 이 spec을 가리키면 이전 세션이 진행하던 작업이다. `슬라이스 N: complete` 줄이 있는 슬라이스는 건너뛴다. 묶음이 `동시 시작`만 있고 `병합 완료`가 없으면, 그 묶음에서 complete가 아닌 슬라이스만 다시 처리한다.
@@ -62,7 +62,7 @@ BASE=$(git -C <슬라이스 worktree> rev-parse HEAD)
 
 brief를 만든다. 아래 명령이 spec에서 슬라이스 N의 본문을 뽑아 워크스페이스에 쓰고 경로를 출력한다.
 ```bash
-cd <ROOT> && bash ${CLAUDE_SKILL_DIR}/scripts/slice-brief <SPEC> N
+cd "<ROOT>" && bash "<SKILL_DIR>/scripts/slice-brief" "<SPEC>" N
 ```
 
 slice-brief는 `<SPEC>`에서 `### 슬라이스 N:` 블록을 뽑는다. 출력 줄은 `wrote <out>: <k> lines`이다.
@@ -99,7 +99,7 @@ report에 `Ruling:` 줄이 있으면 progress.md에 그대로 옮겨 적는다. 
 ### 4. 리뷰 패키지를 만든다
 
 ```bash
-cd <ROOT> && bash ${CLAUDE_SKILL_DIR}/scripts/review-package <SPEC> <BASE> <HEAD sha>
+cd "<ROOT>" && bash "<SKILL_DIR>/scripts/review-package" "<SPEC>" <BASE> <HEAD sha>
 ```
 
 BASE는 1에서 기록한 커밋을 쓴다. `HEAD~1`을 쓰지 않는 이유는 슬라이스 하나가 커밋 여러 개일 수 있기 때문이다. 스크립트가 exit 3으로 끝나면 범위가 비었거나 HEAD가 BASE의 자손이 아니다. worktree와 BASE를 다시 확인한다.

@@ -25,6 +25,10 @@ fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 
 ## 1. [High] Codex에서 `${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_SKILL_DIR}`가 치환되지 않을 수 있다
 
+**처리 완료 (2026-09-30, 5.11.1).** 아래는 최초 지적과 계획이다. 실제 수정은 두 변수를 병기하지 않고 제거했다. 네 SKILL.md의 시작 경로를 SKILL.md 기준 `../_shared/conventions.md`로 통일하고, 템플릿은 `./<파일>`, 스크립트 명령은 실제 절대경로로 바꾸는 `<SKILL_DIR>` 자리표시자를 사용한다. 공용 규약, orchestrator의 세 호출 예시, README 두 언어를 함께 수정했다. 두 호스트 매니페스트의 patch 버전을 올리고 `pnpm run dist`로 배포본을 재생성했다.
+
+**검증.** `pnpm run test:release` 7개 통과. 배포본을 공백이 있는 임시 설치 경로로 복사하고, 별도의 공백 포함 Git 작업 폴더에서 Claude 환경변수 없이 보조 파일 상대경로 8개를 읽고 `workspace`, `slice-brief`, `review-package`를 실행했다. brief의 슬라이스 추출과 리뷰 diff의 변경 파일 포함도 확인했다. Claude/Codex의 스킬 전체 호출을 재현한 검증은 아니다. skill-creator의 `quick_validate.py`는 기존 frontmatter의 `argument-hint`, `disable-model-invocation`을 허용하지 않아 네 스킬 모두 실패했으며, 해당 필드는 이번 변경 범위 밖이므로 유지했다.
+
 **현상.** spec-design, spec-implement, spec-digest는 conventions.md와 템플릿·스크립트를 두 변수로 가리킨다. spec-review만 "이 SKILL.md가 있는 디렉터리 기준 `../_shared/conventions.md`"로 읽는다(`spec-review/SKILL.md:26`). README 요구사항 절은 두 변수를 "Claude Code가 치환한다"고만 적었다. Codex가 치환한다는 근거가 저장소에 없다.
 
 **위반.** 배포 규칙 "Claude와 Codex 양쪽에서 동작해야 한다".

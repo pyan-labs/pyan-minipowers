@@ -7,13 +7,13 @@ disable-model-invocation: true
 
 # spec-design — 요구 하나를 승인된 spec과 feature 브랜치로 만든다
 
-시작할 때 `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`를 읽는다. 폴더 구조, stem 규칙, 날짜를 얻는 명령, 문체 규칙, 스킬 파일 경로는 그 문서가 정한다.
+이 SKILL.md가 있는 폴더를 기준으로 `../_shared/conventions.md`를 읽는다. 스킬에 딸린 파일의 상대경로는 프로젝트의 현재 작업 디렉터리 기준이 아니다. 폴더 구조, stem 규칙, 날짜를 얻는 명령, 문체 규칙, 스킬 파일 경로는 그 문서가 정한다.
 
 ## 이 스킬이 남기는 것
 
 변경의 크기와 관계없이 항상 같다.
 
-- `docs/minipowers/<stem>/spec.md` 파일 하나. 형식은 `${CLAUDE_SKILL_DIR}/spec-template.md`다.
+- `docs/minipowers/<stem>/spec.md` 파일 하나. 형식은 `./spec-template.md`다.
 - 기준 커밋에서 만든 feature 브랜치 하나.
 - 그 브랜치를 checkout한 worktree 하나. 메인 체크아웃 루트의 `.worktrees/<stem>`이다.
 - 그 브랜치의 첫 커밋 하나. spec.md만 들어 있다.
@@ -50,7 +50,7 @@ spec 초안을 쓰기 전에 다음을 읽는다.
 
 ## 4. spec 초안 쓰기
 
-`${CLAUDE_SKILL_DIR}/spec-template.md`를 `docs/minipowers/<stem>/spec.md`로 옮겨 아홉 절을 채운다. 절 제목은 템플릿의 문자열을 그대로 쓴다. 뒤 단계가 이 문자열로 spec을 찾는다.
+`./spec-template.md`를 `docs/minipowers/<stem>/spec.md`로 옮겨 아홉 절을 채운다. 절 제목은 템플릿의 문자열을 그대로 쓴다. 뒤 단계가 이 문자열로 spec을 찾는다.
 
 - 코드베이스에서 답이 나오는 것은 코드를 읽어 채운다.
 - 머리말의 "기준 커밋"과 "브랜치"는 승인 전까지 템플릿의 자리 표시 문구로 둔다.

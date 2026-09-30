@@ -11,7 +11,7 @@ spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마
 
 ## 시작
 
-1. `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`를 읽는다. 네 스킬이 공유하는 규칙(인자 해석, 폴더 구조, 정지 조건, 중단 todo, gitignore 처리, 증거 규칙, 스킬 파일 경로)은 거기 있고, 이 문서는 그것을 가리키기만 한다.
+1. 이 SKILL.md가 있는 폴더를 기준으로 `../_shared/conventions.md`를 읽는다. 스킬에 딸린 파일의 상대경로는 프로젝트의 현재 작업 디렉터리 기준이 아니다. 네 스킬이 공유하는 규칙(인자 해석, 폴더 구조, 정지 조건, 중단 todo, gitignore 처리, 증거 규칙, 스킬 파일 경로)은 거기 있고, 이 문서는 그것을 가리키기만 한다.
 2. 인자를 작업 폴더로 해석한다. 이하 `<폴더>`는 `docs/minipowers/<stem>/`, `<stem>`은 폴더 이름이다.
 3. spec.md를 찾는다. spec은 병합 전까지 feature 브랜치에만 있고, 그 브랜치는 대개 `.worktrees/<stem>`에 checkout되어 있다.
    - 현재 체크아웃에 `<폴더>/spec.md`가 있으면 그것을 읽는다.
@@ -24,7 +24,7 @@ spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마
 
    spec.md를 전부 읽는다. 머리말의 `- 기준 커밋:`과 `- 브랜치:` 줄에서 값을 얻는다. 값을 감싼 백틱과 뒤의 괄호 설명은 떼고 읽는다. 모드 결정에서 읽는 progress.md와 findings.md도 spec.md를 찾은 폴더의 것을 읽는다. 여기서는 파일을 읽을 곳만 찾는다. 위의 브랜치 찾기 경로에서 worktree를 만드는 것만 예외다. 작업 위치는 구현 모드와 수정 모드 모두 "작업 공간과 기준 커밋 확인"이 정하고, 그 뒤로는 작업 위치의 파일을 쓴다.
 4. 프로젝트 지시 파일(CLAUDE.md, AGENTS.md 등)에서 전체 테스트 명령, 테스트 위치, 코딩 규칙, 준비 명령(의존성 설치 등), worktree 복사 목록(`minipowers worktree 복사:` 줄)을 찾는다. spec 머리말의 전체 테스트 명령과 다르면 spec 머리말을 쓴다.
-5. 스크립트는 `bash ${CLAUDE_SKILL_DIR}/scripts/<name> ...`으로 부른다. `${CLAUDE_SKILL_DIR}`는 Claude Code가 이 SKILL.md가 있는 폴더의 절대경로로 치환한다. 보조 문서(orchestrator.md, implementer-prompt.md, reviewer-prompt.md)도 같은 폴더에 있다.
+5. 스크립트는 `bash "<SKILL_DIR>/scripts/<name>" ...`으로 부른다. `<SKILL_DIR>`는 conventions.md "스킬 파일 경로"대로 실제 절대경로로 바꾼다. 보조 문서(orchestrator.md, implementer-prompt.md, reviewer-prompt.md)도 같은 폴더에 있다.
 
 ## 모드 결정
 

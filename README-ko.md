@@ -135,7 +135,7 @@ Claude Code 명령은 **대화창**에, Codex 명령은 **터미널**에 입력�
 ### 요구사항
 
 - spec-implement의 스크립트 세 개(`workspace`, `slice-brief`, `review-package`)는 bash입니다. Windows에서는 Git Bash가 필요합니다.
-- spec-review는 로드한 SKILL.md의 디렉터리를 기준으로 공용 규약과 템플릿의 상대경로를 해석합니다. 나머지 skill은 공용 규약을 `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`로, 자기 폴더의 템플릿과 스크립트를 `${CLAUDE_SKILL_DIR}/<파일>`로 가리킵니다. 두 변수는 Claude Code가 skill 본문에서 치환합니다.
+- 네 skill 모두 로드한 SKILL.md가 있는 폴더를 기준으로 공용 규약(`../_shared/conventions.md`)과 템플릿·스크립트(`./<파일>`)를 찾습니다. 명령의 `<SKILL_DIR>`는 셸에서 접근 가능한 실제 절대경로로 바꾸고 인용합니다. Claude Code와 Codex 모두 호스트의 변수 치환에 의존하지 않습니다.
 - spec-implement의 병렬 실행은 subagent를 띄우는 도구(Claude Code의 Agent)가 있을 때만 씁니다. 없으면 에이전트 하나가 순서대로 구현합니다.
 
 ---

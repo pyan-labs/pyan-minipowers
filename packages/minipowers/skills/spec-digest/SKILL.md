@@ -24,7 +24,7 @@ digest에는 소스를 열어 확인한 것만 쓴다. 문서와 소스가 다�
 
 ## 1. 시작
 
-1. `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`를 읽는다. 인자 해석, 폴더 구조, 정지 조건, 문체 규칙은 거기 있는 대로 따른다. 템플릿은 `${CLAUDE_SKILL_DIR}/digest-template.md`와 `${CLAUDE_SKILL_DIR}/index-template.md`다.
+1. 이 SKILL.md가 있는 폴더를 기준으로 `../_shared/conventions.md`를 읽는다. 스킬에 딸린 파일의 상대경로는 프로젝트의 현재 작업 디렉터리 기준이 아니다. 인자 해석, 폴더 구조, 정지 조건, 문체 규칙은 거기 있는 대로 따른다. 템플릿은 `./digest-template.md`와 `./index-template.md`다.
 2. 인자로 작업 폴더를 정한다. 이하 `<폴더>`, 폴더 이름을 `<stem>`이라 부른다. 현재 체크아웃에 `<폴더>/spec.md`가 없고 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다)의 `.worktrees/<stem>`에 있으면, 이하 모든 명령과 파일 읽기와 쓰기를 그 안에서 한다. 둘 다 없으면 conventions.md "인자 해석"대로 안내하고 끝낸다.
 3. `<폴더>/spec.md`를 읽는다. 머리말에서 다음 세 줄을 찾는다.
    - `- 기준 커밋: <sha>`
@@ -127,7 +127,7 @@ digest.md의 절은 상태와 관계없이 항상 여섯 개다. 파일이 없�
 
 ## 4. digest.md 작성
 
-`${CLAUDE_SKILL_DIR}/digest-template.md`를 복사해 `<폴더>/digest.md`로 채운다. 절 제목은 템플릿과 같은 문자열을 쓴다. 이미 digest.md가 있으면 전체를 새로 쓴다.
+`./digest-template.md`를 복사해 `<폴더>/digest.md`로 채운다. 절 제목은 템플릿과 같은 문자열을 쓴다. 이미 digest.md가 있으면 전체를 새로 쓴다.
 
 머리말에는 작성일, 상태, 커밋 범위, 브랜치를 둔다. 작성일은 conventions.md의 날짜 명령으로 얻는다. 머리말 바로 아래 줄에 다음 문장을 그대로 둔다.
 
@@ -177,7 +177,7 @@ spec 수용 기준마다 소절을 하나 두고, 사용자 행동 → 진입점
 
 ## 5. index.md 재생성
 
-`docs/minipowers/index.md` 전체를 `${CLAUDE_SKILL_DIR}/index-template.md`의 형식과 생성 절차대로 다시 쓴다. 기존 index.md는 읽지 않는다. 손으로 고친 내용이 남지 않는 대신 어느 시점에 불러도 같은 목록이 나온다. 브랜치마다 다시 생성되므로 병합 때 충돌할 수 있고, 그때는 병합 뒤 이 스킬을 다시 불러 재생성한다.
+`docs/minipowers/index.md` 전체를 `./index-template.md`의 형식과 생성 절차대로 다시 쓴다. 기존 index.md는 읽지 않는다. 손으로 고친 내용이 남지 않는 대신 어느 시점에 불러도 같은 목록이 나온다. 브랜치마다 다시 생성되므로 병합 때 충돌할 수 있고, 그때는 병합 뒤 이 스킬을 다시 불러 재생성한다.
 
 `docs/minipowers/*/` 폴더 중 `todo/`와 `spec.md`가 없는 폴더를 뺀 전부가 한 행씩 된다. 상태는 2절의 표로 정하고 "(리뷰 전)" 같은 표시는 붙이지 않는다.
 
