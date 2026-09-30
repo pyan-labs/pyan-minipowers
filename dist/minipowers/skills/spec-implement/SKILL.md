@@ -95,7 +95,7 @@ RED 증거는 슬라이스마다 progress.md에 `슬라이스 N: RED` 줄로 남
 
 ### 판정과 정지 조건
 
-설계가 모호하면 spec을 기준으로 스스로 판정하고 progress.md에 `Ruling:` 줄로 남긴 뒤 계속한다. 멈추고 사용자에게 묻는 경우는 conventions.md "정지 조건" 절의 넷(되돌릴 수 없거나 파괴적인 조작, 보안에 민감한 조작, worktree 밖으로 나가는 부작용, 어느 방향으로 가도 추측인 spec 결함)뿐이다. 넷째는 progress.md에 `spec 결함:` 줄을 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 보고하고 끝낸다. 앞의 셋에서 사용자가 허락하면 그 조작과 답을 progress.md에 `승인:` 줄로 적고 progress.md만 스테이징해 커밋한 뒤 이어 간다. 다시 부르면 progress.md에 이미 `승인:` 줄이 있는 조작은 묻지 않는다. 새 세션이 대화 없이 같은 곳에서 다시 멈추지 않게 하려는 것이다.
+설계가 모호하면 spec을 기준으로 스스로 판정하고 progress.md에 `Ruling:` 줄로 남긴 뒤 계속한다. 멈추고 사용자에게 묻는 경우는 conventions.md "정지 조건"의 넷뿐이다. 넷째(spec 결함)는 progress.md에 `spec 결함:` 줄을 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 보고하고 끝낸다. 앞의 셋에서 사용자가 허락하면 그 조작과 답을 progress.md에 `승인:` 줄로 적고 progress.md만 스테이징해 커밋한 뒤 이어 간다. 다시 부르면 progress.md에 이미 `승인:` 줄이 있는 조작은 묻지 않는다. 새 세션이 대화 없이 같은 곳에서 다시 멈추지 않게 하려는 것이다.
 
 ### spec 결함으로 멈출 때
 
@@ -118,7 +118,8 @@ worktree와 브랜치는 그대로 둔다. 끝난 슬라이스의 커밋은 그 
    - 틀렸다고 판단하면 고치지 않는다. progress.md에 `finding <ID>: 반박 — <근거 file:line>`을 적고 progress.md만 스테이징해 커밋한다.
    - 맞으면 고친다. 테스트를 두는 곳이면 finding을 재현하는 테스트로 RED를 먼저 본다.
 4. finding 하나를 고칠 때마다 고친 파일을 커밋하고, progress.md에 `finding <ID>: <sha>`를 적은 뒤 progress.md만 스테이징해 따로 커밋한다. `<ID>`는 findings.md의 finding ID 그대로다(예: `finding I1: a1b2c3d`).
-5. 끝나면 전체 테스트를 돌리고 보고한다. 고친 finding과 커밋 목록, 반박한 finding과 그 근거를 따로 적는다. 보고의 마지막 줄은 `다음 단계: /spec-review <폴더>`다.
+5. 끝나면 전체 테스트를 돌린다. progress.md에 `완료: head <sha>`를 새로 적고 progress.md만 스테이징해 커밋한다. `<sha>`는 마지막 finding 커밋이다. spec-digest가 마지막 `완료: head` 줄을 끝 커밋으로 읽으므로 수정 커밋이 커밋 범위에 들어간다.
+6. 보고한다. 고친 finding과 커밋 목록, 반박한 finding과 그 근거를 따로 적는다. 보고의 마지막 줄은 `다음 단계: /spec-review <폴더>`다.
 
 findings.md는 읽기만 한다. ADDRESSED와 WITHDRAWN 판정은 spec-review가 한다.
 
@@ -134,7 +135,7 @@ findings.md는 읽기만 한다. ADDRESSED와 WITHDRAWN 판정은 spec-review가
    - Ruling 목록: progress.md의 `Ruling:` 줄 전부
 5. 보고의 마지막 줄은 `다음 단계: /spec-review <폴더>`다.
 
-병합, push, Pull Request 생성은 하지 않는다. worktree는 그대로 둔다.
+worktree는 그대로 둔다.
 
 ## progress.md 형식
 

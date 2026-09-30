@@ -231,6 +231,8 @@ fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 
 ## 9. [Minor] 수정 모드 뒤 `완료: head` 줄이 갱신되지 않는다
 
+**처리 완료 (2026-09-30, 5.11.12).** 수정 모드 5에 전체 테스트 뒤 `완료: head <마지막 finding 커밋>`을 새로 적고 progress.md만 커밋하는 단계를 넣고, 보고를 6으로 분리했다. progress-template.md의 `완료: head` 행에 "수정 모드가 끝날 때도 다시 적는다. 읽는 쪽은 마지막 줄을 쓴다"를 더했다. spec-digest의 끝 커밋 규칙은 이미 "마지막"이라 바꾸지 않았다.
+
 **현상.** 수정 모드(`spec-implement/SKILL.md:128-135`)는 `finding <ID>: <sha>` 줄만 적고 끝낸다. findings.md가 needs fixes인 채로 spec-digest를 부르면 끝 커밋이 옛 `완료: head` sha라 수정 커밋이 커밋 범위에서 빠진다.
 
 **fix plan.**
@@ -244,6 +246,8 @@ fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 ---
 
 ## 10. [Minor] conventions.md의 자기 규칙 위반
+
+**처리 완료 (2026-09-30, 5.11.12).** 네 SKILL.md의 "병합, push, Pull Request 생성을 하지 않는다" 문장을 지웠다. 정본은 conventions.md "정지 조건" 마지막 문단이다. implementer-prompt.md의 같은 줄은 subagent에게 직접 주는 프롬프트라 남겼다. spec-implement의 정지 조건 나열 괄호를 지우고 "conventions.md '정지 조건'의 넷뿐이다"로 줄였다. 항목 2·3 뒤의 재검사에서 conventions.md 절 내용을 다시 풀어 쓴 곳은 이 두 가지 외에 없었다.
 
 **현상.** `conventions.md:3`은 "여기 적힌 것을 각 SKILL.md는 반복하지 않는다"고 하지만, "병합·push·PR 생성을 하지 않는다"가 네 SKILL.md 끝에 다시 나온다(`spec-design:145`, `spec-implement:150`, `spec-review:56-57`, `spec-digest:195`). 정지 조건 넷도 `spec-implement/SKILL.md:111`에 다시 풀어 적혀 있다.
 

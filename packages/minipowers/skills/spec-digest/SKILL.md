@@ -150,8 +150,6 @@ git rev-parse --abbrev-ref HEAD
 - 작업 위치의 브랜치가 spec 머리말의 브랜치와 같으면 `<폴더>/digest.md`와 `docs/minipowers/index.md`를 한 커밋으로 넣는다. 커밋 메시지 형식은 프로젝트 지시 파일이 정한다. 정하지 않았으면 `docs(<stem>): digest`를 쓴다.
 - 다르면 커밋하지 않는다. 공유 브랜치에 직접 커밋하는 일을 막기 위해서다.
 
-병합, push, Pull Request 생성은 하지 않는다.
-
 마무리 보고에는 digest.md 경로, 상태, 커밋 범위, index.md의 행 수를 적는다. 커밋하지 않았으면 "digest.md와 index.md를 썼고 커밋하지 않았다. 작업 위치의 브랜치가 spec의 브랜치와 다르다"를 마지막 줄로 적는다. 커밋했으면 마지막 줄은 상태에 따른 다음 단계 하나다.
 
 상태가 ready to merge이면 다음 단계 줄 바로 위에 병합 뒤 정리 명령을 적는다. 스킬이 직접 지우지는 않고 안내만 한다.

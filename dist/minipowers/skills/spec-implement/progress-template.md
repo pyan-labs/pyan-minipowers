@@ -39,4 +39,4 @@ spec-implement가 쓰는 progress.md의 머리말과 줄 형식이다. 읽는 �
 | `발견: <내용> — <file:line>` | 마무리 3에서 `수동 확인:` 줄 다음. 작업 중 발견했지만 고치지 않은 기존 버그나 요청 밖 동작 하나마다 한 줄. 기준 테스트의 기존 실패는 머리말 `- 기준 테스트:` 줄에 있으므로 쓰지 않는다 | spec-review · spec-digest |
 | `승인: <조작> — <사용자 답>` | 정지 조건 1~3에서 멈춰 사용자가 허락하고 이어 갈 때. 이 줄이 있는 조작은 다시 묻지 않는다 | spec-implement · spec-review · spec-digest |
 | `수동 확인: <항목>` | 마무리 3에서. 사람이 확인해야 할 항목 하나마다 한 줄 | spec-digest |
-| `완료: head <sha>` | 마무리 3에서 `수동 확인:` 줄 다음. `<sha>`는 마무리 2가 끝난 시점의 HEAD다 | spec-implement · spec-review · spec-digest |
+| `완료: head <sha>` | 마무리 3에서 `수동 확인:` 줄 다음. `<sha>`는 마무리 2가 끝난 시점의 HEAD다. 수정 모드가 끝날 때도 마지막 finding 커밋으로 다시 적는다. 읽는 쪽은 마지막 줄을 쓴다 | spec-implement · spec-review · spec-digest |
