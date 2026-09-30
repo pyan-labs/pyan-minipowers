@@ -64,7 +64,8 @@ if [ -d "$specdir" ]; then
   )
 fi
 
-candidates=("$spec" "${amend_files[@]}")
+# amendment가 없으면 배열이 빈다. macOS 기본 bash 3.2는 set -u에서 빈 배열 펼치기를 오류로 본다.
+candidates=("$spec" ${amend_files[@]+"${amend_files[@]}"})
 
 found=0
 best_file=""
