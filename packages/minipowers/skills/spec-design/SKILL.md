@@ -46,7 +46,7 @@ spec 초안을 쓰기 전에 다음을 읽는다.
 - **지시 파일.** 프로젝트 루트와 작업 디렉터리의 `CLAUDE.md`, `AGENTS.md`. 코딩 규칙, 테스트 위치, 테스트 명령, 브랜치 이름 규칙이 여기 있다.
 - **전체 테스트 명령.** 지시 파일에 있으면 그것을 쓴다. 없으면 프로젝트 종류로 정해지는 표준 명령(`dotnet test`, `pnpm test`, `pytest`, `go test ./...` 등)을 쓴다.
 - **관련 코드.** 요구가 건드리는 파일, 그 파일을 부르는 곳, 비슷한 일을 하는 기존 코드, 관련 테스트.
-- **이전 spec.** `docs/minipowers/` 안에 같은 영역을 다룬 spec 폴더가 있으면 그 spec.md와 digest.md. todo의 `중단된 작업:` 줄이 spec을 가리키면(conventions.md "중단 todo") 그 폴더의 spec.md, progress.md, findings.md도 읽는다. 폴더는 `.worktrees/<stem>`에 있을 수 있다. 끝난 슬라이스의 커밋은 그 브랜치에만 있다. 새 spec은 항상 승인 시점의 HEAD를 기준 커밋으로 삼는다. 그 커밋을 이어받으려면 사용자가 승인 전에 그 브랜치를 프로젝트의 git 규칙대로 기반 브랜치에 병합해 두어야 하고, 7절의 검토 요청에 적은 현재 브랜치와 HEAD 해시로 확인한다. 이 스킬은 병합하지 않는다.
+- **이전 spec.** `docs/minipowers/` 안에 같은 영역을 다룬 spec 폴더가 있으면 그 spec.md와 digest.md. todo의 `중단된 작업:` 줄이 spec을 가리키면(conventions.md "중단 todo") 그 폴더의 spec.md, progress.md, findings.md도 읽는다. 폴더는 `.worktrees/<stem>`에 있을 수 있다. 새 spec의 기준 커밋은 승인 시점의 HEAD다. 앞 사이클의 브랜치를 병합할지는 사용자가 todo의 "사용자가 할 일"을 보고 정하며, 이 스킬은 그 브랜치를 보지 않는다.
 
 ## 4. spec 초안 쓰기
 

@@ -102,13 +102,13 @@ RED 증거는 슬라이스마다 progress.md에 `슬라이스 N: RED` 줄로 남
 정지 조건 4로 멈출 때마다 다음을 순서대로 하고 끝낸다. 승인된 spec.md는 고치지 않는다. 구현 모드의 "기준 커밋 확인", 판정과 정지 조건, orchestrator의 BLOCKED가 여기로 온다.
 
 1. progress.md에 `spec 결함:` 줄이 없으면 적는다. 적은 뒤 progress.md만 스테이징해 커밋한다.
-2. conventions.md "중단 todo"의 형식과 위치대로 todo를 쓴다. `끝난 것`은 progress.md의 `complete` 줄에서, `남은 것`은 spec의 슬라이스 가운데 complete가 아닌 것에서 뽑는다. 커밋하지 않는다.
-3. 보고한다. 틀린 전제와 확인한 결과, 끝난 슬라이스의 커밋 목록, 쓴 todo의 경로를 적는다. 마지막 줄은 다음 단계 하나다.
+2. conventions.md "중단 todo"의 형식과 위치대로 todo를 쓴다. `끝난 것`은 progress.md의 `complete` 줄에서, `남은 것`은 spec의 슬라이스 가운데 complete가 아닌 것에서 뽑는다. `사용자가 할 일`은 끝난 것이 있으면 형식의 두 줄, 없으면 "없음"이다. 커밋하지 않는다.
+3. 보고한다. 틀린 전제와 확인한 결과, 끝난 슬라이스의 커밋 목록, 쓴 todo의 경로, todo의 "사용자가 할 일" 절을 그대로 적는다. 마지막 줄은 다음 단계 하나다.
    ```
-   다음 단계: todo를 검토한 뒤 `/spec-design docs/minipowers/todo/<파일 이름>`
+   다음 단계: todo의 "사용자가 할 일"을 정한 뒤 `/spec-design docs/minipowers/todo/<파일 이름>`
    ```
 
-worktree와 브랜치는 그대로 둔다. 끝난 슬라이스의 커밋은 그 브랜치에만 있다. 새 사이클은 spec-design이 새 기준 커밋에서 시작하므로, 그 커밋을 이어받으려면 사용자가 새 spec을 승인하기 전에 그 브랜치를 프로젝트의 git 규칙대로 기반 브랜치에 병합해 둔다.
+worktree와 브랜치는 그대로 둔다. 끝난 슬라이스의 커밋은 그 브랜치에만 있고, 이어받을지는 사용자가 todo를 보고 정한다.
 
 ## 수정 모드
 
