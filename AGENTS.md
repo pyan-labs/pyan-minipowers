@@ -20,6 +20,23 @@
 - 뒤 단계는 앞 단계들의 산출물을 쌓아서 받는다. 예를 들어 `spec-review`는 `spec.md`, `progress.md`, 구현 커밋의 diff를 함께 읽는다.
 - 승인된 `spec.md`는 고치지 않는다. 바꿀 것이 생기면 새 todo로 새 사이클을 돈다.
 
+**모든 skill은 아래 폴더 구조를 기본으로 하고, 이 구조 안에서 작동한다는 암묵적 합의 위에서 진행한다.** 앞 단계의 산출물을 어디서 찾고 자기 산출물을 어디에 남길지는 대화가 아니라 이 구조가 정한다. 정본은 `packages/minipowers/skills/_shared/conventions.md`의 "폴더 구조" 절이고, 구조를 바꾸면 그 절과 여기를 함께 고친다.
+
+```
+docs/minipowers/
+├── index.md                          spec-digest가 매번 다시 생성하는 누적 목록
+├── todo/<이름>.md                    사용자가 쓰는 todo. 형식은 자유. spec-design의 입력. spec 결함으로 멈춘 사이클의 todo는 spec-implement가 쓴다("중단 todo" 절)
+└── <stem>/                           작업 하나 = 폴더 하나
+    ├── spec.md                       spec-design이 쓴다. 승인 뒤에는 고치지 않는다. 바꿀 것이 생기면 새 todo로 새 사이클을 돈다
+    ├── progress.md                   spec-implement가 쓴다
+    ├── findings.md                   spec-review가 쓴다. spec-implement 수정 모드가 읽는다
+    └── digest.md                     spec-digest가 쓴다
+
+.minipowers/<stem>/work/              subagent에게 넘기는 brief · report · diff 패키지. 일회용
+.worktrees/<stem>                     spec 브랜치의 체크아웃. spec-design이 만들고 네 스킬이 "작업 위치 결정"으로 같은 곳을 쓴다
+.worktrees/<stem>-slice-N             orchestrator가 슬라이스마다 만드는 격리 작업 공간. 병합 뒤 지운다
+```
+
 ## skill 작성 방향
 
 - **같은 입력이면 같은 종류의 산출물.** 산출물의 종류·개수가 모델 판단이나 숫자 상한으로 갈리지 않게 한다. 분기는 파일 존재·도구 존재·파일 내용처럼 관찰 가능한 조건만 쓴다.
