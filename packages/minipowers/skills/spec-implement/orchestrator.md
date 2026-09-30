@@ -120,7 +120,7 @@ BASE는 1에서 기록한 커밋을 쓴다. `HEAD~1`을 쓰지 않는 이유는 
 수정은 한 번이다. 두 번째 검사도 FAIL이면 컨트롤러가 FAIL 항목을 명령으로 직접 확인한다. 항목이 실제로는 충족되어 있으면 `Ruling:`으로 근거를 남기고 7로 간다. 충족되어 있지 않으면 FAIL 항목이 brief에 구현 방법이 정해질 만큼 적혀 있는지 본다.
 
 - 적혀 있지 않으면 spec 결함이다. SKILL.md "spec 결함으로 멈출 때"대로 progress.md에 `spec 결함:` 줄을 적고 todo를 쓰고 끝낸다.
-- 적혀 있으면 구현 실패다. 재시도 한도에 닿은 것이지 spec이 틀린 것이 아니므로 todo를 쓰지 않고 같은 사이클에서 다시 시작할 수 있게 남긴다. 슬라이스의 코드를 BASE로 되돌린다(`<SPEC_WT>`에서 작업했으면 `git -C <SPEC_WT> reset --hard <BASE>`, 슬라이스 worktree였으면 병합하지 않은 것이므로 `cd <ROOT> && git worktree remove --force .worktrees/<stem>-slice-N && git branch -D <브랜치>-slice-N`으로 지운다). progress.md에 `슬라이스 N: blocked — <FAIL 항목> — <확인한 결과>`를 적고 progress.md만 스테이징해 커밋한다. 같은 묶음의 다른 슬라이스는 마저 끝낸다. 그 뒤 다음 묶음으로 가지 않고 마무리 없이 보고하고 끝낸다. 보고에는 FAIL 항목과 확인한 결과, 다시 부르면 이 슬라이스부터 새 subagent로 다시 시작한다는 것을 적는다. 마지막 줄은 `다음 단계: /spec-implement docs/minipowers/<stem>/`다.
+- 적혀 있으면 구현 실패다. 재시도 한도에 닿은 것이지 spec이 틀린 것이 아니므로 todo를 쓰지 않고 같은 사이클에서 다시 시작할 수 있게 남긴다. 슬라이스의 코드를 BASE로 되돌린다(`<SPEC_WT>`에서 작업했으면 `git -C <SPEC_WT> reset --hard <BASE>`, 슬라이스 worktree였으면 병합하지 않은 것이므로 `cd <ROOT> && git worktree remove --force <이번 시도의 worktree> && git branch -D <이번 시도의 브랜치>`로 지운다. 이름은 "묶음에 슬라이스가 둘 이상일 때" 2에서 이번 시도에 실제로 만든 것이다. 접미사를 붙였으면 `-r2` 같은 접미사가 붙은 그 이름이고, 접미사 없는 이전 worktree와 브랜치는 건드리지 않는다). progress.md에 `슬라이스 N: blocked — <FAIL 항목> — <확인한 결과>`를 적고 progress.md만 스테이징해 커밋한다. 같은 묶음의 다른 슬라이스는 마저 끝내고 병합한다. 묶음에 blocked 슬라이스가 있으므로 `병합 완료` 줄은 적지 않되, 끝난 슬라이스의 `complete`와 RED 줄이 담기도록 progress.md만 스테이징해 한 번 더 커밋한다. 그 뒤 다음 묶음으로 가지 않고 마무리 없이 보고하고 끝낸다. 보고에는 FAIL 항목과 확인한 결과, 다시 부르면 이 슬라이스부터 새 subagent로 다시 시작한다는 것을 적는다. 마지막 줄은 `다음 단계: /spec-implement docs/minipowers/<stem>/`다.
 
 ### 7. 완료
 
