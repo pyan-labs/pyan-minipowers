@@ -8,6 +8,8 @@ AGENTS.md와 README-ko.md의 세 원칙을 기준으로 `packages/minipowers/ski
 
 항목마다 **현상 → 원칙 위반 → fix plan** 순서로 적는다. 항목 번호는 우선순위다. 설계 결정이 필요한 항목은 제목에 `[결정 필요]`를 붙이고, 추천안과 대안을 함께 적는다.
 
+**상태 (2026-09-30): 11개 항목 모두 처리 완료. 5.12.0.** 각 항목의 첫 문단이 실제로 한 일과 계획과 다른 점이다. 항목 밖에서 한 변경은 문서 끝 "추가 변경" 절에 있다.
+
 ## 전체 크기 (기준선)
 
 | 파일 | 줄 |
@@ -22,6 +24,19 @@ AGENTS.md와 README-ko.md의 세 원칙을 기준으로 `packages/minipowers/ski
 항목 2 뒤(5.11.2): conventions.md 180, spec-implement/SKILL.md 189, spec-review/SKILL.md 220, spec-digest/SKILL.md 216, 나머지 동일. 합계 1,711.
 항목 3 뒤(5.11.5): conventions.md 188, spec-implement/SKILL.md 147 + progress-template.md 47(신규), spec-review/SKILL.md 212, spec-digest/SKILL.md 180, 나머지 동일. 합계 1,690.
 항목 4 뒤(5.11.6): orchestrator.md 184, implementer-prompt.md 105, checker-prompt.md 56(reviewer-prompt.md 155 대체), progress-template.md 42, spec-review/SKILL.md 211, findings-template.md 102, spec-digest/SKILL.md 179, digest-template.md 82, 나머지 동일. 합계 1,569.
+
+최종(5.12.0, 11개 항목 뒤):
+
+| 파일 | 줄 |
+|---|---|
+| `_shared/conventions.md` | 196 |
+| `spec-design/SKILL.md` + `spec-template.md` | 154 + 81 |
+| `spec-implement/SKILL.md` + `orchestrator.md` + `implementer-prompt.md` + `checker-prompt.md` + `progress-template.md` | 148 + 184 + 105 + 56 + 42 |
+| `spec-review/SKILL.md` + `findings-template.md` | 204 + 102 |
+| `spec-digest/SKILL.md` + `digest-template.md` + `index-template.md` | 172 + 82 + 29 |
+| 합계 | 1,555 (기준선 1,723에서 168 감소) |
+
+conventions.md만 늘었다(173 → 196). 세 SKILL.md에 흩어져 있던 작업 위치 결정과 중단 todo의 "사용자가 할 일" 절이 여기로 모였기 때문이다.
 
 fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 
@@ -289,4 +304,21 @@ fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 6. **항목 7, 8, 11** 나머지 축소.
 7. 각 사이클 끝에 `pnpm run dist`, `pnpm test`(release.test.mjs), 그리고 이 문서 위의 크기 표를 다시 잰다. 마지막에 `pnpm run version:bump minipowers minor`.
 
+실제 순서는 1 → 2 → 3 → 10(항목 2·3과 함께) → 4 → 11 → 5 → 6 → 7 → 8 → 9·10 이었다. 항목마다 patch를 올려 5.11.1부터 5.11.12까지 갔고, 마지막에 minor를 올려 5.12.0이다.
+
 각 사이클은 minipowers 자체의 흐름(`/spec-design` → `/spec-implement` → `/spec-review` → `/spec-digest`)으로 돌 수 있다. 이 todo 파일의 각 항목 절이 `/spec-design`의 인자다.
+
+---
+
+## 추가 변경 (항목 밖)
+
+todo 항목이 아니지만 같은 날 사용자 결정으로 함께 바꾼 것이다.
+
+- **작업 위치 결정을 정상 시나리오와 문제 시나리오로 나눴다** (5.11.4). 대부분의 호출이 타는 정상 경로 세 단계를 먼저 적고, 브랜치 검색과 worktree 생성 같은 드문 경우를 뒤에 두었다. `<작업 폴더>` 별칭을 없애고 `docs/minipowers/<stem>/` 경로를 그대로 쓴다.
+- **폴더 구조에서 `.worktrees/<stem>`과 `-slice-N`을 나눠 적었다** (5.11.3). 전자는 네 스킬이 공유하는 spec 브랜치 체크아웃, 후자는 orchestrator 전용 격리 공간이다.
+- **AGENTS.md에 폴더 구조를 옮겨 적었다.** 네 스킬이 이 구조 안에서 작동한다는 합의를 핵심 명제 아래 두었다. conventions.md와 서로를 정본으로 가리키는 문장은 두지 않는다.
+- **spec-design "이 스킬이 남기는 것"을 표와 항목으로 바꿨다.** 산출물, 위치, 조건 세 열의 표와 브랜치 상태 항목 셋이다.
+- **origin/dev의 다른 줄기와 병합했다** (커밋 c108cea). 원격의 세 커밋(메인 체크아웃 기준 설계, `--amend` 모드, 5.11.1)은 이날의 worktree 기반 설계와 반대라 이력만 합치고 파일에는 반영하지 않았다.
+
+**검증하지 않은 것.** 모든 항목에서 release 테스트와 dist 일치만 확인했다. Claude Code나 Codex에서 네 스킬을 실제로 호출해 한 사이클을 돌린 검증은 하지 않았다. 다음 사이클을 minipowers 자체로 돌릴 때 확인한다.
+
