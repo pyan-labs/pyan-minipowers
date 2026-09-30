@@ -11,15 +11,17 @@ disable-model-invocation: true
 
 ## 이 스킬이 남기는 것
 
-변경의 크기와 관계없이 항상 같다.
+변경의 크기와 관계없이 항상 다음 셋이다.
 
-- feature 브랜치 하나와 그 브랜치를 checkout한 worktree 하나. 메인 체크아웃 루트의 `.worktrees/<stem>`이다.
-- 그 안의 `docs/minipowers/<stem>/spec.md` 파일 하나. 형식은 `./spec-template.md`다.
-- 브랜치의 커밋은 전부 spec.md만 담는다. 마지막 커밋이 머리말에 기준 커밋과 브랜치를 채운 승인본이다.
+| 산출물 | 위치 | 조건 |
+|---|---|---|
+| feature 브랜치 | `<브랜치>` | 승인 시점의 메인 체크아웃 HEAD에서 갈라진다 |
+| worktree | `<메인 체크아웃 루트>/.worktrees/<stem>` | `<브랜치>`를 checkout한 것 |
+| spec.md | worktree 안 `docs/minipowers/<stem>/spec.md` | 형식은 `./spec-template.md`. 절을 지우거나 비우지 않는다. 변경이 작으면 절마다 한 줄이다 |
 
-변경이 작으면 spec의 각 절이 한 줄이다. 한 줄짜리 수정에도 spec 파일을 만든다.
+브랜치의 모든 커밋은 spec.md만 담는다. 마지막 커밋은 머리말의 "기준 커밋"과 "브랜치"가 채워진 승인본이다. 그 뒤 spec.md는 고치지 않는다.
 
-spec은 뒤 단계(spec-implement, spec-review, spec-digest)가 받는 유일한 입력이다. 뒤 단계는 이 대화를 볼 수 없으므로, 구현에 필요한 코드베이스 맥락은 전부 spec에 적는다.
+spec.md는 뒤 단계(spec-implement, spec-review, spec-digest)가 받는 유일한 입력이다. 뒤 단계는 이 대화를 볼 수 없다. 구현에 필요한 코드베이스 맥락은 전부 spec에 적는다.
 
 ## 1. 인자 해석
 
