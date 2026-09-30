@@ -2,11 +2,8 @@
 # spec의 "### 슬라이스 N: …" 절(같은 레벨이거나 더 높은 다음 제목 전까지)을 파일로 뽑는다.
 # 구현자가 한 번의 Read로 요구사항을 읽고, 컨트롤러 컨텍스트에 본문이 남지 않는다.
 # 과거 plan 파일 호환으로 "### Task N" 제목도 받는다.
-# SPEC_FILE과 같은 폴더의 amendment-<N>.md(이름이 정확히 이 형식인 것만)를 N의 숫자 순서로 보고,
-# spec.md와 각 amendment에 같은 추출을 적용해 슬라이스 N 블록이 있는 마지막 파일의 블록을 쓴다.
-# (amendment가 spec.md의 슬라이스를 대체하거나 새 슬라이스를 추가할 수 있으므로 뒤 파일이 이긴다.)
 #
-# 출처: superpowers subagent-driven-development scripts/task-brief (MIT), 제목 패턴·경로·절 끝 판정·amendment 우선 변경.
+# 출처: superpowers subagent-driven-development scripts/task-brief (MIT), 제목 패턴·경로·절 끝 판정.
 # Usage: slice-brief SPEC_FILE SLICE_NUMBER [OUTFILE]
 # Default OUTFILE: <repo-root>/.minipowers/<spec-stem>/work/slice-<N>-brief.md
 set -euo pipefail
@@ -48,46 +45,15 @@ extract_slice() {
   ' "$1"
 }
 
-specdir=$(cd "$(dirname "$spec")" && pwd)
-
-# amendment-<숫자>.md만, 숫자 순서로.
-amend_files=()
-if [ -d "$specdir" ]; then
-  while IFS= read -r name; do
-    amend_files+=("$specdir/$name")
-  done < <(
-    find "$specdir" -maxdepth 1 -type f -name 'amendment-*.md' -exec basename {} \; 2>/dev/null \
-      | grep -E '^amendment-[0-9]+\.md$' \
-      | sed -E 's/^amendment-([0-9]+)\.md$/\1 &/' \
-      | sort -n -k1,1 \
-      | cut -d' ' -f2-
-  )
-fi
-
-# amendment가 없으면 배열이 빈다. macOS 기본 bash 3.2는 set -u에서 빈 배열 펼치기를 오류로 본다.
-candidates=("$spec" ${amend_files[@]+"${amend_files[@]}"})
-
-found=0
-best_file=""
 tmp=$(mktemp)
 trap 'rm -f "$tmp"' EXIT
 
-for f in "${candidates[@]}"; do
-  extract_slice "$f" > "$tmp.try"
-  if [ -s "$tmp.try" ]; then
-    mv "$tmp.try" "$tmp"
-    best_file=$f
-    found=1
-  else
-    rm -f "$tmp.try"
-  fi
-done
-
-if [ "$found" -ne 1 ]; then
+extract_slice "$spec" > "$tmp"
+if [ ! -s "$tmp" ]; then
   echo "slice ${n} not found in ${spec} (no heading matching '슬라이스 ${n}' or 'Task ${n}')" >&2
   exit 3
 fi
 
 cp "$tmp" "$out"
 
-echo "wrote ${out}: $(wc -l < "$out" | tr -d ' ') lines (from $(basename "$best_file"))"
+echo "wrote ${out}: $(wc -l < "$out" | tr -d ' ') lines"

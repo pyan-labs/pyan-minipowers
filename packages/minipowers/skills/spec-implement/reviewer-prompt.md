@@ -1,6 +1,6 @@
 # 리뷰 subagent 프롬프트 — 빠른 패스
 
-orchestrator.md "5. 리뷰 subagent를 띄운다"와 "6. 수정 라운드"에서 쓴다. 슬라이스 리뷰는 빠른 패스 하나다. 그 슬라이스의 brief와 diff만 보고, 기준은 유효 spec의 수용 기준이며, 테스트는 다시 돌리지 않고 report의 출력을 대조한다. 공통 블록 뒤에 모드 하나를 붙여 Agent 도구(general-purpose)로 띄운다.
+orchestrator.md "5. 리뷰 subagent를 띄운다"와 "6. 수정 라운드"에서 쓴다. 슬라이스 리뷰는 빠른 패스 하나다. 그 슬라이스의 brief와 diff만 보고, 기준은 spec의 수용 기준이며, 테스트는 다시 돌리지 않고 report의 출력을 대조한다. 공통 블록 뒤에 모드 하나를 붙여 Agent 도구(general-purpose)로 띄운다.
 
 - **전체 리뷰 모드**: 슬라이스를 처음 리뷰할 때
 - **재리뷰 모드**: 수정 라운드 뒤에 지적한 것이 고쳐졌는지 볼 때
@@ -15,7 +15,7 @@ orchestrator.md "5. 리뷰 subagent를 띄운다"와 "6. 수정 라운드"에서
 | `[DIFF_FILE]` | `review-package`가 출력한 경로 |
 | `[BASE_SHA]` | 전체 리뷰: 구현 subagent를 띄우기 전의 HEAD. 재리뷰: 이전 리뷰가 본 HEAD |
 | `[HEAD_SHA]` | 지금 HEAD |
-| `[수용 기준]`, `[리뷰 기준]` | 유효 spec의 `## 수용 기준`과 `## 리뷰 기준` 본문을 그대로 복사한 것 |
+| `[수용 기준]`, `[리뷰 기준]` | spec의 `## 수용 기준`과 `## 리뷰 기준` 본문을 그대로 복사한 것 |
 | `[모델]` | orchestrator.md "모델 선택"에 따라 고른 모델 이름(`sonnet`, `opus`, `fable` 중 하나). 구현 subagent와 같은 모델이다 |
 
 ## 공통 블록
@@ -31,9 +31,9 @@ prompt: |
 
   ## 요구사항
   [BRIEF_FILE]을 읽는다. 이 슬라이스의 Files, Consumes/Produces, 완료 판정이 요구사항이다.
-  구속력 있는 기준은 유효 spec의 수용 기준이다:
+  구속력 있는 기준은 spec의 수용 기준이다:
   [수용 기준]
-  diff 밖을 볼 때의 기준은 유효 spec의 리뷰 기준이다:
+  diff 밖을 볼 때의 기준은 spec의 리뷰 기준이다:
   [리뷰 기준]
 
   ## 구현 subagent의 주장
@@ -48,7 +48,7 @@ prompt: |
   diff 파일을 읽는다. 커밋 목록, 바뀐 파일 목록, 앞뒤 문맥 10줄이 붙은 diff가 들어 있다.
   diff 파일이 없을 때만 `git diff --stat [BASE_SHA]..[HEAD_SHA]`와 `git diff [BASE_SHA]..[HEAD_SHA]`로 직접 뽑는다.
 
-  diff 밖은 유효 spec의 리뷰 기준이 가리키는 곳과 이름 붙일 수 있는 위험만 본다.
+  diff 밖은 spec의 리뷰 기준이 가리키는 곳과 이름 붙일 수 있는 위험만 본다.
   예: API 계약이나 공유 상태가 바뀌었으면 호출하는 쪽을 확인한다.
   무엇을 왜 봤는지 보고에 쓴다.
 

@@ -17,8 +17,6 @@ const PLUGINS = [
     files: [
       '.claude-plugin/plugin.json',
       '.codex-plugin/plugin.json',
-      'README.md',
-      'README-ko.md',
     ],
     // glob 패턴 대신 디렉토리 + 파일명으로 수집
     skillDirs: ['skills'],

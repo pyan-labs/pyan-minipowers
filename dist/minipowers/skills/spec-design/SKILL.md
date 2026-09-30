@@ -1,7 +1,7 @@
 ---
 name: spec-design
-description: todo 파일이나 요구 문장 하나를 승인된 docs/minipowers/<stem>/spec.md와 그 spec을 첫 커밋으로 둔 feature 브랜치 worktree로 만들고, --amend 모드에서는 승인된 spec의 개정을 같은 폴더의 amendment 파일로 쓴다.
-argument-hint: "<todo 파일 | 요구 문장> 또는 --amend <작업 폴더>"
+description: todo 파일이나 요구 문장 하나를 승인된 docs/minipowers/<stem>/spec.md와 그 spec을 첫 커밋으로 둔 feature 브랜치 worktree로 만든다.
+argument-hint: "<todo 파일 | 요구 문장>"
 disable-model-invocation: true
 ---
 
@@ -20,18 +20,15 @@ disable-model-invocation: true
 
 변경이 작으면 spec의 각 절이 한 줄이다. 한 줄짜리 수정에도 spec 파일을 만든다.
 
-`--amend` 모드는 이것 대신 기존 작업 폴더에 `amendment-<N>.md` 파일 하나와 그 파일만 든 커밋 하나를 남긴다. 절차는 "`--amend` 모드" 절이다.
-
 spec은 뒤 단계(spec-implement, spec-review, spec-digest)가 받는 유일한 입력이다. 뒤 단계는 이 대화를 볼 수 없으므로, 구현에 필요한 코드베이스 맥락은 전부 spec에 적는다.
 
 ## 1. 인자 해석
 
-인자는 todo 파일 경로, 요구를 적은 문장, `--amend <작업 폴더>` 중 하나다.
+인자는 todo 파일 경로 또는 요구를 적은 문장이다.
 
-- 인자가 `--amend`로 시작하면 "`--amend` 모드" 절로 간다. 이하 2~8절은 새 spec을 쓸 때의 절차다.
 - 인자가 존재하는 파일 경로이면 그 파일을 읽는다. 원문을 spec 머리말의 "원 요구"에 경로와 함께 `>` 인용으로 옮긴다.
 - 인자가 파일 경로가 아니면 문장으로 받는다. 그 문장을 "원 요구"에 인용한다.
-- 인자가 없으면 "todo 파일 경로나 요구 문장, 또는 `--amend <작업 폴더>`를 넣어 다시 호출한다"고 한 줄로 안내하고 끝낸다.
+- 인자가 없으면 "todo 파일 경로나 요구 문장을 넣어 다시 호출한다"고 한 줄로 안내하고 끝낸다.
 
 ## 2. 작업 폴더 만들기
 
@@ -49,7 +46,7 @@ spec 초안을 쓰기 전에 다음을 읽는다.
 - **지시 파일.** 프로젝트 루트와 작업 디렉터리의 `CLAUDE.md`, `AGENTS.md`. 코딩 규칙, 테스트 위치, 테스트 명령, 브랜치 이름 규칙이 여기 있다.
 - **전체 테스트 명령.** 지시 파일에 있으면 그것을 쓴다. 없으면 프로젝트 종류로 정해지는 표준 명령(`dotnet test`, `pnpm test`, `pytest`, `go test ./...` 등)을 쓴다.
 - **관련 코드.** 요구가 건드리는 파일, 그 파일을 부르는 곳, 비슷한 일을 하는 기존 코드, 관련 테스트.
-- **이전 spec.** `docs/minipowers/` 안에 같은 영역을 다룬 spec 폴더가 있으면 그 spec.md와 digest.md.
+- **이전 spec.** `docs/minipowers/` 안에 같은 영역을 다룬 spec 폴더가 있으면 그 spec.md와 digest.md. todo의 `중단된 작업:` 줄이 spec을 가리키면(conventions.md "중단 todo") 그 폴더의 spec.md, progress.md, findings.md도 읽는다. 폴더는 `.worktrees/<stem>`에 있을 수 있다. 끝난 슬라이스의 커밋은 그 브랜치에만 있다. 새 spec은 항상 승인 시점의 HEAD를 기준 커밋으로 삼는다. 그 커밋을 이어받으려면 사용자가 승인 전에 그 브랜치를 프로젝트의 git 규칙대로 기반 브랜치에 병합해 두어야 하고, 7절의 검토 요청에 적은 현재 브랜치와 HEAD 해시로 확인한다. 이 스킬은 병합하지 않는다.
 
 ## 4. spec 초안 쓰기
 
@@ -143,32 +140,6 @@ spec.md를 파일로 저장하고 경로를 알려 사용자에게 검토를 요
    다음 단계: `/spec-implement docs/minipowers/<stem>/`
    ```
 
-첫 커밋 뒤에는 spec.md를 고치지 않는다. 그 뒤 spec에 결함이 드러나면 `/spec-design --amend docs/minipowers/<stem>/`로 같은 폴더에 amendment를 쓴다. 요구 자체가 달라져 기존 브랜치와 무관한 작업이 되면 이 스킬을 다시 호출해 새 spec을 쓴다. 그 spec의 "원 요구"에는 기존 spec 경로를 적고, 기준 커밋은 새로 호출한 시점의 HEAD다.
-
-## `--amend` 모드
-
-인자는 `--amend <작업 폴더>`다. 폴더 안의 `spec.md` 경로를 받으면 그 폴더로 해석한다. `--amend` 뒤에 폴더가 없으면 "개정할 작업 폴더를 `--amend` 뒤에 넣어 다시 호출한다"고 한 줄로 안내하고 끝낸다. `<stem>`은 작업 폴더 이름이다. 승인된 spec은 대개 `.worktrees/<stem>`에만 있고 메인 체크아웃에는 없으므로, 폴더가 현재 위치에 없다는 이유로 끝내지 않는다. 1단계에서 찾는다.
-
-승인된 spec의 개정을 같은 폴더의 `amendment-<N>.md`로 쓴다. N은 폴더에 있는 amendment의 가장 큰 번호에 1을 더한 값이고, 처음이면 1이다. 형식은 `${CLAUDE_SKILL_DIR}/amendment-template.md`다. 머리말 네 줄과 첫 절 `## 개정 이유`는 템플릿 문자열 그대로 쓴다.
-
-1. 작업 위치를 정한다. 먼저 spec.md를 찾아 머리말의 브랜치를 읽는다.
-   - 현재 위치의 `docs/minipowers/<stem>/spec.md`를 먼저 본다.
-   - 없으면 `<메인 체크아웃 루트>/.worktrees/<stem>/docs/minipowers/<stem>/spec.md`를 본다. 메인 체크아웃 루트는 `git worktree list --porcelain | head -1`의 `worktree <경로>`다.
-   - 둘 다 없으면 conventions.md "인자 해석"대로 안내하고 끝낸다.
-
-   그 브랜치로 위치를 확정한다. spec-review와 같은 규칙이다. 현재 브랜치(`git rev-parse --abbrev-ref HEAD`)가 spec 머리말의 브랜치이면 그 자리다. 아니면 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다)의 `.worktrees/<stem>`이 있고 그 안의 브랜치가 spec의 브랜치이면 그 안이다. 둘 다 아니면 현재 브랜치와 spec의 브랜치를 보고하고 끝낸다. 이하 파일 읽기, 쓰기, 커밋은 모두 그 위치에서(`git -C <경로>`) 한다.
-2. 작업 폴더의 spec.md, 기존 `amendment-<N>.md`, progress.md, findings.md를 읽는다. 없는 파일은 건너뛴다. 유효 spec은 conventions.md `## 유효 spec`대로 만든다. 개정을 부른 것(finding ID, progress.md의 `spec 결함:` 줄, 사용자 문장)을 대화에서 찾는다. 찾지 못하면 사용자에게 묻는다.
-3. 바뀌는 절만 amendment에 둔다. `##` 절은 유효 spec의 같은 제목 절 전체를 대체하므로, 그 절에서 바뀌지 않는 내용도 옮겨 적는다. `## 구현 슬라이스`는 바꾸거나 더하는 `### 슬라이스 N:` 블록만 쓴다.
-   - progress.md에 `슬라이스 N: complete` 줄이 있는 슬라이스는 대체하지 않는다.
-   - 끝난 슬라이스의 결과를 바꿔야 하면 새 슬라이스를 추가한다.
-   - 새 슬라이스 번호는 유효 spec의 가장 큰 슬라이스 번호에 1을 더한 값이다.
-4. amendment가 `## 검증된 전제`를 바꾸면 유효 spec의 표 전체를 옮기고 행을 더하거나 고친다. 절 전체를 대체하는 규칙 때문이다. 새 단언은 5절대로 확인한다.
-5. 질문은 6절과 같다. 검토 요청은 7절의 항목에서 기준 커밋과 브랜치에 관한 항목(현재 브랜치와 HEAD 해시, 기반 브랜치 동기화)을 빼고 쓴다. 대신 개정 대상 절 목록을 넣는다. 사용자가 승인하기 전에는 amendment를 커밋하지 않는다. 머리말의 "개정 시점 HEAD"에는 작업 위치의 `git rev-parse HEAD`와 그 브랜치를 적는다.
-6. 승인 뒤에는 브랜치를 만들지 않는다. `amendment-<N>.md` 한 파일만 스테이징해 작업 위치의 현재 브랜치에 커밋한다. 커밋 해시와 amendment 경로를 보고하고, 마지막 줄에 다음 단계를 적고 끝낸다.
-   ```
-   다음 단계: `/spec-implement docs/minipowers/<stem>/`
-   ```
-
-spec.md와 커밋된 amendment는 고치지 않는다. 다시 고칠 것이 생기면 다음 번호의 amendment를 쓴다.
+첫 커밋 뒤에는 spec.md를 고치지 않는다. 그 뒤 spec에 결함이 드러나거나 요구가 달라지면 그 내용을 새 todo로 적어 이 스킬을 다시 호출해 새 spec을 쓴다. 그 spec의 "원 요구"에는 기존 spec 경로를 적고, 기준 커밋은 새로 호출한 시점의 HEAD다. 사이클이 spec 결함으로 멈췄으면 spec-implement가 그 todo를 `docs/minipowers/todo/<stem>-followup.md`로 이미 써 두었다(conventions.md "중단 todo").
 
 이 스킬은 병합, push, Pull Request 생성을 하지 않는다.

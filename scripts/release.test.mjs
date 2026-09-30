@@ -25,8 +25,6 @@ function fixture(t) {
     for (const host of ['.claude-plugin', '.codex-plugin']) {
       write(`packages/${name}/${host}/plugin.json`, JSON.stringify({ name, version: '1.0.0', skills: './skills/' }));
     }
-    write(`packages/${name}/README.md`, name);
-    write(`packages/${name}/README-ko.md`, name);
     write(`packages/${name}/skills/example/SKILL.md`, '---\nname: example\ndescription: test\n---\n');
     write(`packages/${name}/skills/_shared/helper.md`, 'support');
   }

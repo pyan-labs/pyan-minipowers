@@ -7,11 +7,11 @@ disable-model-invocation: true
 
 # spec-implement — spec 하나를 슬라이스 단위로 구현한다
 
-유효 spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마다 커밋하고, 진행을 `progress.md`에 남긴다. 입력은 spec.md와 amendment, 프로젝트 지시 파일, 소스코드뿐이다.
+spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마다 커밋하고, 진행을 `progress.md`에 남긴다. 입력은 spec.md, 프로젝트 지시 파일, 소스코드뿐이다. spec에 결함이 있어 진행할 수 없으면 spec을 고치지 않고 멈춰서, 다음 사이클의 todo를 남긴다.
 
 ## 시작
 
-1. `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`를 읽는다. 네 스킬이 공유하는 규칙(인자 해석, 폴더 구조, 유효 spec, 정지 조건, gitignore 처리, 증거 규칙, 스킬 파일 경로)은 거기 있고, 이 문서는 그것을 가리키기만 한다.
+1. `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`를 읽는다. 네 스킬이 공유하는 규칙(인자 해석, 폴더 구조, 정지 조건, 중단 todo, gitignore 처리, 증거 규칙, 스킬 파일 경로)은 거기 있고, 이 문서는 그것을 가리키기만 한다.
 2. 인자를 작업 폴더로 해석한다. 이하 `<폴더>`는 `docs/minipowers/<stem>/`, `<stem>`은 폴더 이름이다.
 3. spec.md를 찾는다. spec은 병합 전까지 feature 브랜치에만 있고, 그 브랜치는 대개 `.worktrees/<stem>`에 checkout되어 있다.
    - 현재 체크아웃에 `<폴더>/spec.md`가 있으면 그것을 읽는다.
@@ -22,17 +22,16 @@ disable-model-invocation: true
      - 여럿이면 브랜치 목록을 보고하고 끝낸다.
      - 없으면 conventions.md "인자 해석"대로 안내하고 끝낸다.
 
-   spec.md를 전부 읽는다. 머리말의 `- 기준 커밋:`과 `- 브랜치:` 줄에서 값을 얻는다. 값을 감싼 백틱과 뒤의 괄호 설명은 떼고 읽는다. 모드 결정에서 읽는 progress.md와 findings.md, 4의 amendment도 spec.md를 찾은 폴더의 것을 읽는다. 여기서는 파일을 읽을 곳만 찾는다. 위의 브랜치 찾기 경로에서 worktree를 만드는 것만 예외다. 작업 위치는 구현 모드와 수정 모드 모두 "작업 공간과 기준 커밋 확인"이 정하고, 그 뒤로는 작업 위치의 파일을 쓴다.
-4. `<폴더>`에 `amendment-<N>.md`가 있으면 conventions.md `## 유효 spec`대로 spec.md에 겹쳐 유효 spec을 만든다. 이하 spec을 읽는 곳은 모두 유효 spec을 읽는다. 머리말은 spec.md의 것 그대로다.
-5. 프로젝트 지시 파일(CLAUDE.md, AGENTS.md 등)에서 전체 테스트 명령, 테스트 위치, 코딩 규칙, 준비 명령(의존성 설치 등), worktree 복사 목록(`minipowers worktree 복사:` 줄)을 찾는다. spec 머리말의 전체 테스트 명령과 다르면 spec 머리말을 쓴다.
-6. 스크립트는 `bash ${CLAUDE_SKILL_DIR}/scripts/<name> ...`으로 부른다. `${CLAUDE_SKILL_DIR}`는 Claude Code가 이 SKILL.md가 있는 폴더의 절대경로로 치환한다. 보조 문서(orchestrator.md, implementer-prompt.md, reviewer-prompt.md)도 같은 폴더에 있다.
+   spec.md를 전부 읽는다. 머리말의 `- 기준 커밋:`과 `- 브랜치:` 줄에서 값을 얻는다. 값을 감싼 백틱과 뒤의 괄호 설명은 떼고 읽는다. 모드 결정에서 읽는 progress.md와 findings.md도 spec.md를 찾은 폴더의 것을 읽는다. 여기서는 파일을 읽을 곳만 찾는다. 위의 브랜치 찾기 경로에서 worktree를 만드는 것만 예외다. 작업 위치는 구현 모드와 수정 모드 모두 "작업 공간과 기준 커밋 확인"이 정하고, 그 뒤로는 작업 위치의 파일을 쓴다.
+4. 프로젝트 지시 파일(CLAUDE.md, AGENTS.md 등)에서 전체 테스트 명령, 테스트 위치, 코딩 규칙, 준비 명령(의존성 설치 등), worktree 복사 목록(`minipowers worktree 복사:` 줄)을 찾는다. spec 머리말의 전체 테스트 명령과 다르면 spec 머리말을 쓴다.
+5. 스크립트는 `bash ${CLAUDE_SKILL_DIR}/scripts/<name> ...`으로 부른다. `${CLAUDE_SKILL_DIR}`는 Claude Code가 이 SKILL.md가 있는 폴더의 절대경로로 치환한다. 보조 문서(orchestrator.md, implementer-prompt.md, reviewer-prompt.md)도 같은 폴더에 있다.
 
 ## 모드 결정
 
 위에서부터 처음 성립하는 것 하나다. findings.md의 현재 판정은 `## Verdict` 절 하나에만 있으므로 그 절만 읽는다.
 
 - `<폴더>/findings.md`가 있고 `## Verdict` 절에 `Rounds: 2/2` 줄이 있으면 남은 항목은 사용자가 판정할 차례다. 수정 모드로 들어가지 않고 `Verdict:` 줄의 목록을 보고하고 끝낸다. 마지막 줄은 "다음 단계: 고칠 항목을 정한 뒤 findings.md `## Verdict` 절의 `Rounds:` 줄을 지우고 `/spec-implement <폴더>`를 다시 호출한다"이다.
-- 유효 spec `## 구현 슬라이스` 절의 `### 슬라이스 N:`(코드 펜스 안의 제목은 치지 않는다, slice-brief와 같은 규칙) 가운데 progress.md에 `슬라이스 N: complete` 줄이 없는 슬라이스가 있으면 **구현 모드**다. progress.md가 없으면 모든 슬라이스가 여기 해당한다. `완료: head` 뒤에 amendment가 슬라이스를 추가한 경우도 여기서 구현 모드로 이어 간다.
+- spec `## 구현 슬라이스` 절의 `### 슬라이스 N:`(코드 펜스 안의 제목은 치지 않는다, slice-brief와 같은 규칙) 가운데 progress.md에 `슬라이스 N: complete` 줄이 없는 슬라이스가 있으면 **구현 모드**다. progress.md가 없으면 모든 슬라이스가 여기 해당한다.
 - `<폴더>/findings.md`가 있고, `## Verdict` 절의 `Verdict:` 줄이 `Verdict: needs fixes`로 시작하면 **수정 모드**다. 고칠 항목은 그 줄의 `— ` 뒤 목록(예: `I1, I3`)이다.
 - `<폴더>/progress.md`에 `완료: head` 줄이 있으면 구현이 끝난 것이다. 할 일이 없다고 보고하고 끝낸다. 마지막 줄은 findings.md가 없으면 `다음 단계: /spec-review <폴더>`, 있으면 `다음 단계: /spec-digest <폴더>`다.
 - 그 밖에는 **구현 모드**다.
@@ -45,10 +44,10 @@ disable-model-invocation: true
 2. 없고, 현재 체크아웃의 브랜치가 spec의 브랜치이면 그 자리에서 작업한다. 사용자가 직접 그 브랜치를 checkout해 둔 경우다. 이때 worktree를 만들지 않는 이유는 git이 이미 checkout된 브랜치로 worktree를 만들지 못하게 막기 때문이다.
 3. 둘 다 아니고 브랜치가 있으면 메인 체크아웃 루트에서 `git worktree add .worktrees/<stem> <브랜치>`로 만들어 그 안에서 작업한다. `.worktrees/`를 처음 만들 때는 conventions.md의 gitignore 처리를 따른다. 새 worktree에 없는 gitignore된 파일과 의존성은 아래 "준비와 기준 테스트"에서 conventions.md "worktree 준비"대로 채운다.
 4. 브랜치가 없으면 spec-design이 승인 단계를 끝내지 않은 것이다. 그렇게 안내하고 끝낸다.
-5. `git merge-base --is-ancestor <기준 커밋> HEAD`가 실패하면 progress.md에 `spec 결함:` 줄을 적고 사용자에게 보고하고 끝낸다.
-6. `git diff --name-only <기준 커밋> HEAD`에 `<폴더>` 밖의 파일이 있고, progress.md에 `슬라이스 N: complete` 줄이 하나도 없으면, HEAD가 기준 커밋에서 움직인 것이다. 유효 spec의 `## 검증된 전제` 절 항목을 하나씩 적힌 방법으로 다시 확인한다. 하나라도 틀리면 progress.md에 `spec 결함:` 줄로 적고 사용자에게 보고하고 끝낸다. `슬라이스 N: complete` 줄이 하나라도 있으면 이 확인을 건너뛴다. 끝난 슬라이스의 커밋이 전제를 바꾼 것이기 때문이다.
+5. `git merge-base --is-ancestor <기준 커밋> HEAD`가 실패하면 progress.md에 `spec 결함:` 줄을 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 사용자에게 보고하고 끝낸다.
+6. `git diff --name-only <기준 커밋> HEAD`에 `<폴더>` 밖의 파일이 있고, progress.md에 `슬라이스 N: complete` 줄이 하나도 없으면, HEAD가 기준 커밋에서 움직인 것이다. spec의 `## 검증된 전제` 절 항목을 하나씩 적힌 방법으로 다시 확인한다. 하나라도 틀리면 progress.md에 `spec 결함:` 줄로 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 사용자에게 보고하고 끝낸다. `슬라이스 N: complete` 줄이 하나라도 있으면 이 확인을 건너뛴다. 끝난 슬라이스의 커밋이 전제를 바꾼 것이기 때문이다.
 
-이하 파일 읽기, 쓰기, 명령, 커밋은 모두 정한 작업 위치에서 한다. 1~3의 작업 위치는 spec의 브랜치를 checkout한 폴더다. 한 브랜치는 한 폴더에만 checkout되므로 "시작" 3에서 spec.md를 찾은 폴더와 대개 같다. 다르면(예: 병합 뒤 기반 브랜치에 남은 같은 폴더를 먼저 찾은 경우) 작업 위치의 spec.md, amendment, progress.md, findings.md로 다시 읽고 모드 결정을 다시 한다.
+이하 파일 읽기, 쓰기, 명령, 커밋은 모두 정한 작업 위치에서 한다. 1~3의 작업 위치는 spec의 브랜치를 checkout한 폴더다. 한 브랜치는 한 폴더에만 checkout되므로 "시작" 3에서 spec.md를 찾은 폴더와 대개 같다. 다르면(예: 병합 뒤 기반 브랜치에 남은 같은 폴더를 먼저 찾은 경우) 작업 위치의 spec.md, progress.md, findings.md로 다시 읽고 모드 결정을 다시 한다.
 
 ### 이어서 하기
 
@@ -56,7 +55,7 @@ disable-model-invocation: true
 
 ### 실행 방식
 
-유효 spec의 `## 구현 슬라이스` 절에서 `### 슬라이스 N: 이름` 제목마다 Files와 Consumes/Produces를 읽어 의존 관계를 만든다.
+spec의 `## 구현 슬라이스` 절에서 `### 슬라이스 N: 이름` 제목마다 Files와 Consumes/Produces를 읽어 의존 관계를 만든다.
 
 - 슬라이스 B의 Consumes에 슬라이스 A의 Produces가 있으면 B는 A 뒤에 온다.
 - 두 슬라이스의 Files에 같은 파일이 있으면 spec에서 뒤에 적힌 슬라이스가 앞의 것 뒤에 온다.
@@ -109,7 +108,20 @@ RED 증거는 슬라이스마다 progress.md에 `슬라이스 N: RED` 줄로 남
 
 ### 판정과 정지 조건
 
-설계가 모호하면 spec을 기준으로 스스로 판정하고 progress.md에 `Ruling:` 줄로 남긴 뒤 계속한다. 멈추고 사용자에게 묻는 경우는 conventions.md "정지 조건" 절의 넷(되돌릴 수 없거나 파괴적인 조작, 보안에 민감한 조작, worktree 밖으로 나가는 부작용, 어느 방향으로 가도 추측인 spec 결함)뿐이다. 넷째는 spec 결함을 보고하고 끝낸다.
+설계가 모호하면 spec을 기준으로 스스로 판정하고 progress.md에 `Ruling:` 줄로 남긴 뒤 계속한다. 멈추고 사용자에게 묻는 경우는 conventions.md "정지 조건" 절의 넷(되돌릴 수 없거나 파괴적인 조작, 보안에 민감한 조작, worktree 밖으로 나가는 부작용, 어느 방향으로 가도 추측인 spec 결함)뿐이다. 넷째는 progress.md에 `spec 결함:` 줄을 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 보고하고 끝낸다. 앞의 셋에서 사용자가 허락하면 그 조작과 답을 progress.md에 `승인:` 줄로 적고 progress.md만 스테이징해 커밋한 뒤 이어 간다. 다시 부르면 progress.md에 이미 `승인:` 줄이 있는 조작은 묻지 않는다. 새 세션이 대화 없이 같은 곳에서 다시 멈추지 않게 하려는 것이다.
+
+### spec 결함으로 멈출 때
+
+정지 조건 4로 멈출 때마다 다음을 순서대로 하고 끝낸다. 승인된 spec.md는 고치지 않는다. 구현 모드의 "작업 공간과 기준 커밋 확인" 5·6, 판정과 정지 조건, orchestrator의 BLOCKED가 여기로 온다.
+
+1. progress.md에 `spec 결함:` 줄이 없으면 적는다. 적은 뒤 progress.md만 스테이징해 커밋한다.
+2. conventions.md "중단 todo"의 형식과 위치대로 todo를 쓴다. `끝난 것`은 progress.md의 `complete` 줄에서, `남은 것`은 spec의 슬라이스 가운데 complete가 아닌 것에서 뽑는다. 커밋하지 않는다.
+3. 보고한다. 틀린 전제와 확인한 결과, 끝난 슬라이스의 커밋 목록, 쓴 todo의 경로를 적는다. 마지막 줄은 다음 단계 하나다.
+   ```
+   다음 단계: todo를 검토한 뒤 `/spec-design docs/minipowers/todo/<파일 이름>`
+   ```
+
+worktree와 브랜치는 그대로 둔다. 끝난 슬라이스의 커밋은 그 브랜치에만 있다. 새 사이클은 spec-design이 새 기준 커밋에서 시작하므로, 그 커밋을 이어받으려면 사용자가 새 spec을 승인하기 전에 그 브랜치를 프로젝트의 git 규칙대로 기반 브랜치에 병합해 둔다.
 
 ## 수정 모드
 
@@ -125,13 +137,13 @@ findings.md는 읽기만 한다. ADDRESSED와 WITHDRAWN 판정은 spec-review가
 
 ## 마무리 (구현 모드)
 
-1. 브랜치의 전체 테스트를 돌린다. 실패가 있으면 고치고 다시 돌린다. 단, progress.md 머리말 `- 기준 테스트:` 줄의 실패 목록에 있는 테스트는 구현을 시작하기 전 HEAD에서 이미 실패하던 것이므로 고치지 않고, 4의 "발견했지만 고치지 않은 것"에 적는다. 고칠 수 없는 실패가 남으면 그 출력을 보고에 넣는다.
+1. 브랜치의 전체 테스트를 돌린다. 실패가 있으면 고치고 다시 돌린다. 단, progress.md 머리말 `- 기준 테스트:` 줄의 실패 목록에 있는 테스트는 구현을 시작하기 전 HEAD에서 이미 실패하던 것이므로 고치지 않는다. 그 목록은 머리말에 이미 있다. 고칠 수 없는 실패가 남으면 그 출력을 보고에 넣는다.
 2. 남은 변경을 커밋한다.
-3. progress.md에 수동 확인 항목을 `수동 확인: <항목>` 줄로 하나씩 적고(4의 두 번째 항목과 같은 내용), 이어서 `완료: head <sha>`를 적고 progress.md만 스테이징해 커밋한다. `<sha>`는 2가 끝난 시점의 HEAD다. amendment가 슬라이스를 추가해 이전 `완료: head` 줄이 이미 있어도 새 줄을 하나 더 쓴다.
+3. progress.md에 수동 확인 항목을 `수동 확인: <항목>` 줄로 하나씩 적고(4의 두 번째 항목과 같은 내용), 작업 중 발견했지만 고치지 않은 기존 버그나 요청 밖 동작을 `발견: <내용> — <file:line>` 줄로 하나씩 적고(4의 세 번째 항목과 같은 내용), 이어서 `완료: head <sha>`를 적고 progress.md만 스테이징해 커밋한다. `<sha>`는 2가 끝난 시점의 HEAD다.
 4. 마무리 보고를 한다. 네 가지를 넣는다.
-   - 수용 기준 대조: 유효 spec의 `## 수용 기준` 항목마다 통과 또는 실패와 그 증거(명령과 출력)
-   - 수동 확인 항목: 유효 spec `## 수용 기준` 절의 `- 수동 확인 항목:` 줄을 옮기고, 작업 중 테스트로 대신할 수 없던 것을 더한다. 준비의 파일 복사에서 메인 체크아웃에 없어 건너뛴 경로가 있으면 적는다. 이 스킬이 프로젝트 `.gitignore`에 줄을 추가했으면 그 사실도 적는다. 그 변경의 커밋 여부는 사용자가 정한다
-   - 발견했지만 고치지 않은 것: 작업 중 발견한 기존 버그나 요청 밖 동작, 기준 테스트에서 이미 실패하던 테스트
+   - 수용 기준 대조: spec의 `## 수용 기준` 항목마다 통과 또는 실패와 그 증거(명령과 출력)
+   - 수동 확인 항목: spec `## 수용 기준` 절의 `- 수동 확인 항목:` 줄을 옮기고, 작업 중 테스트로 대신할 수 없던 것을 더한다. 준비의 파일 복사에서 메인 체크아웃에 없어 건너뛴 경로가 있으면 적는다. 이 스킬이 프로젝트 `.gitignore`에 줄을 추가했으면 그 사실도 적는다. 그 변경의 커밋 여부는 사용자가 정한다
+   - 발견했지만 고치지 않은 것: progress.md의 `발견:` 줄 전부, 그리고 기준 테스트에서 이미 실패하던 테스트
    - Ruling 목록: progress.md의 `Ruling:` 줄 전부
 5. 보고의 마지막 줄은 `다음 단계: /spec-review <폴더>`다.
 
@@ -177,7 +189,9 @@ spec-review와 spec-digest가 아래 문자열로 이 파일을 읽는다. 줄 �
 | `finding <ID>: 반박 — <근거 file:line>` | 수정 모드에서 findings.md의 `<ID>` 항목이 지금 코드 기준으로 틀렸다고 판단해 고치지 않았을 때 |
 | `묶음 W: 슬라이스 a, b 동시 시작 (base <sha>)` | orchestrator가 슬라이스 둘 이상인 묶음을 시작할 때 |
 | `묶음 W: 병합 완료 (head <sha>)` | 그 묶음의 슬라이스가 전부 병합됐을 때 |
-| `spec 결함: <틀린 전제 또는 항목> — <확인한 결과>` | 기준 커밋 확인이나 전제 재확인이 실패했을 때 |
+| `spec 결함: <틀린 전제 또는 항목> — <확인한 결과>` | 정지 조건 4로 멈출 때. 이 줄 다음에 중단 todo를 쓴다 |
+| `발견: <내용> — <file:line>` | 마무리 3에서 `수동 확인:` 줄 다음. 작업 중 발견했지만 고치지 않은 기존 버그나 요청 밖 동작 하나마다 한 줄. 기준 테스트의 기존 실패는 머리말 `- 기준 테스트:` 줄에 있으므로 쓰지 않는다. spec-review와 spec-digest가 이 줄을 읽는다 |
+| `승인: <조작> — <사용자 답>` | 정지 조건 1~3에서 멈춰 사용자가 허락하고 이어 갈 때. 이 줄이 있는 조작은 다시 묻지 않는다 |
 | `수동 확인: <항목>` | 마무리 3에서. 사람이 확인해야 할 항목 하나마다 한 줄. spec-digest가 이 줄을 옮긴다 |
 | `완료: head <sha>` | 마무리 3에서 `수동 확인:` 줄 다음. `<sha>`는 마무리 2가 끝난 시점의 HEAD다 |
 

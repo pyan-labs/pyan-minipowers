@@ -31,9 +31,8 @@ digest에는 소스를 열어 확인한 것만 쓴다. 문서와 소스가 다�
    - `- 브랜치: <이름>`
    - `- 원 요구:`
 
-   값이 백틱으로 감싸여 있으면 첫 백틱 안의 문자열을 값으로 쓴다. 머리말은 amendment로 개정되지 않으므로 spec.md 그대로 읽는다.
-4. `<폴더>`의 `amendment-<N>.md`를 번호(숫자) 순서로 찾는다. 있으면 conventions.md `## 유효 spec`대로 spec.md와 겹쳐 유효 spec을 만든다. 없으면 spec.md 그대로가 유효 spec이다. 이하 `## 결정`, `## 검증된 전제`, `## 구현 슬라이스`, `## 수용 기준` 등 spec 본문은 모두 유효 spec에서 읽는다.
-5. `<폴더>/progress.md`와 `<폴더>/findings.md`가 있으면 읽는다.
+   값이 백틱으로 감싸여 있으면 첫 백틱 안의 문자열을 값으로 쓴다.
+4. `<폴더>/progress.md`와 `<폴더>/findings.md`가 있으면 읽는다.
 
 절 제목과 줄 형식은 아래 문자열을 그대로 찾는다. 코드 펜스(```) 안의 줄은 제목으로 치지 않는다.
 
@@ -47,13 +46,14 @@ spec.md       ## 문제
               ## 구현 슬라이스
               ### 슬라이스 N: 이름
               ## 수용 기준
-              amendment-<N>.md
 progress.md   슬라이스 N: complete (commits <a>..<b>)
               Ruling: <결정> — <근거> — <틀렸다면 잘못되는 것>
               슬라이스 N: minor(deferred): ...
               슬라이스 N: parked — ... — Ruling: ...
               finding <ID>: <sha>
               수동 확인: <항목>
+              발견: <내용> — <file:line>
+              승인: <조작> — <사용자 답>
               완료: head <sha>
               - 기준 테스트: <통과/실패 수 한 줄>, 실패: <테스트 이름 목록 또는 없음>
               슬라이스 N: RED <테스트 이름> — <실패 요지 한 줄>
@@ -155,6 +155,8 @@ spec 수용 기준마다 소절을 하나 두고, 사용자 행동 → 진입점
 
 - spec의 결정: `### 바꾸는 것`, `### 바꾸지 않는 것`, `### 감수하는 것`을 각각 한두 줄로 줄인다.
 - Ruling: progress.md에서 `Ruling:`을 포함하는 줄을 전부 원문 그대로 옮긴다.
+- 발견: progress.md에서 `발견:`으로 시작하는 줄을 전부 원문 그대로 옮긴다.
+- 승인: progress.md에서 `승인:`으로 시작하는 줄을 전부 원문 그대로 옮긴다.
 - 리뷰 판정: findings.md `## Verdict` 절의 `Verdict:` 줄과 `Rounds:` 줄을 원문 그대로 옮긴다. 제목에 `— WITHDRAWN (<근거 file:line>)`이 붙은 finding 제목이 있으면 원문 그대로 옮긴다.
 - 수동 확인 항목: spec `## 수용 기준` 절의 `- 수동 확인 항목:` 줄과 progress.md의 `수동 확인:`으로 시작하는 줄을 옮긴다.
 - parked: progress.md에서 `슬라이스 N: parked —`로 시작하는 줄을 원문 그대로 옮긴다.
@@ -169,7 +171,7 @@ spec 수용 기준마다 소절을 하나 두고, 사용자 행동 → 진입점
   grep -l "<stem>" docs/minipowers/*/spec.md
   ```
   자기 자신의 spec.md는 뺀다.
-- amendment: `<폴더>`의 `amendment-<N>.md` 파일 이름을 번호 순서로 나열한다. 없으면 "없음".
+- 후속 todo: 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다)의 `docs/minipowers/todo/<stem>-followup*.md`를 찾아 경로를 나열한다. spec-implement가 spec 결함으로 멈추며 쓴 것이다(conventions.md "중단 todo"). 없으면 "없음".
 - 커밋 범위: 2절에서 정한 값.
 - 브랜치: spec 머리말의 브랜치.
 

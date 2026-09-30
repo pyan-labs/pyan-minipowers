@@ -57,6 +57,14 @@ spec 수용 기준마다 소절을 하나 두고 사용자 행동 → 진입점 
 
 progress.md의 `Ruling:` 줄을 전부 원문 그대로 옮긴다.
 
+### 발견
+
+progress.md의 `발견:` 줄을 전부 원문 그대로 옮긴다. 없으면 "없음".
+
+### 승인
+
+progress.md의 `승인:` 줄을 전부 원문 그대로 옮긴다. 없으면 "없음".
+
 ### 리뷰 판정
 
 findings.md `## Verdict` 절의 `Verdict:` 줄과 `Rounds:` 줄을 원문 그대로 옮긴다. findings.md가 없으면 "없음(리뷰 전)".
@@ -73,6 +81,6 @@ progress.md의 `parked` 줄을 원문 그대로 옮긴다.
 
 - 선행 spec: <spec 본문이 참조하는 다른 `docs/minipowers/<stem>/` 폴더>
 - 뒤 spec: <이 stem을 참조하는 다른 `docs/minipowers/*/spec.md`>
-- amendment: <amendment 파일 목록 또는 없음>
+- 후속 todo: <`docs/minipowers/todo/<stem>-followup*.md`의 경로 또는 없음>
 - 커밋 범위: `<기준 커밋>..<끝 커밋>`
 - 브랜치: <브랜치>

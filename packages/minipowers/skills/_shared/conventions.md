@@ -22,7 +22,7 @@ minipowers의 네 스킬(spec-design · spec-implement · spec-review · spec-di
   ```
 - 찾은 뒤 할 일은 스킬마다 다르다. 어느 경우든 메인 체크아웃의 브랜치를 바꾸라고 안내하지 않는다.
   - spec-implement: 찾은 브랜치가 하나면 그 브랜치로 `.worktrees/<stem>`을 만들어 진행한다(spec-implement/SKILL.md "시작" 3).
-  - spec-review, spec-digest, spec-design `--amend`: worktree를 만들지 않는다. 현재 브랜치 이름(`git rev-parse --abbrev-ref HEAD`)과 찾은 브랜치 이름을 넣어 "`/spec-implement <작업 폴더>`를 먼저 부르거나, 메인 체크아웃 루트에서 `git worktree add .worktrees/<stem> <찾은 브랜치>`로 만든 뒤 다시 실행한다"고 안내하고 끝낸다.
+  - spec-review, spec-digest: worktree를 만들지 않는다. 현재 브랜치 이름(`git rev-parse --abbrev-ref HEAD`)과 찾은 브랜치 이름을 넣어 "`/spec-implement <작업 폴더>`를 먼저 부르거나, 메인 체크아웃 루트에서 `git worktree add .worktrees/<stem> <찾은 브랜치>`로 만든 뒤 다시 실행한다"고 안내하고 끝낸다.
   - 찾은 브랜치가 여럿이면 목록을 보고하고 끝낸다.
   - 어느 브랜치에도 없으면 현재 브랜치 이름과 함께 "`/spec-design`을 먼저 실행한다"고 안내하고 끝낸다.
 
@@ -38,10 +38,9 @@ Claude Code는 SKILL.md 본문의 `${CLAUDE_PLUGIN_ROOT}`를 플러그인 설치
 ```
 docs/minipowers/
 ├── index.md                          spec-digest가 매번 다시 생성하는 누적 목록
-├── todo/<이름>.md                    사용자가 쓰는 todo. 형식은 자유. spec-design의 입력
+├── todo/<이름>.md                    사용자가 쓰는 todo. 형식은 자유. spec-design의 입력. spec 결함으로 멈춘 사이클의 todo는 spec-implement가 쓴다("중단 todo" 절)
 └── <stem>/                           작업 하나 = 폴더 하나
-    ├── spec.md                       spec-design이 쓴다. 승인 뒤에는 고치지 않는다. 개정은 amendment로 한다
-    ├── amendment-<N>.md              spec-design이 `--amend`로 쓴다. N은 1부터 차례로
+    ├── spec.md                       spec-design이 쓴다. 승인 뒤에는 고치지 않는다. 바꿀 것이 생기면 새 todo로 새 사이클을 돈다
     ├── progress.md                   spec-implement가 쓴다
     ├── findings.md                   spec-review가 쓴다. spec-implement 수정 모드가 읽는다
     └── digest.md                     spec-digest가 쓴다
@@ -61,23 +60,12 @@ git worktree list --porcelain | head -1
 | 파일 | 쓰는 스킬 | 읽는 스킬 |
 |---|---|---|
 | `spec.md` | spec-design | spec-implement · spec-review · spec-digest |
-| `amendment-<N>.md` | spec-design(`--amend`) | spec-implement · spec-review · spec-digest |
+| `todo/<stem>-followup.md` | spec-implement(spec 결함으로 멈출 때) | spec-design |
 | `progress.md` | spec-implement | spec-review · spec-digest |
 | `findings.md` | spec-review | spec-implement(수정 모드) · spec-digest |
 | `digest.md`, `index.md` | spec-digest | 사람 |
 
 각 파일의 절 제목과 줄 형식은 그 파일을 쓰는 스킬의 템플릿이 정한다. 읽는 스킬은 그 템플릿의 제목 문자열을 그대로 찾는다.
-
-## 유효 spec
-
-spec.md 하나만 있으면 그것이 유효 spec이다. `amendment-<N>.md`가 있으면 spec.md를 읽고 amendment-1.md, amendment-2.md, …를 번호(숫자) 순서로 겹친 결과가 유효 spec이다. spec-implement · spec-review · spec-digest는 spec을 읽는 곳마다 이 절차로 유효 spec을 만들어 쓴다.
-
-겹치는 규칙은 다음 넷이다.
-
-- amendment의 `##` 절(`## 개정 이유` 제외)은 spec.md와 앞 amendment의 같은 제목 절 전체를 대체한다.
-- `## 구현 슬라이스`만 예외다. 절 전체가 아니라 `### 슬라이스 N:` 블록 단위로 같은 N을 대체하거나 새 N을 추가한다.
-- 머리말(작성일, 기준 커밋, 브랜치, 원 요구, 전체 테스트 명령)은 개정하지 않는다. spec.md의 머리말 그대로 쓴다.
-- 뒤 번호가 이긴다. 코드 펜스 안의 제목은 제목으로 치지 않는다.
 
 ## stem 규칙
 
@@ -104,9 +92,41 @@ spec-implement · spec-review · spec-digest는 진행 중에 설계에 관한 �
 1. 되돌릴 수 없거나 파괴적인 조작을 해야 할 때
 2. 보안에 민감한 조작을 해야 할 때. worktree에 없는 설정 파일이나 비밀 값이 필요할 때도 여기 해당한다("worktree 준비" 절)
 3. worktree 밖으로 나가는 부작용이 생길 때. 병합, 공유 브랜치로 push, 배포가 여기 해당한다
-4. spec이 틀려서 어느 방향으로 가도 추측일 때. 이 경우 spec 결함을 보고하고 끝낸다. 고치는 일은 spec-design의 몫이다
+4. spec이 틀려서 어느 방향으로 가도 추측일 때. 이 경우 spec 결함을 보고하고 끝낸다. spec-implement는 끝내기 전에 "중단 todo" 절대로 todo를 쓴다. 승인된 spec은 고치지 않는다. 고치는 일은 그 todo로 도는 새 사이클(spec-design)의 몫이다
 
 네 스킬 모두 병합 · push · Pull Request 생성을 하지 않는다. 마무리 보고의 마지막 줄에 사용자가 할 다음 단계 하나를 적는다.
+
+## 중단 todo
+
+사이클이 spec 결함(정지 조건 4)으로 멈추면 spec-implement가 다음 사이클의 입력으로 todo 하나를 쓴다. spec을 고치는 대신 새 사이클로 고친다. 정지 조건 1~3은 사용자가 허락하거나 조건을 채운 뒤 같은 작업 폴더로 이어 가는 것이므로 todo를 쓰지 않는다. 사용자의 허락은 progress.md의 `승인:` 줄로 남긴다.
+
+- 위치: `<메인 체크아웃 루트>/docs/minipowers/todo/<stem>-followup.md`. 폴더가 없으면 만든다. 같은 이름이 이미 있으면 덮어쓰지 않고 `<stem>-followup-2.md`, `-3.md`처럼 처음 비는 번호를 쓴다.
+- 커밋하지 않는다. todo는 브랜치 밖의 사용자 파일이다.
+- 형식은 아래 그대로다. spec-design이 이 파일을 읽어 새 spec의 "원 요구"로 옮긴다.
+
+```markdown
+# <해결할 것을 한 줄로> (spec 결함으로 중단된 <stem>의 후속)
+
+- 중단된 작업: docs/minipowers/<stem>/spec.md
+- 브랜치: <브랜치> (중단 시점 HEAD <sha>)
+- 기준 커밋: <sha>
+
+## spec 결함
+
+progress.md의 `spec 결함:` 줄과 같은 내용. 틀린 전제 또는 항목과 확인한 결과를 `파일:줄`이나 명령 출력으로 쓴다.
+
+## 끝난 것
+
+progress.md의 `슬라이스 N: complete (commits <a>..<b>)` 줄마다 슬라이스 이름과 그 커밋 범위. 없으면 "없음".
+
+## 남은 것
+
+complete가 아닌 슬라이스의 제목과 Files. 없으면 "없음".
+
+## 해결할 요구
+
+새 사이클이 해결할 것. 원 spec의 요구 가운데 아직 이뤄지지 않은 것과 spec 결함을 고친 요구를 문장으로 쓴다.
+```
 
 ## gitignore 처리
 
@@ -131,7 +151,7 @@ spec-implement · spec-review · spec-digest는 진행 중에 설계에 관한 �
 
 ## 문체 규칙
 
-네 스킬이 쓰는 문서(spec.md · progress.md · findings.md · digest.md)에 적용한다.
+네 스킬이 쓰는 문서(spec.md · progress.md · findings.md · digest.md · 중단 todo)에 적용한다.
 
 - 독자는 그 작업을 지켜보지 않은 개발자다. 대화에서만 통하는 표현을 쓰지 않는다.
 - 문장이 길어져도 풀어 쓴다. 항목이 셋 이상이면 한 줄에 `·`로 잇지 않고 줄을 나눈다.

@@ -12,9 +12,8 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
 
 | 용어 | 뜻 |
 |---|---|
-| 슬라이스 | 유효 spec의 `## 구현 슬라이스` 절에 있는 `### 슬라이스 N: 이름` 하나. Files, Consumes/Produces, 완료 판정 세 항목과 선택 항목 `- 모델:`으로 정의된다 |
-| 유효 spec | spec.md에 같은 폴더의 `amendment-<N>.md`를 conventions.md `## 유효 spec`대로 겹친 것. amendment가 없으면 spec.md 그대로다 |
-| brief | 슬라이스 하나의 본문을 유효 spec에서 뽑아낸 파일. 구현 subagent가 읽는다 |
+| 슬라이스 | spec의 `## 구현 슬라이스` 절에 있는 `### 슬라이스 N: 이름` 하나. Files, Consumes/Produces, 완료 판정 세 항목과 선택 항목 `- 모델:`으로 정의된다 |
+| brief | 슬라이스 하나의 본문을 spec에서 뽑아낸 파일. 구현 subagent가 읽는다 |
 | report | 구현 subagent가 무엇을 했고 어떤 테스트를 돌렸는지 쓴 파일. 리뷰 subagent가 읽는다 |
 | 리뷰 패키지 | 슬라이스의 커밋 목록, 바뀐 파일 목록, 문맥 10줄 diff를 한 파일로 만든 것 |
 | progress.md | `docs/minipowers/<stem>/progress.md`. 진행 기록이다. 줄 형식은 SKILL.md "progress.md 형식" 절이 정한다 |
@@ -26,7 +25,7 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
 
 - `<ROOT>`: 메인 체크아웃의 절대경로. conventions.md "폴더 구조"의 명령(`git worktree list --porcelain | head -1`)으로 얻는다
 - `<SPEC_WT>`: SKILL.md "작업 공간과 기준 커밋 확인"에서 정한 작업 위치의 절대경로. 대개 `<ROOT>/.worktrees/<stem>`이고, 사용자가 spec 브랜치를 직접 checkout해 둔 경우에는 현재 체크아웃이다
-- `<SPEC>`: `<SPEC_WT>/docs/minipowers/<stem>/spec.md`의 절대경로. 스크립트에는 amendment가 있어도 항상 이 값을 넘긴다. 워크스페이스는 spec 경로로 소유를 확인하므로 같은 경로를 계속 써야 같은 워크스페이스가 나온다
+- `<SPEC>`: `<SPEC_WT>/docs/minipowers/<stem>/spec.md`의 절대경로. 워크스페이스는 spec 경로로 소유를 확인하므로 같은 경로를 계속 써야 같은 워크스페이스가 나온다
 - `${CLAUDE_SKILL_DIR}`: 이 스킬의 SKILL.md가 있는 폴더의 절대경로. Claude Code가 치환한다
 
 스크립트는 `<ROOT>`에서 실행한다. worktree 안에서 실행하면 `.minipowers/`가 그 worktree 안에 생긴다. 커밋은 SHA로 넘긴다. `<ROOT>`의 `HEAD`는 spec 브랜치의 HEAD가 아닐 수 있다.
@@ -42,7 +41,7 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
    - 파일이 있고 첫 줄이 이 spec을 가리키면 이전 세션이 진행하던 작업이다. `슬라이스 N: complete` 줄이 있는 슬라이스는 건너뛴다. 묶음이 `동시 시작`만 있고 `병합 완료`가 없으면, 그 묶음에서 complete가 아닌 슬라이스만 다시 처리한다.
    - 머리말은 SKILL.md "준비와 기준 테스트"에서 이미 만들어져 있다. 여기서는 `- 준비:`와 `- 기준 테스트:` 줄이 있는지 확인만 한다. 이전 세션에서 이어받은 이전 형식 progress.md라 두 줄이 없으면 그대로 두고 진행한다.
    - 컨텍스트가 압축된 뒤에는 기억보다 progress.md와 `git log`를 믿는다.
-4. **유효 spec을 읽는다.** spec.md와 `amendment-<N>.md`를 conventions.md `## 유효 spec`대로 겹친다. 그 결과의 `## 검증된 전제`, `## 구현 맥락`, `## 구현 슬라이스`, `## 수용 기준`, `## 리뷰 기준`을 읽는다. 슬라이스끼리 Consumes와 Produces가 맞물리는지 대조한다. 어긋난 곳은 유효 spec을 기준으로 판정하고 `Ruling:`으로 남긴다. spec.md와 amendment 파일은 고치지 않는다.
+4. **spec을 읽는다.** spec.md의 `## 검증된 전제`, `## 구현 맥락`, `## 구현 슬라이스`, `## 수용 기준`, `## 리뷰 기준`을 읽는다. 슬라이스끼리 Consumes와 Produces가 맞물리는지 대조한다. 어긋난 곳은 spec을 기준으로 판정하고 `Ruling:`으로 남긴다. spec.md는 고치지 않는다.
 
 ## 슬라이스 하나를 처리하는 순서
 
@@ -61,12 +60,12 @@ BASE=$(git -C <슬라이스 worktree> rev-parse HEAD)
 
 ### 2. 구현 subagent를 띄운다
 
-brief를 만든다. 아래 명령이 유효 spec에서 슬라이스 N의 본문을 뽑아 워크스페이스에 쓰고 경로를 출력한다.
+brief를 만든다. 아래 명령이 spec에서 슬라이스 N의 본문을 뽑아 워크스페이스에 쓰고 경로를 출력한다.
 ```bash
 cd <ROOT> && bash ${CLAUDE_SKILL_DIR}/scripts/slice-brief <SPEC> N
 ```
 
-slice-brief는 `<SPEC>`과 같은 폴더의 `amendment-<N>.md`를 N의 숫자 순서로 보고, `### 슬라이스 N:` 블록이 있는 마지막 파일에서 블록을 뽑는다. 그런 amendment가 없으면 spec.md에서 뽑는다. 출력 줄은 `wrote <out>: <k> lines (from <파일 이름>)`이다. 괄호 안의 파일 이름으로 어느 파일의 블록인지 확인한다.
+slice-brief는 `<SPEC>`에서 `### 슬라이스 N:` 블록을 뽑는다. 출력 줄은 `wrote <out>: <k> lines`이다.
 
 [implementer-prompt.md](implementer-prompt.md)의 템플릿을 채워 띄운다. 프롬프트에 넣는 것은 다음이다.
 
@@ -95,7 +94,7 @@ slice-brief는 `<SPEC>`과 같은 폴더의 `amendment-<N>.md`를 N의 숫자 �
 - 슬라이스의 Files가 모두 테스트를 두지 않는 곳이면 `슬라이스 N: RED 없음 — <테스트를 두지 않는 이유 한 줄>`을 한 줄 적는다.
 - report에 테스트를 두는 곳의 RED 증거가 없으면 줄을 지어내지 않는다. 리뷰 subagent가 Important finding으로 올린다.
 
-report에 `Ruling:` 줄이 있으면 progress.md에 그대로 옮겨 적는다. BLOCKED의 원인이 어느 방향으로 가도 추측인 spec 결함이면 conventions.md 정지 조건 4에 해당한다. 원인이 worktree에 없는 파일(설정, 비밀 값)이면 conventions.md "worktree 준비"의 마지막 문단대로 멈춘다.
+report에 `Ruling:` 줄이 있으면 progress.md에 그대로 옮겨 적는다. BLOCKED의 원인이 어느 방향으로 가도 추측인 spec 결함이면 conventions.md 정지 조건 4에 해당한다. SKILL.md "spec 결함으로 멈출 때"대로 todo를 쓰고 끝낸다. 원인이 worktree에 없는 파일(설정, 비밀 값)이면 conventions.md "worktree 준비"의 마지막 문단대로 멈춘다.
 
 ### 4. 리뷰 패키지를 만든다
 
@@ -112,9 +111,9 @@ BASE는 1에서 기록한 커밋을 쓴다. `HEAD~1`을 쓰지 않는 이유는 
 - brief 경로 (구현 subagent가 읽은 것과 같은 파일)
 - report 경로
 - 리뷰 패키지 경로
-- 유효 spec의 `## 수용 기준`과 `## 리뷰 기준`을 그대로 복사한 것
+- spec의 `## 수용 기준`과 `## 리뷰 기준`을 그대로 복사한 것
 
-빠른 패스는 그 슬라이스의 brief와 diff만 본다. 기준은 유효 spec의 수용 기준이다. 테스트는 다시 돌리지 않고 report의 출력을 diff와 대조한다. 브랜치 전체의 철저한 리뷰는 spec-review가 한다.
+빠른 패스는 그 슬라이스의 brief와 diff만 본다. 기준은 spec의 수용 기준이다. 테스트는 다시 돌리지 않고 report의 출력을 diff와 대조한다. 브랜치 전체의 철저한 리뷰는 spec-review가 한다.
 
 ### 6. 수정 라운드
 
@@ -182,7 +181,7 @@ Ruling: <결정> — <근거> — <틀렸다면 잘못되는 것>
 
 subagent를 띄울 때마다 모델을 지정한다. 지정하지 않으면 세션의 모델을 물려받는다.
 
-- 구현 subagent: 유효 spec의 슬라이스에 `- 모델:` 줄이 있으면 그 값(`sonnet`, `opus`, `fable` 중 하나)이다. 값을 감싼 백틱은 떼고 읽는다. 줄이 없으면 슬라이스의 Files에 적힌 파일이 둘 이하일 때 `sonnet`, 셋 이상일 때 `opus`다. 값이 셋 중 하나가 아니면 파일 수 규칙을 쓰고 `Ruling:`으로 남긴다.
+- 구현 subagent: spec의 슬라이스에 `- 모델:` 줄이 있으면 그 값(`sonnet`, `opus`, `fable` 중 하나)이다. 값을 감싼 백틱은 떼고 읽는다. 줄이 없으면 슬라이스의 Files에 적힌 파일이 둘 이하일 때 `sonnet`, 셋 이상일 때 `opus`다. 값이 셋 중 하나가 아니면 파일 수 규칙을 쓰고 `Ruling:`으로 남긴다.
 - 리뷰 subagent: 그 슬라이스의 구현 subagent와 같은 모델
 - 수정 라운드: 처음 띄운 구현 subagent와 같은 모델
 
@@ -194,4 +193,4 @@ subagent를 띄운 뒤에는 progress.md 기록이나 다음 리뷰 패키지 �
 
 ## 마무리
 
-모든 묶음이 끝나면 SKILL.md "마무리 (구현 모드)"로 간다. 워크스페이스(`<ROOT>/.minipowers/<stem>/work/`)는 spec-review가 끝날 때까지 남겨 둔다.
+모든 묶음이 끝나면 SKILL.md "마무리 (구현 모드)"로 간다. 워크스페이스(`<ROOT>/.minipowers/<stem>/work/`)는 일회용이라 뒤 단계가 읽지 않는다. 지우는 것은 spec-digest의 병합 뒤 정리 안내다.
