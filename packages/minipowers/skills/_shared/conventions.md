@@ -10,15 +10,13 @@ spec-implement · spec-review · spec-digest는 시작할 때 이 절로 읽을 
 
 ### 정상 시나리오
 
-인자는 작업 폴더 `docs/minipowers/<stem>/` 하나다. 예: `docs/minipowers/2026-09-27-01-minipowers/`. 폴더 안의 `spec.md` 경로를 받으면 그 폴더다. 폴더 이름이 `<stem>`이다. 인자가 없으면 무엇을 넣어야 하는지 한 줄로 안내하고 끝낸다. 폴더를 추측하지 않는다.
+인자는 작업 폴더 `docs/minipowers/<stem>/` 하나다. `spec.md` 경로를 받으면 그 폴더로 본다. 인자가 없으면 넣을 것을 한 줄로 안내하고 끝낸다.
 
-spec-design이 끝나면 spec의 브랜치는 `<메인 체크아웃 루트>/.worktrees/<stem>`에 checkout되어 있고, 승인된 spec.md는 병합 전까지 그 브랜치에만 있다. 루트는 "폴더 구조" 절의 명령으로 얻는다.
+1. **spec.md를 읽는다.** 현재 체크아웃의 `docs/minipowers/<stem>/spec.md`, 없으면 `<메인 체크아웃 루트>/.worktrees/<stem>/docs/minipowers/<stem>/spec.md`다. 루트는 "폴더 구조" 절의 명령으로 얻는다. 머리말에서 `- 브랜치:`와 `- 기준 커밋:` 값을 얻는다. 백틱과 괄호 설명은 뗀다.
+2. **작업 위치를 정한다.** spec의 브랜치가 checkout된 폴더다. 현재 체크아웃의 브랜치가 spec의 브랜치이면 현재 체크아웃, 아니면 `<메인 체크아웃 루트>/.worktrees/<stem>`이다.
+3. **이후 모든 읽기, 쓰기, 명령, 커밋은 작업 위치에서 한다.** spec.md, progress.md, findings.md도 작업 위치의 것이다.
 
-1. **spec.md를 읽는다.** 현재 체크아웃의 `docs/minipowers/<stem>/spec.md`, 없으면 `<메인 체크아웃 루트>/.worktrees/<stem>/docs/minipowers/<stem>/spec.md`다. 머리말의 `- 브랜치:`와 `- 기준 커밋:` 값을 읽는다. 값을 감싼 백틱과 뒤의 괄호 설명은 뗀다.
-2. **작업 위치를 정한다.** 작업 위치는 spec의 브랜치를 checkout한 폴더다. 현재 체크아웃의 브랜치(`git rev-parse --abbrev-ref HEAD`)가 spec의 브랜치이면 현재 체크아웃이다. 아니면 `.worktrees/<stem>`의 브랜치가 spec의 브랜치이면 그 폴더다.
-3. **이하 파일 읽기, 쓰기, 명령, 커밋은 모두 작업 위치에서 한다.** spec.md, progress.md, findings.md도 작업 위치의 것을 읽는다. 1에서 읽은 spec.md가 다른 폴더의 것이면 작업 위치의 것으로 다시 읽는다.
-
-spec-digest는 병합 뒤에도 부른다. 이때 spec.md는 기반 브랜치의 현재 체크아웃에 있고 spec의 브랜치는 지워졌거나 다른 곳에 있다. spec-digest는 1에서 spec.md를 찾은 폴더를 작업 위치로 쓰고 커밋하지 않는다(spec-digest/SKILL.md "커밋과 마무리"). spec-implement와 spec-review에는 이 예외가 없다.
+예외: spec-digest는 병합 뒤에도 부른다. spec의 브랜치가 어디에도 checkout되어 있지 않으면 1에서 spec.md를 읽은 폴더가 작업 위치이고, 커밋하지 않는다.
 
 ### 문제 시나리오
 
@@ -39,7 +37,7 @@ spec-digest는 병합 뒤에도 부른다. 이때 spec.md는 기반 브랜치의
 3. **spec.md는 있는데 spec의 브랜치가 없다.**
    - spec-implement: spec-design이 승인 단계를 끝내지 않은 것이다. 그렇게 안내하고 끝낸다.
    - spec-review: 현재 브랜치 이름과 spec의 브랜치를 보고하고 끝낸다. findings.md는 쓰지 않는다. spec의 브랜치가 아닌 곳에서 `<기준 커밋>..HEAD`는 다른 작업의 커밋을 담기 때문이다.
-   - spec-digest: 정상 시나리오의 병합 뒤 규칙대로 진행한다.
+   - spec-digest: 정상 시나리오의 예외대로 진행한다.
 
 ## 스킬 파일 경로
 
