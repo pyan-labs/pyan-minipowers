@@ -17,7 +17,9 @@ AGENTS.md와 README-ko.md의 세 원칙을 기준으로 `packages/minipowers/ski
 | `spec-implement/SKILL.md` + `orchestrator.md` + `implementer-prompt.md` + `reviewer-prompt.md` | 202 + 196 + 107 + 155 |
 | `spec-review/SKILL.md` + `findings-template.md` | 226 + 107 |
 | `spec-digest/SKILL.md` + `digest-template.md` + `index-template.md` | 216 + 86 + 29 |
-| 합계 | 2,685 |
+| 합계 | 1,723 (표의 줄 수를 더한 값. 최초 기록 2,685는 합산 오류) |
+
+항목 2 뒤(5.11.2): conventions.md 180, spec-implement/SKILL.md 189, spec-review/SKILL.md 220, spec-digest/SKILL.md 216, 나머지 동일. 합계 1,711.
 
 fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 
@@ -50,6 +52,10 @@ fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 ---
 
 ## 2. [High] spec.md 찾기와 작업 위치 결정이 세 곳에 얽혀 있다
+
+**처리 완료 (2026-09-30, 5.11.2).** conventions.md "인자 해석" 절을 "작업 위치 결정" 절로 바꾸고, 인자 해석 → spec.md 찾기 → 작업 위치 → 작업 위치가 없을 때의 스킬별 표를 한 절에 두었다. spec-implement "시작" 3과 "작업 공간과 기준 커밋 확인" 1~4를 지우고 남은 5·6을 "기준 커밋 확인"으로 이름을 바꿨다. 이어서 하기, 준비와 기준 테스트의 예외, 수정 모드 1, orchestrator의 두 참조도 새 절 이름으로 맞췄다. spec-review 시작 2·3·5·6을 두 줄로, spec-digest 시작 2를 한 줄로 줄였다. 계획의 표와 다른 점 하나: spec-digest는 브랜치가 없어도 현재 체크아웃이나 `.worktrees/<stem>`에서 spec.md를 찾았으면 거기서 진행하고 커밋만 하지 않는다. 병합 뒤 브랜치를 지운 상태에서 digest를 부르는 기존 동작을 지키기 위해서다. 브랜치에서만 찾은 경우는 spec-review와 같이 안내하고 끝낸다.
+
+**검증.** `pnpm run test:release` 7개 통과. `인자 해석`, `작업 공간과 기준 커밋 확인`, `"시작" 3` 참조가 spec-design의 자체 절 제목 외에 남지 않은 것을 grep으로 확인했다. 크기는 위 표 아래에 적었다.
 
 **현상.** 같은 동작이 `conventions.md:14-27`(인자 해석), `spec-implement/SKILL.md:16-25`(시작 3), `spec-implement/SKILL.md:43-50`(작업 공간과 기준 커밋 확인)에 나뉘어 있고, 서로를 "시작 3의 브랜치 찾기 경로", "작업 공간 3의 명령", "준비와 기준 테스트의 예외"로 가리킨다. spec-review 시작 3·6, spec-digest 시작 2도 같은 내용을 다시 풀어 쓴다.
 

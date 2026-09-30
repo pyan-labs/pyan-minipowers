@@ -4,27 +4,33 @@ minipowers의 네 스킬(spec-design · spec-implement · spec-review · spec-di
 
 프로젝트 지시 파일(CLAUDE.md, AGENTS.md 등)이 이 규약과 다르게 정한 것이 있으면 지시 파일을 따른다.
 
-## 인자 해석
+## 작업 위치 결정
 
-네 스킬 모두 인자는 **작업 폴더 경로 하나**다. 예: `docs/minipowers/2026-09-27-01-minipowers/`.
+spec-implement · spec-review · spec-digest는 시작할 때 이 절의 순서로 읽을 spec.md와 작업 위치를 정한다. spec-design은 인자가 todo 파일 경로 또는 요구 문장이고 작업 폴더를 스스로 만들므로 이 절을 쓰지 않는다. 어느 경우든 메인 체크아웃의 브랜치를 바꾸거나 바꾸라고 안내하지 않는다.
 
-- 폴더 안의 `spec.md` 경로를 받으면 그 폴더로 해석한다.
-- spec-design만 예외다. 인자는 todo 파일 경로 또는 요구를 적은 문장이고, 작업 폴더는 spec-design이 만든다.
-- 인자가 없으면 무엇을 넣어야 하는지 한 줄로 안내하고 끝낸다. 폴더를 추측하지 않는다.
-- 승인된 spec은 병합 전까지 feature 브랜치에만 있고, 그 브랜치는 대개 `.worktrees/<stem>`에 checkout되어 있다. 메인 체크아웃에는 없는 것이 보통이다. 그래서 `spec.md`는 다음 순서로 찾는다.
-  1. 현재 체크아웃의 `<작업 폴더>/spec.md`
-  2. `<메인 체크아웃 루트>/.worktrees/<stem>/<작업 폴더>/spec.md`. 메인 체크아웃 루트는 "폴더 구조" 절의 명령으로 얻는다.
-- 둘 다 없으면 `<작업 폴더>/spec.md`를 가진 로컬 브랜치를 찾는다. 메인 체크아웃이 기반 브랜치에 있고 `.worktrees/<stem>`이 아직 없거나 지워진 경우다.
-  ```bash
-  for b in $(git for-each-ref --format='%(refname:short)' refs/heads); do
-    git cat-file -e "$b:docs/minipowers/<stem>/spec.md" 2>/dev/null && echo "$b"
-  done
-  ```
-- 찾은 뒤 할 일은 스킬마다 다르다. 어느 경우든 메인 체크아웃의 브랜치를 바꾸라고 안내하지 않는다.
-  - spec-implement: 찾은 브랜치가 하나면 그 브랜치로 `.worktrees/<stem>`을 만들어 진행한다(spec-implement/SKILL.md "시작" 3).
-  - spec-review, spec-digest: worktree를 만들지 않는다. 현재 브랜치 이름(`git rev-parse --abbrev-ref HEAD`)과 찾은 브랜치 이름을 넣어 "`/spec-implement <작업 폴더>`를 먼저 부르거나, 메인 체크아웃 루트에서 `git worktree add .worktrees/<stem> <찾은 브랜치>`로 만든 뒤 다시 실행한다"고 안내하고 끝낸다.
-  - 찾은 브랜치가 여럿이면 목록을 보고하고 끝낸다.
-  - 어느 브랜치에도 없으면 현재 브랜치 이름과 함께 "`/spec-design`을 먼저 실행한다"고 안내하고 끝낸다.
+1. **인자를 `<작업 폴더>`로 해석한다.** 인자는 작업 폴더 경로 하나다. 예: `docs/minipowers/2026-09-27-01-minipowers/`. 폴더 안의 `spec.md` 경로를 받으면 그 폴더다. 폴더 이름이 `<stem>`이다. 인자가 없으면 무엇을 넣어야 하는지 한 줄로 안내하고 끝낸다. 폴더를 추측하지 않는다.
+2. **spec.md를 찾는다.** 승인된 spec은 병합 전까지 feature 브랜치에만 있고, 그 브랜치는 대개 `.worktrees/<stem>`에 checkout되어 있다. 메인 체크아웃에는 없는 것이 보통이다. 다음 순서로 처음 있는 것을 쓴다.
+   1. 현재 체크아웃의 `<작업 폴더>/spec.md`
+   2. `<메인 체크아웃 루트>/.worktrees/<stem>/<작업 폴더>/spec.md`. 루트는 "폴더 구조" 절의 명령으로 얻는다.
+   3. `<작업 폴더>/spec.md`를 가진 로컬 브랜치. `.worktrees/<stem>`이 아직 없거나 지워진 경우다.
+      ```bash
+      for b in $(git for-each-ref --format='%(refname:short)' refs/heads); do
+        git cat-file -e "$b:docs/minipowers/<stem>/spec.md" 2>/dev/null && echo "$b"
+      done
+      ```
+      브랜치가 여럿이면 목록을 보고하고 끝낸다. 하나도 없으면 현재 브랜치 이름과 함께 "`/spec-design`을 먼저 실행한다"고 안내하고 끝낸다. 하나면 `git show <브랜치>:<작업 폴더>/spec.md`로 머리말의 `- 브랜치:` 값을 읽어 찾은 브랜치와 같은지 확인한다. 다르면 두 이름을 보고하고 끝낸다.
+
+   찾은 spec.md 머리말의 `- 브랜치:`와 `- 기준 커밋:` 값을 읽는다. 값을 감싼 백틱과 뒤의 괄호 설명은 떼고 읽는다.
+3. **작업 위치를 정한다.** 작업 위치는 spec의 브랜치를 checkout한 폴더다. 현재 체크아웃의 브랜치(`git rev-parse --abbrev-ref HEAD`)가 spec의 브랜치이면 현재 체크아웃이다. 아니면 `<메인 체크아웃 루트>/.worktrees/<stem>`의 브랜치가 spec의 브랜치이면 그 폴더다. 한 브랜치는 한 폴더에만 checkout되므로 2에서 spec.md를 찾은 폴더와 대개 같지만, 병합 뒤 기반 브랜치에 남은 spec.md를 먼저 찾은 경우처럼 다를 수 있다. 이하 파일 읽기, 쓰기, 명령, 커밋은 모두 작업 위치에서 한다. spec.md, progress.md, findings.md도 작업 위치의 것을 읽는다.
+4. **작업 위치가 없을 때**의 행동은 스킬마다 다르다.
+
+   | 스킬 | spec의 브랜치가 있다 | spec의 브랜치가 없다 |
+   |---|---|---|
+   | spec-implement | 메인 체크아웃 루트에서 `git worktree add .worktrees/<stem> <브랜치>`로 만들어 작업 위치로 삼는다. `.worktrees/`를 처음 만들면 "gitignore 처리"를 따른다. 이번 실행에서 worktree를 만들었으므로 progress.md가 있어도 "worktree 준비"를 한 번 한다 | spec-design이 승인 단계를 끝내지 않은 것이다. 그렇게 안내하고 끝낸다 |
+   | spec-review | 현재 브랜치 이름과 spec의 브랜치를 넣어 "`/spec-implement <작업 폴더>`를 먼저 부르거나, 메인 체크아웃 루트에서 `git worktree add .worktrees/<stem> <브랜치>`로 만든 뒤 다시 실행한다"고 안내하고 끝낸다. findings.md는 쓰지 않는다 | 현재 브랜치 이름과 spec의 브랜치를 보고하고 끝낸다. findings.md는 쓰지 않는다. spec의 브랜치가 아닌 곳에서 `<기준 커밋>..HEAD`는 다른 작업의 커밋을 담기 때문이다 |
+   | spec-digest | 2의 1 또는 2에서 spec.md를 찾았으면 그 폴더를 작업 위치로 쓰고 커밋하지 않는다(spec-digest/SKILL.md "커밋과 마무리"). 2의 3에서 찾았으면 spec-review와 같이 안내하고 끝낸다 | 2의 1 또는 2에서 찾은 폴더를 작업 위치로 쓰고 커밋하지 않는다. 병합 뒤 브랜치를 지운 경우다 |
+
+   `git worktree add`가 실패하면(찾은 브랜치가 이미 다른 경로에 checkout되어 있거나, `.worktrees/<stem>` 폴더가 다른 브랜치로 남아 있는 경우 등) 그 출력과 함께 보고하고 끝낸다.
 
 ## 스킬 파일 경로
 

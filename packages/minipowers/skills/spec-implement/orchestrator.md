@@ -24,7 +24,7 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
 ## 경로 표기
 
 - `<ROOT>`: 메인 체크아웃의 절대경로. conventions.md "폴더 구조"의 명령(`git worktree list --porcelain | head -1`)으로 얻는다
-- `<SPEC_WT>`: SKILL.md "작업 공간과 기준 커밋 확인"에서 정한 작업 위치의 절대경로. 대개 `<ROOT>/.worktrees/<stem>`이고, 사용자가 spec 브랜치를 직접 checkout해 둔 경우에는 현재 체크아웃이다
+- `<SPEC_WT>`: conventions.md "작업 위치 결정"으로 정한 작업 위치의 절대경로. 대개 `<ROOT>/.worktrees/<stem>`이고, 사용자가 spec 브랜치를 직접 checkout해 둔 경우에는 현재 체크아웃이다
 - `<SPEC>`: `<SPEC_WT>/docs/minipowers/<stem>/spec.md`의 절대경로. 워크스페이스는 spec 경로로 소유를 확인하므로 같은 경로를 계속 써야 같은 워크스페이스가 나온다
 - `<SKILL_DIR>`: conventions.md "스킬 파일 경로"대로 실제 절대경로로 바꾼다
 
@@ -32,7 +32,7 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
 
 ## 준비
 
-1. **작업 공간을 확인한다.** SKILL.md "작업 공간과 기준 커밋 확인"과 "준비와 기준 테스트"를 끝낸 상태여야 한다.
+1. **작업 공간을 확인한다.** SKILL.md "기준 커밋 확인"과 "준비와 기준 테스트"를 끝낸 상태여야 한다.
 2. **워크스페이스를 만든다.** 아래 명령이 디렉터리를 만들고 절대경로를 출력한다. 프로젝트 `.gitignore`의 `.minipowers/` 줄도 이 스크립트가 처리한다.
    ```bash
    cd "<ROOT>" && bash "<SKILL_DIR>/scripts/workspace" "<SPEC>"

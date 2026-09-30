@@ -11,18 +11,9 @@ spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마
 
 ## 시작
 
-1. 이 SKILL.md가 있는 폴더를 기준으로 `../_shared/conventions.md`를 읽는다. 스킬에 딸린 파일의 상대경로는 프로젝트의 현재 작업 디렉터리 기준이 아니다. 네 스킬이 공유하는 규칙(인자 해석, 폴더 구조, 정지 조건, 중단 todo, gitignore 처리, 증거 규칙, 스킬 파일 경로)은 거기 있고, 이 문서는 그것을 가리키기만 한다.
-2. 인자를 작업 폴더로 해석한다. 이하 `<폴더>`는 `docs/minipowers/<stem>/`, `<stem>`은 폴더 이름이다.
-3. spec.md를 찾는다. spec은 병합 전까지 feature 브랜치에만 있고, 그 브랜치는 대개 `.worktrees/<stem>`에 checkout되어 있다.
-   - 현재 체크아웃에 `<폴더>/spec.md`가 있으면 그것을 읽는다.
-   - 없고 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령 `git worktree list --porcelain | head -1`로 얻는다)의 `.worktrees/<stem>/<폴더>/spec.md`가 있으면 그것을 읽는다.
-   - 둘 다 없으면 conventions.md "인자 해석"의 브랜치 찾기 명령으로 `<폴더>/spec.md`를 가진 로컬 브랜치를 찾는다.
-     - 하나면 `git show <브랜치>:docs/minipowers/<stem>/spec.md`로 머리말의 `- 브랜치:` 값을 읽어 찾은 브랜치와 같은지 확인한다. 다르면 두 이름을 보고하고 끝낸다. 같으면 "작업 공간과 기준 커밋 확인" 3의 명령(`git worktree add .worktrees/<stem> <브랜치>`, gitignore 처리 포함)으로 지금 worktree를 만들고, 그 안의 `<폴더>/spec.md`를 읽는다. 이 경우 "작업 공간과 기준 커밋 확인"에서는 1이 성립한다. 이번 실행에서 worktree를 새로 만든 것이므로 아래 "준비와 기준 테스트"의 예외(준비를 한 번 한다)가 적용된다.
-     - `git worktree add`가 실패하면(찾은 브랜치가 이미 다른 경로에 checkout되어 있거나, `.worktrees/<stem>` 폴더가 다른 브랜치로 남아 있는 경우 등) 그 출력과 함께 보고하고 끝낸다.
-     - 여럿이면 브랜치 목록을 보고하고 끝낸다.
-     - 없으면 conventions.md "인자 해석"대로 안내하고 끝낸다.
-
-   spec.md를 전부 읽는다. 머리말의 `- 기준 커밋:`과 `- 브랜치:` 줄에서 값을 얻는다. 값을 감싼 백틱과 뒤의 괄호 설명은 떼고 읽는다. 모드 결정에서 읽는 progress.md와 findings.md도 spec.md를 찾은 폴더의 것을 읽는다. 여기서는 파일을 읽을 곳만 찾는다. 위의 브랜치 찾기 경로에서 worktree를 만드는 것만 예외다. 작업 위치는 구현 모드와 수정 모드 모두 "작업 공간과 기준 커밋 확인"이 정하고, 그 뒤로는 작업 위치의 파일을 쓴다.
+1. 이 SKILL.md가 있는 폴더를 기준으로 `../_shared/conventions.md`를 읽는다. 스킬에 딸린 파일의 상대경로는 프로젝트의 현재 작업 디렉터리 기준이 아니다. 네 스킬이 공유하는 규칙(작업 위치 결정, 폴더 구조, 정지 조건, 중단 todo, gitignore 처리, worktree 준비, 증거 규칙, 스킬 파일 경로)은 거기 있고, 이 문서는 그것을 가리키기만 한다.
+2. conventions.md "작업 위치 결정"대로 `<폴더>`, spec.md, 작업 위치를 정한다. 이하 `<폴더>`는 `docs/minipowers/<stem>/`, `<stem>`은 폴더 이름이다. 작업 위치가 없고 spec의 브랜치가 있으면 그 절의 표대로 지금 worktree를 만든다. 이후 파일 읽기, 쓰기, 명령, 커밋은 모두 작업 위치에서 한다.
+3. 작업 위치의 spec.md를 전부 읽는다. 머리말의 `- 기준 커밋:`과 `- 브랜치:` 값은 "작업 위치 결정"에서 읽은 것이다. 모드 결정에서 읽는 progress.md와 findings.md도 작업 위치의 것이다.
 4. 프로젝트 지시 파일(CLAUDE.md, AGENTS.md 등)에서 전체 테스트 명령, 테스트 위치, 코딩 규칙, 준비 명령(의존성 설치 등), worktree 복사 목록(`minipowers worktree 복사:` 줄)을 찾는다. spec 머리말의 전체 테스트 명령과 다르면 spec 머리말을 쓴다.
 5. 스크립트는 `bash "<SKILL_DIR>/scripts/<name>" ...`으로 부른다. `<SKILL_DIR>`는 conventions.md "스킬 파일 경로"대로 실제 절대경로로 바꾼다. 보조 문서(orchestrator.md, implementer-prompt.md, reviewer-prompt.md)도 같은 폴더에 있다.
 
@@ -38,20 +29,16 @@ spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마
 
 ## 구현 모드
 
-### 작업 공간과 기준 커밋 확인
+### 기준 커밋 확인
 
-1. 메인 체크아웃 루트의 `.worktrees/<stem>`이 있고 그 브랜치가 spec의 브랜치이면 그 안에서 작업한다.
-2. 없고, 현재 체크아웃의 브랜치가 spec의 브랜치이면 그 자리에서 작업한다. 사용자가 직접 그 브랜치를 checkout해 둔 경우다. 이때 worktree를 만들지 않는 이유는 git이 이미 checkout된 브랜치로 worktree를 만들지 못하게 막기 때문이다.
-3. 둘 다 아니고 브랜치가 있으면 메인 체크아웃 루트에서 `git worktree add .worktrees/<stem> <브랜치>`로 만들어 그 안에서 작업한다. `.worktrees/`를 처음 만들 때는 conventions.md의 gitignore 처리를 따른다. 새 worktree에 없는 gitignore된 파일과 의존성은 아래 "준비와 기준 테스트"에서 conventions.md "worktree 준비"대로 채운다.
-4. 브랜치가 없으면 spec-design이 승인 단계를 끝내지 않은 것이다. 그렇게 안내하고 끝낸다.
-5. `git merge-base --is-ancestor <기준 커밋> HEAD`가 실패하면 progress.md에 `spec 결함:` 줄을 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 사용자에게 보고하고 끝낸다.
-6. `git diff --name-only <기준 커밋> HEAD`에 `<폴더>` 밖의 파일이 있고, progress.md에 `슬라이스 N: complete` 줄이 하나도 없으면, HEAD가 기준 커밋에서 움직인 것이다. spec의 `## 검증된 전제` 절 항목을 하나씩 적힌 방법으로 다시 확인한다. 하나라도 틀리면 progress.md에 `spec 결함:` 줄로 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 사용자에게 보고하고 끝낸다. `슬라이스 N: complete` 줄이 하나라도 있으면 이 확인을 건너뛴다. 끝난 슬라이스의 커밋이 전제를 바꾼 것이기 때문이다.
+작업 위치에서 한다.
 
-이하 파일 읽기, 쓰기, 명령, 커밋은 모두 정한 작업 위치에서 한다. 1~3의 작업 위치는 spec의 브랜치를 checkout한 폴더다. 한 브랜치는 한 폴더에만 checkout되므로 "시작" 3에서 spec.md를 찾은 폴더와 대개 같다. 다르면(예: 병합 뒤 기반 브랜치에 남은 같은 폴더를 먼저 찾은 경우) 작업 위치의 spec.md, progress.md, findings.md로 다시 읽고 모드 결정을 다시 한다.
+1. `git merge-base --is-ancestor <기준 커밋> HEAD`가 실패하면 progress.md에 `spec 결함:` 줄을 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 사용자에게 보고하고 끝낸다.
+2. `git diff --name-only <기준 커밋> HEAD`에 `<폴더>` 밖의 파일이 있고, progress.md에 `슬라이스 N: complete` 줄이 하나도 없으면, HEAD가 기준 커밋에서 움직인 것이다. spec의 `## 검증된 전제` 절 항목을 하나씩 적힌 방법으로 다시 확인한다. 하나라도 틀리면 progress.md에 `spec 결함:` 줄로 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 사용자에게 보고하고 끝낸다. `슬라이스 N: complete` 줄이 하나라도 있으면 이 확인을 건너뛴다. 끝난 슬라이스의 커밋이 전제를 바꾼 것이기 때문이다.
 
 ### 이어서 하기
 
-`progress.md`가 있으면 이전 세션이 진행하던 작업이다. `슬라이스 N: complete` 줄이 있는 슬라이스는 건너뛰고 다음 슬라이스부터 이어 간다. 기억보다 progress.md와 `git log`를 믿는다. 이번 실행에서 worktree를 새로 만들었으면 아래 "준비와 기준 테스트"의 예외대로 준비(파일 복사와 준비 명령)만 한 번 한다.
+`progress.md`가 있으면 이전 세션이 진행하던 작업이다. `슬라이스 N: complete` 줄이 있는 슬라이스는 건너뛰고 다음 슬라이스부터 이어 간다. 기억보다 progress.md와 `git log`를 믿는다.
 
 ### 실행 방식
 
@@ -71,7 +58,7 @@ spec의 `## 구현 슬라이스` 절에서 `### 슬라이스 N: 이름` 제목�
 
 progress.md가 없을 때만 한다. 실행 방식을 정한 직후, 첫 슬라이스를 시작하기 전이다. inline과 orchestrator 공통이다. progress.md가 이미 있으면(이전 세션을 이어받으면) 준비도 기준 테스트도 다시 하지 않는다.
 
-예외가 하나 있다. 이번 실행에서 worktree를 새로 만들었으면("시작" 3의 브랜치 찾기 경로 또는 "작업 공간과 기준 커밋 확인" 3) progress.md가 있어도 1의 준비를 한 번 한다. 새 worktree에는 gitignore된 파일과 의존성이 없기 때문이다. 기준 테스트와 머리말은 progress.md가 있으면 다시 쓰지 않는다. 구현 모드의 이어서 하기와 수정 모드 모두 이 예외를 따른다.
+예외가 하나 있다. 이번 실행에서 worktree를 새로 만들었으면 progress.md가 있어도 1의 준비를 한 번 한다. 기준 테스트와 머리말은 다시 쓰지 않는다. 구현 모드의 이어서 하기와 수정 모드 모두 같다.
 
 1. 작업 위치에서 conventions.md "worktree 준비"의 두 단계(파일 복사, 준비 명령)를 한다.
 2. spec 머리말의 전체 테스트 명령을 한 번 돌린다. 이것이 기준 테스트다. 여기서 나온 실패는 구현을 시작하기 전 HEAD에서 이미 있던 것이므로 고치지 않는다.
@@ -112,7 +99,7 @@ RED 증거는 슬라이스마다 progress.md에 `슬라이스 N: RED` 줄로 남
 
 ### spec 결함으로 멈출 때
 
-정지 조건 4로 멈출 때마다 다음을 순서대로 하고 끝낸다. 승인된 spec.md는 고치지 않는다. 구현 모드의 "작업 공간과 기준 커밋 확인" 5·6, 판정과 정지 조건, orchestrator의 BLOCKED가 여기로 온다.
+정지 조건 4로 멈출 때마다 다음을 순서대로 하고 끝낸다. 승인된 spec.md는 고치지 않는다. 구현 모드의 "기준 커밋 확인", 판정과 정지 조건, orchestrator의 BLOCKED가 여기로 온다.
 
 1. progress.md에 `spec 결함:` 줄이 없으면 적는다. 적은 뒤 progress.md만 스테이징해 커밋한다.
 2. conventions.md "중단 todo"의 형식과 위치대로 todo를 쓴다. `끝난 것`은 progress.md의 `complete` 줄에서, `남은 것`은 spec의 슬라이스 가운데 complete가 아닌 것에서 뽑는다. 커밋하지 않는다.
@@ -125,7 +112,7 @@ worktree와 브랜치는 그대로 둔다. 끝난 슬라이스의 커밋은 그 
 
 ## 수정 모드
 
-1. 작업 공간은 구현 모드의 "작업 공간과 기준 커밋 확인" 1~5를 따른다. 이번 실행에서 worktree를 새로 만들었으면("시작" 3의 브랜치 찾기 경로 또는 그 3) progress.md가 있어도 "준비와 기준 테스트" 1의 준비를 한 번 한다. 기준 테스트와 머리말은 다시 쓰지 않는다.
+1. 작업 위치는 "시작"에서 정한 곳이다. 구현 모드의 "기준 커밋 확인" 1을 한다. 이번 실행에서 worktree를 새로 만들었으면 "준비와 기준 테스트"의 예외대로 준비를 한 번 한다.
 2. `Verdict: needs fixes — ` 뒤 목록의 항목만 목록 순서대로 하나씩 처리한다. 항목의 내용은 findings.md의 `#### <ID>` 제목(예: `#### I1`) 아래에 있다. 목록에 없는 항목은 그대로 둔다.
 3. 항목마다 고치기 전에 finding이 가리키는 `file:line`을 열어, 지적이 지금 코드 기준으로 맞는지 확인한다.
    - 틀렸다고 판단하면 고치지 않는다. progress.md에 `finding <ID>: 반박 — <근거 file:line>`을 적고 progress.md만 스테이징해 커밋한다.
