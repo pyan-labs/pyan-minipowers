@@ -16,7 +16,7 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
 | brief | 슬라이스 하나의 본문을 spec에서 뽑아낸 파일. 구현 subagent가 읽는다 |
 | report | 구현 subagent가 무엇을 했고 어떤 테스트를 돌렸는지 쓴 파일. 리뷰 subagent가 읽는다 |
 | 리뷰 패키지 | 슬라이스의 커밋 목록, 바뀐 파일 목록, 문맥 10줄 diff를 한 파일로 만든 것 |
-| progress.md | `docs/minipowers/<stem>/progress.md`. 진행 기록이다. 줄 형식은 SKILL.md "progress.md 형식" 절이 정한다 |
+| progress.md | `docs/minipowers/<stem>/progress.md`. 진행 기록이다. 줄 형식은 `./progress-template.md` 절이 정한다 |
 | 워크스페이스 | brief, report, 리뷰 패키지가 사는 일회용 디렉터리. `<ROOT>/.minipowers/<stem>/work/`. git이 추적하지 않는다 |
 | Ruling | 컨트롤러가 spec을 기준으로 스스로 내린 판정. progress.md에 `Ruling:` 줄로 남긴다 |
 | 묶음 | 서로 의존하지 않아 동시에 시작하는 슬라이스들 |

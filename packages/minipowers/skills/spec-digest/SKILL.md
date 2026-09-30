@@ -34,47 +34,11 @@ digest에는 소스를 열어 확인한 것만 쓴다. 문서와 소스가 다�
    값이 백틱으로 감싸여 있으면 첫 백틱 안의 문자열을 값으로 쓴다.
 4. `<폴더>/progress.md`와 `<폴더>/findings.md`가 있으면 읽는다.
 
-절 제목과 줄 형식은 아래 문자열을 그대로 찾는다. 코드 펜스(```) 안의 줄은 제목으로 치지 않는다.
+절 제목과 줄 형식은 각 파일의 템플릿에 적힌 문자열을 그대로 찾는다. 코드 펜스(```) 안의 줄은 제목으로 치지 않는다.
 
-```
-spec.md       ## 문제
-              ## 결정
-              ### 바꾸는 것
-              ### 바꾸지 않는 것
-              ### 감수하는 것
-              ## 검증된 전제
-              ## 구현 슬라이스
-              ### 슬라이스 N: 이름
-              ## 수용 기준
-progress.md   슬라이스 N: complete (commits <a>..<b>)
-              Ruling: <결정> — <근거> — <틀렸다면 잘못되는 것>
-              슬라이스 N: minor(deferred): ...
-              슬라이스 N: parked — ... — Ruling: ...
-              finding <ID>: <sha>
-              수동 확인: <항목>
-              발견: <내용> — <file:line>
-              승인: <조작> — <사용자 답>
-              완료: head <sha>
-              - 기준 테스트: <통과/실패 수 한 줄>, 실패: <테스트 이름 목록 또는 없음>
-              슬라이스 N: RED <테스트 이름> — <실패 요지 한 줄>
-              슬라이스 N: RED 없음 — <테스트를 두지 않는 이유 한 줄>
-              finding <ID>: 반박 — <근거 file:line>
-              슬라이스 N: withdrawn — <finding 한 줄> — <근거 file:line>
-findings.md   ## 구현 요약
-              ### 바뀐 파일
-              ### 수용 기준별 구현 위치
-              ### 동작 흐름
-              ## Findings
-              ### Critical
-              ### Important
-              ### Minor
-              ## Verdict
-              Verdict: ready to merge (<sha>)
-              Verdict: needs fixes — <목록>
-              Rounds: 2/2 — 남은 항목은 사용자가 판정한다
-              - 기존 실패: <목록 또는 없음>
-              — WITHDRAWN (<근거 file:line>)
-```
+- spec.md: `../spec-design/spec-template.md`
+- progress.md: `../spec-implement/progress-template.md`. 표에 읽는 스킬로 spec-digest가 적힌 줄과 머리말의 `- 기준 테스트:` 줄을 읽는다
+- findings.md: `../spec-review/findings-template.md`
 
 현재 판정은 findings.md의 `## Verdict` 절 하나다. 재리뷰는 이 절을 교체하므로 다른 절의 `Verdict:` 줄은 판정으로 읽지 않는다.
 

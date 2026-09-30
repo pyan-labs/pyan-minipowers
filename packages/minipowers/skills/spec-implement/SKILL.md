@@ -15,7 +15,7 @@ spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마
 2. conventions.md "작업 위치 결정"대로 `<폴더>`, spec.md, 작업 위치를 정한다. 이하 `<폴더>`는 `docs/minipowers/<stem>/`, `<stem>`은 폴더 이름이다. 작업 위치가 나오지 않으면 그 절의 문제 시나리오를 따른다. worktree를 만드는 경우도 거기 있다. 이후 파일 읽기, 쓰기, 명령, 커밋은 모두 작업 위치에서 한다.
 3. 작업 위치의 spec.md를 전부 읽는다. 머리말의 `- 기준 커밋:`과 `- 브랜치:` 값은 "작업 위치 결정"에서 읽은 것이다. 모드 결정에서 읽는 progress.md와 findings.md도 작업 위치의 것이다.
 4. 프로젝트 지시 파일(CLAUDE.md, AGENTS.md 등)에서 전체 테스트 명령, 테스트 위치, 코딩 규칙, 준비 명령(의존성 설치 등), worktree 복사 목록(`minipowers worktree 복사:` 줄)을 찾는다. spec 머리말의 전체 테스트 명령과 다르면 spec 머리말을 쓴다.
-5. 스크립트는 `bash "<SKILL_DIR>/scripts/<name>" ...`으로 부른다. `<SKILL_DIR>`는 conventions.md "스킬 파일 경로"대로 실제 절대경로로 바꾼다. 보조 문서(orchestrator.md, implementer-prompt.md, reviewer-prompt.md)도 같은 폴더에 있다.
+5. 스크립트는 `bash "<SKILL_DIR>/scripts/<name>" ...`으로 부른다. `<SKILL_DIR>`는 conventions.md "스킬 파일 경로"대로 실제 절대경로로 바꾼다. 보조 문서(orchestrator.md, implementer-prompt.md, reviewer-prompt.md)와 `progress-template.md`도 같은 폴더에 있다.
 
 ## 모드 결정
 
@@ -63,7 +63,7 @@ progress.md가 없을 때만 한다. 실행 방식을 정한 직후, 첫 슬라�
 1. 작업 위치에서 conventions.md "worktree 준비"의 두 단계(파일 복사, 준비 명령)를 한다.
 2. spec 머리말의 전체 테스트 명령을 한 번 돌린다. 이것이 기준 테스트다. 여기서 나온 실패는 구현을 시작하기 전 HEAD에서 이미 있던 것이므로 고치지 않는다.
 3. 기준 테스트의 실패가 worktree에 없는 파일 때문이면 기존 실패로 기록하지 않는다. conventions.md "worktree 준비"의 마지막 문단대로 멈춘다. 이때 progress.md 머리말을 쓰지 않으므로, 사용자가 파일을 채운 뒤 다시 부르면 1부터 다시 한다.
-4. progress.md 머리말 전체를 아래 "progress.md 형식"대로 쓴다. `- 준비:` 줄에는 1에서 복사한 경로와 돌린 명령을, `- 기준 테스트:` 줄에는 2의 결과를 적는다. orchestrator 방식이면 `- 묶음:` 줄은 orchestrator.md "실행 순서"대로 정한다.
+4. progress.md 머리말 전체를 `./progress-template.md`대로 쓴다. `- 준비:` 줄에는 1에서 복사한 경로와 돌린 명령을, `- 기준 테스트:` 줄에는 2의 결과를 적는다. orchestrator 방식이면 `- 묶음:` 줄은 orchestrator.md "실행 순서"대로 정한다.
 
 ### inline 방식
 
@@ -138,49 +138,7 @@ findings.md는 읽기만 한다. ADDRESSED와 WITHDRAWN 판정은 spec-review가
 
 ## progress.md 형식
 
-spec-review와 spec-digest가 아래 문자열로 이 파일을 읽는다. 줄 형식은 아래 그대로 쓴다. `<sha>`는 7자리 short SHA다.
-
-```markdown
-# minipowers progress — spec: docs/minipowers/<stem>/spec.md
-
-- 브랜치: <브랜치>
-- 기준 커밋: <sha>
-- 준비: 복사: <경로 목록 또는 없음>; 명령: <명령 또는 없음>
-- 기준 테스트: <통과/실패 수 한 줄>, 실패: <테스트 이름 목록 또는 없음>
-- 실행 방식: inline | orchestrator (<근거 한 줄>)
-- 묶음: [1] → [2, 3] → [4]
-
-## 기록
-
-<아래 줄들을 일어난 순서대로 한 줄씩 덧붙인다>
-```
-
-`- 준비:` 줄은 "준비와 기준 테스트" 1에서 복사한 경로와 돌린 명령을 적는다. 해당하는 것이 없는 쪽은 `없음`이라고 적는다. orchestrator가 슬라이스 worktree를 준비할 때도 이 줄의 목록과 명령을 쓴다.
-
-`- 기준 테스트:` 줄은 "준비와 기준 테스트" 2의 결과다. 실패가 없으면 `실패: 없음`이다. 이 줄이 없는 progress.md는 이 형식 전에 쓴 것이다.
-
-`- 묶음:` 줄은 orchestrator 방식일 때 의존 관계로 만든 묶음 순서를 적고, inline 방식이면 `없음`이라고 적는다.
-
-| 줄 | 쓰는 때 |
-|---|---|
-| `슬라이스 N: RED <테스트 이름> — <실패 요지 한 줄>` | RED 출력을 본 테스트마다 한 줄. inline 방식은 RED를 본 직후 적고, orchestrator 방식은 컨트롤러가 report의 TDD 증거를 옮겨 적는다. 그 슬라이스의 `complete` 줄과 같은 progress.md 커밋에 들어간다 |
-| `슬라이스 N: RED 없음 — <테스트를 두지 않는 이유 한 줄>` | 슬라이스의 Files가 모두 테스트를 두지 않는 곳일 때 한 줄 |
-| `슬라이스 N: complete (commits <a>..<b>)` | 슬라이스가 끝났을 때. `<a>`는 슬라이스 시작 직전의 커밋(BASE), `<b>`는 슬라이스의 마지막 코드 커밋이다. `git log <a>..<b>`가 그 슬라이스의 커밋이고 progress.md 커밋은 여기 들어가지 않는다 |
-| `슬라이스 N: complete (commits <a>..<b>, K parked)` | 수정 라운드 뒤에 남은 finding K개를 parked로 두고 끝냈을 때 |
-| `슬라이스 N: fix round R/2 (해결 X건, 남은 Y건; commits <a>..<b>)` | orchestrator의 수정 라운드 하나가 끝났을 때. 해결 X건에는 ADDRESSED와 WITHDRAWN을 함께 센다 |
-| `슬라이스 N: withdrawn — <finding 한 줄> — <근거 file:line>` | orchestrator 수정 라운드의 재리뷰가 구현 subagent의 반박을 WITHDRAWN으로 판정했을 때. finding마다 한 줄 |
-| `슬라이스 N: minor(deferred): <한 줄>` | 슬라이스 리뷰의 Minor, 구현 subagent가 남긴 관찰 |
-| `슬라이스 N: parked — <finding> — Ruling: <근거>` | 수정 라운드 2회 뒤 남은 finding을 그대로 둘 때 |
-| `Ruling: <결정> — <근거> — <틀렸다면 잘못되는 것>` | spec을 기준으로 스스로 판정했을 때 |
-| `finding <ID>: <sha>` | 수정 모드에서 findings.md의 `<ID>` 항목(예: `I1`, `C2`)을 고친 커밋 |
-| `finding <ID>: 반박 — <근거 file:line>` | 수정 모드에서 findings.md의 `<ID>` 항목이 지금 코드 기준으로 틀렸다고 판단해 고치지 않았을 때 |
-| `묶음 W: 슬라이스 a, b 동시 시작 (base <sha>)` | orchestrator가 슬라이스 둘 이상인 묶음을 시작할 때 |
-| `묶음 W: 병합 완료 (head <sha>)` | 그 묶음의 슬라이스가 전부 병합됐을 때 |
-| `spec 결함: <틀린 전제 또는 항목> — <확인한 결과>` | 정지 조건 4로 멈출 때. 이 줄 다음에 중단 todo를 쓴다 |
-| `발견: <내용> — <file:line>` | 마무리 3에서 `수동 확인:` 줄 다음. 작업 중 발견했지만 고치지 않은 기존 버그나 요청 밖 동작 하나마다 한 줄. 기준 테스트의 기존 실패는 머리말 `- 기준 테스트:` 줄에 있으므로 쓰지 않는다. spec-review와 spec-digest가 이 줄을 읽는다 |
-| `승인: <조작> — <사용자 답>` | 정지 조건 1~3에서 멈춰 사용자가 허락하고 이어 갈 때. 이 줄이 있는 조작은 다시 묻지 않는다 |
-| `수동 확인: <항목>` | 마무리 3에서. 사람이 확인해야 할 항목 하나마다 한 줄. spec-digest가 이 줄을 옮긴다 |
-| `완료: head <sha>` | 마무리 3에서 `수동 확인:` 줄 다음. `<sha>`는 마무리 2가 끝난 시점의 HEAD다 |
+머리말과 줄 형식은 `./progress-template.md`가 정한다. 줄은 거기 적힌 문자열 그대로 쓴다. 표의 읽는 스킬 열이 어느 줄을 누가 읽는지 보여 준다.
 
 progress.md는 `<폴더>` 안에 있으므로 브랜치에 커밋된다. 어느 방식이든 코드 커밋과 섞지 않고 progress.md만 스테이징해 따로 커밋한다. 줄에 적는 sha는 그 줄을 쓰기 전에 만든 커밋이므로, 커밋한 뒤에 줄을 쓰는 순서를 지키면 sha를 미리 알 필요가 없다.
 

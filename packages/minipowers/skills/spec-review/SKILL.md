@@ -83,15 +83,7 @@ git diff <기준 커밋>..HEAD
 
 1. spec의 `## 수용 기준`과 `## 리뷰 기준`
 2. spec의 `## 구현 슬라이스`에서 슬라이스별 Files와 완료 판정
-3. progress.md의 다음 줄
-   - 머리말의 `- 기준 테스트:` 줄(있으면)
-   - `Ruling:`으로 시작하는 줄
-   - `발견: <내용> — <file:line>` 줄과 `승인: <조작> — <사용자 답>` 줄
-   - `슬라이스 N: RED <테스트 이름> — <실패 요지 한 줄>` 또는 `슬라이스 N: RED 없음 — <테스트를 두지 않는 이유 한 줄>`
-   - `finding <ID>: 반박 — <근거 file:line>`
-   - `슬라이스 N: minor(deferred): <한 줄>`
-   - `슬라이스 N: parked — <finding> — Ruling: <근거>`
-   - `완료: head <sha>`
+3. progress.md에서 `../spec-implement/progress-template.md`의 표에 읽는 스킬로 spec-review가 적힌 줄과 머리말의 `- 기준 테스트:` 줄
 4. diff 전체
 
 ### 3. TDD 증거와 기준 테스트 확인

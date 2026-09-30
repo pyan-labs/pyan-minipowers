@@ -20,6 +20,7 @@ AGENTS.md와 README-ko.md의 세 원칙을 기준으로 `packages/minipowers/ski
 | 합계 | 1,723 (표의 줄 수를 더한 값. 최초 기록 2,685는 합산 오류) |
 
 항목 2 뒤(5.11.2): conventions.md 180, spec-implement/SKILL.md 189, spec-review/SKILL.md 220, spec-digest/SKILL.md 216, 나머지 동일. 합계 1,711.
+항목 3 뒤(5.11.5): conventions.md 188, spec-implement/SKILL.md 147 + progress-template.md 47(신규), spec-review/SKILL.md 212, spec-digest/SKILL.md 180, 나머지 동일. 합계 1,690.
 
 fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 
@@ -85,6 +86,10 @@ fix 뒤에 같은 표를 다시 재서 줄어든 것을 확인한다.
 ---
 
 ## 3. [High] progress.md 줄 형식 계약을 읽는 쪽마다 복제했다
+
+**처리 완료 (2026-09-30, 5.11.5).** 계획의 `_shared/progress-format.md` 대신 `spec-implement/progress-template.md`에 두었다. conventions.md "폴더 구조"의 "각 파일의 절 제목과 줄 형식은 그 파일을 쓰는 스킬의 템플릿이 정한다"에 맞추기 위해서다. spec.md, findings.md, digest.md와 같은 자리다. 표에 "읽는 스킬" 열을 더했고, 항목 4에서 지울 다섯 줄은 그대로 옮겼다. spec-implement/SKILL.md "progress.md 형식"은 참조 한 줄과 커밋 규칙만 남겼다. spec-review "읽는 순서" 3과 spec-digest 시작의 문자열 블록은 세 템플릿 참조로 바꿨다. spec-digest 블록의 findings 문자열(`Rounds: 2/2`, `- 기존 실패:`, `— WITHDRAWN`)과 spec 절 제목이 findings-template.md, spec-template.md에 있는 것을 확인했다. dist는 스킬 폴더를 통째로 복사하므로 스크립트 수정은 없다.
+
+**검증.** `pnpm run test:release` 7개 통과. 옛 표의 줄 문자열이 세 SKILL.md에 남지 않은 것을 grep으로 확인했다. 크기는 위 표 아래에 적었다.
 
 **현상.** 줄 형식 표는 `spec-implement/SKILL.md:177-197`에 있고, `spec-digest/SKILL.md:39-77`과 `spec-review/SKILL.md:93-101`이 그 목록을 다시 적는다. findings.md 절 제목도 spec-digest가 다시 나열한다.
 
