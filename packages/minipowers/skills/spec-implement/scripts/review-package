@@ -5,7 +5,7 @@
 #
 # 출처: superpowers subagent-driven-development scripts/review-package (MIT), 경로 변경.
 # Usage: review-package SPEC_FILE BASE HEAD [OUTFILE]
-# Default OUTFILE: <repo-root>/.minipowers/<spec-stem>/work/review-<base7>..<head7>.diff
+# Default OUTFILE: <프로젝트 루트>/.minipowers/<spec-stem>/work/review-<base7>..<head7>.diff
 set -euo pipefail
 
 if [ $# -lt 3 ] || [ $# -gt 4 ]; then

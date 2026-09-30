@@ -1,7 +1,7 @@
 {
   "name": "minipowers",
   "description": "todo → spec → 구현 → 리뷰 → 기록. spec 파일 하나를 단계 사이의 계약서로 쓰는 네 스킬(spec-design · spec-implement · spec-review · spec-digest)",
-  "version": "5.10.0",
+  "version": "5.11.0",
   "author": {
     "name": "pyan-labs"
   }

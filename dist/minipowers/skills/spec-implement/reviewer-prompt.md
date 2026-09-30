@@ -9,7 +9,7 @@ orchestrator.md "5. 리뷰 subagent를 띄운다"와 "6. 수정 라운드"에서
 
 | 자리표시자 | 넣는 것 |
 |---|---|
-| `[worktree 절대경로]` | 리뷰 대상 슬라이스의 worktree 절대경로 |
+| `[worktree 절대경로]` | 리뷰 대상 슬라이스의 작업 위치 절대경로. 구현 subagent에게 넘긴 것과 같은 값(orchestrator.md "경로 표기"의 `<슬라이스 worktree>`) |
 | `[BRIEF_FILE]` | 구현 subagent가 읽은 것과 같은 brief 파일 |
 | `[REPORT_FILE]` | 구현 subagent의 report 파일. 수정 보고는 이 파일 끝에 덧붙어 있다 |
 | `[DIFF_FILE]` | `review-package`가 출력한 경로 |

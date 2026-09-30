@@ -8,7 +8,7 @@
 #
 # 출처: superpowers subagent-driven-development scripts/task-brief (MIT), 제목 패턴·경로·절 끝 판정·amendment 우선 변경.
 # Usage: slice-brief SPEC_FILE SLICE_NUMBER [OUTFILE]
-# Default OUTFILE: <repo-root>/.minipowers/<spec-stem>/work/slice-<N>-brief.md
+# Default OUTFILE: <프로젝트 루트>/.minipowers/<spec-stem>/work/slice-<N>-brief.md
 set -euo pipefail
 
 if [ $# -lt 2 ] || [ $# -gt 3 ]; then

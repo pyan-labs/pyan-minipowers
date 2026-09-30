@@ -22,7 +22,7 @@ If the spec has to change after approval, `/spec-design --amend <work folder>` w
 
 | Skill | Invocation | Input | Output |
 |---|---|---|---|
-| spec-design | `/spec-design <todo file or sentence>` | the todo, the codebase, Q&A with the user | `spec.md`, a feature branch, `.worktrees/<stem>`, the first commit |
+| spec-design | `/spec-design <todo file or sentence>` | the todo, the codebase, Q&A with the user | `spec.md`, a feature branch (the main checkout switches to it), the first commit |
 | spec-design (amend) | `/spec-design --amend <work folder>` | the effective spec, progress.md, findings.md, Q&A with the user | `amendment-<N>.md`, one commit containing only that file |
 | spec-implement | `/spec-implement <work folder>` | the effective spec, project instruction files, source code | one commit per slice, `progress.md` |
 | spec-review | `/spec-review <work folder>` | the effective spec, the `base-commit..HEAD` diff | `findings.md` |
@@ -47,7 +47,7 @@ docs/minipowers/
     └── digest.md
 ```
 
-One piece of work is one folder. The argument to all four skills is this folder path. An approved spec.md is never edited. An amendment is written by `/spec-design --amend <work folder>` into the same folder as `amendment-<N>.md` (N starts at 1), and the other skills read the "effective spec": spec.md with the amendments layered on in numeric order. Throwaway intermediates go in `.minipowers/` and the isolated workspace goes in `.worktrees/`; both are added to `.gitignore`. Details are in [skills/_shared/conventions.md](skills/_shared/conventions.md).
+One piece of work is one folder. The argument to all four skills is this folder path. An approved spec.md is never edited. An amendment is written by `/spec-design --amend <work folder>` into the same folder as `amendment-<N>.md` (N starts at 1), and the other skills read the "effective spec": spec.md with the amendments layered on in numeric order. Throwaway intermediates go in `.minipowers/` and the isolated workspaces for parallel slice implementation go in `.worktrees/`; both are added to `.gitignore`. All of these folders are relative to the **project root**, the folder the session was opened in. When one repository holds several projects, they are created under that project folder, not under the repository root. Details are in [skills/_shared/conventions.md](skills/_shared/conventions.md).
 
 ## What gets recorded
 
@@ -58,18 +58,17 @@ One piece of work is one folder. The argument to all four skills is this folder 
 
 ## Working folder flow
 
-The main checkout stays on the base branch (for example `dev`). Work happens in a second working folder, `.worktrees/<stem>`, which has the feature branch checked out (`git worktree`).
+Work happens in the main checkout you are already looking at. The spec, progress, findings, and code changes are visible in the IDE and CLI as they happen.
 
-1. After approval, `/spec-design` creates the feature branch and `.worktrees/<stem>`, and commits spec.md there as the first commit. It does not change the main checkout's branch.
-2. `/spec-implement`, `/spec-review`, and `/spec-digest` find `.worktrees/<stem>` even when called from the main checkout, and read and commit inside it. To look at the implementation in an IDE, open the `.worktrees/<stem>` folder.
-   - If `.worktrees/<stem>` is missing, `/spec-implement` finds the local branch that holds spec.md and recreates the worktree. `/spec-review` and `/spec-digest` do not create a worktree; they tell you the branch name they found and ask you to call `/spec-implement` first.
-3. A new worktree has none of the gitignored files (dependencies, local settings such as `.env`). Before implementation starts, `/spec-implement` prepares the worktree: it copies from the main checkout the files listed in a line of the project instruction file (CLAUDE.md and the like) such as `minipowers worktree 복사: .env, src/appsettings.Development.json` (복사 = "copy"), and runs the dependency install command. If a test fails because of a file that is not on the list, it stops instead of writing the failure off as pre-existing.
-4. Merging is done by the user, following the project's git rules.
+1. After approval, `/spec-design` creates the feature branch from the HEAD of the base branch (for example `dev`), switches the main checkout to it (`git switch -c`), and commits spec.md as the first commit. Uncommitted changes carry over. To go back to the base branch, run `git switch <base branch>`.
+2. `/spec-implement`, `/spec-review`, and `/spec-digest` never switch branches. When the current branch is the spec's branch, they read and commit right there. If you call them while the main checkout is back on the base branch, they report the branch that holds spec.md and ask you to either `git switch <branch>` or run `git worktree add .worktrees/<stem> <branch>` to work side by side, then stop.
+3. Worktrees are created only by `/spec-implement`, as `.worktrees/<stem>-slice-N`, when it implements independent slices at the same time, and they are removed once merged. A new worktree has none of the gitignored files (dependencies, local settings such as `.env`), so it is prepared before the implementer subagent starts: files listed in a line of the project instruction file (CLAUDE.md and the like) such as `minipowers worktree 복사: .env, src/appsettings.Development.json` (복사 = "copy") are copied in, and the dependency install command runs. If a test fails because of a file that is not on the list, it stops instead of writing the failure off as pre-existing.
+   - When one repository holds several projects (the project root is a subfolder of the repository root), the worktree is a sparse checkout of the project folder only. If a sibling project is needed too, list it in the instruction file as `minipowers worktree 포함: DTOGenerator` (포함 = "include").
+4. Merging is done by the user, following the project's git rules. Since the main checkout is on the feature branch, run `git switch <base branch>` first.
 
-After merging, clean up from the root of the main checkout. The skills only tell you what to do; they delete nothing.
+After merging, clean up from the project root. The skills only tell you what to do; they delete nothing.
 
 ```bash
-git worktree remove .worktrees/<stem>
 git branch -d <branch>
 rm -rf .minipowers/<stem>/
 ```

@@ -25,16 +25,15 @@ spec을 기준으로 리뷰하고 `findings.md`를 쓴다. 리뷰 대상은 spec
 
 1. 이 SKILL.md가 있는 디렉터리를 기준으로 `../_shared/conventions.md`와 `./findings-template.md`를 읽는다. 상대경로는 프로젝트의 현재 작업 디렉터리 기준이 아니다. 공용 규약의 스킬 파일 경로도 같은 설치 위치를 기준으로 해석한다. 이 문서가 반복하지 않는 공용 규칙은 그 문서를 따른다.
 2. 사용자가 전달한 작업 폴더 경로를 conventions.md의 "인자 해석"대로 해석한다. 이하 `<폴더>`, 폴더 이름을 `<stem>`이라 부른다.
-3. `<폴더>/spec.md`의 위치를 찾는다. 새 세션을 메인 체크아웃에서 열었다면, 승인된 spec이 메인 체크아웃에 없고 `.worktrees/<stem>`에만 있을 수 있다.
-   - 현재 체크아웃에 `<폴더>/spec.md`가 있으면 그것을 읽는다.
-   - 없으면 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다)의 `.worktrees/<stem>/<폴더>/spec.md`가 있으면 그것을 읽는다.
-   - 둘 다 없으면 conventions.md "인자 해석"대로 안내하고 끝낸다. `findings.md`는 쓰지 않는다.
+3. `<폴더>/spec.md`의 위치를 conventions.md "인자 해석"의 순서(현재 체크아웃 → 다른 체크아웃 → 로컬 브랜치)로 찾는다. spec 브랜치는 대개 메인 체크아웃에 checkout되어 있다.
+   - 현재 체크아웃이나 다른 체크아웃에 있으면 그것을 읽는다.
+   - 브랜치에만 있거나 어디에도 없으면 conventions.md "인자 해석"대로 안내하고 끝낸다. worktree를 만들거나 브랜치를 전환하지 않는다. `findings.md`는 쓰지 않는다.
 4. 3에서 찾은 spec.md와 같은 폴더의 `amendment-<N>.md`(있으면), `progress.md`, 기존 `findings.md`(있으면)를 읽는다. `amendment-<N>.md`가 있으면 conventions.md `## 유효 spec`대로 유효 spec을 만든다. 이하 "수용 기준", "리뷰 기준", "구현 슬라이스"는 유효 spec의 것을 쓴다. `progress.md`가 없으면 "구현 기록 없음"으로 보고 계속한다.
 5. spec 머리말에서 세 값을 얻는다. 값을 감싼 백틱과 뒤의 괄호 설명은 떼고 읽는다. 머리말은 amendment로 개정하지 않으므로 spec.md 그대로 읽는다.
    - 기준 커밋: `- 기준 커밋: <sha>` 줄
    - 브랜치: `- 브랜치:` 줄
    - 전체 테스트 명령: `- 전체 테스트 명령:` 줄
-6. 작업 위치를 정한다. 현재 브랜치(`git rev-parse --abbrev-ref HEAD`)가 spec의 브랜치이면 그 자리에서 리뷰한다. 아니면 메인 체크아웃 루트의 `.worktrees/<stem>`이 있고 그 안의 브랜치가 spec의 브랜치이면, 이하 모든 git 명령과 파일 읽기를 그 안에서(`git -C <경로>`) 한다. 둘 다 아니면 현재 브랜치와 spec의 브랜치를 보고하고 끝낸다. `findings.md`는 쓰지 않는다. spec의 브랜치가 아닌 곳에서 `<기준 커밋>..HEAD`는 다른 작업의 커밋을 담기 때문이다.
+6. 작업 위치를 정한다. 현재 브랜치(`git rev-parse --abbrev-ref HEAD`)가 spec의 브랜치이면 그 자리에서 리뷰한다. 아니면 `git worktree list --porcelain`에서 `branch refs/heads/<spec의 브랜치>` 줄이 붙은 체크아웃을 찾아, 이하 모든 git 명령과 파일 읽기를 그 안의 프로젝트 루트(`<체크아웃 경로>/<prefix>`)에서(`git -C <경로>`) 한다. 둘 다 아니면 현재 브랜치와 spec의 브랜치를 보고하고 conventions.md "인자 해석"의 안내 문구를 쓰고 끝낸다. `findings.md`는 쓰지 않는다. spec의 브랜치가 아닌 곳에서 `<기준 커밋>..HEAD`는 다른 작업의 커밋을 담기 때문이다.
 
 7. 6에서 정한 작업 위치의 프로젝트 지시 파일(AGENTS.md, CLAUDE.md 등)과 리뷰 대상 경로에 적용되는 지침을 읽는다. 이전 세션에서 읽었다고 가정하지 않는다. 현재 실행 환경의 지침 우선순위를 따른다.
 

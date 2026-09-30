@@ -1,22 +1,23 @@
 ---
 name: spec-design
-description: todo 파일이나 요구 문장 하나를 승인된 docs/minipowers/<stem>/spec.md와 그 spec을 첫 커밋으로 둔 feature 브랜치 worktree로 만들고, --amend 모드에서는 승인된 spec의 개정을 같은 폴더의 amendment 파일로 쓴다.
+description: todo 파일이나 요구 문장 하나를 승인된 docs/minipowers/<stem>/spec.md와 그 spec을 첫 커밋으로 둔 feature 브랜치로 만들고, --amend 모드에서는 승인된 spec의 개정을 같은 폴더의 amendment 파일로 쓴다.
 argument-hint: "<todo 파일 | 요구 문장> 또는 --amend <작업 폴더>"
 disable-model-invocation: true
 ---
 
 # spec-design — 요구 하나를 승인된 spec과 feature 브랜치로 만든다
 
-시작할 때 `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`를 읽는다. 폴더 구조, stem 규칙, 날짜를 얻는 명령, 문체 규칙, 스킬 파일 경로는 그 문서가 정한다.
+시작할 때 `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`를 읽는다. 프로젝트 루트, 폴더 구조, stem 규칙, 날짜를 얻는 명령, 문체 규칙, 스킬 파일 경로는 그 문서가 정한다. 이 문서의 경로는 모두 프로젝트 루트 기준이다.
 
 ## 이 스킬이 남기는 것
 
 변경의 크기와 관계없이 항상 같다.
 
 - `docs/minipowers/<stem>/spec.md` 파일 하나. 형식은 `${CLAUDE_SKILL_DIR}/spec-template.md`다.
-- 기준 커밋에서 만든 feature 브랜치 하나.
-- 그 브랜치를 checkout한 worktree 하나. 메인 체크아웃 루트의 `.worktrees/<stem>`이다.
+- 기준 커밋에서 만든 feature 브랜치 하나. 메인 체크아웃이 이 브랜치로 전환된다.
 - 그 브랜치의 첫 커밋 하나. spec.md만 들어 있다.
+
+worktree는 만들지 않는다. 뒤 단계의 작업이 지금 보고 있는 체크아웃에서 그대로 보이게 하기 위해서다. 슬라이스를 나란히 구현할 때의 worktree는 spec-implement가 만든다.
 
 변경이 작으면 spec의 각 절이 한 줄이다. 한 줄짜리 수정에도 spec 파일을 만든다.
 
@@ -40,13 +41,13 @@ spec은 뒤 단계(spec-implement, spec-review, spec-digest)가 받는 유일한
 3. 일련번호와 stem은 conventions.md "stem 규칙"대로 정한다. 주제어는 요구에서 뽑는다.
 4. `docs/minipowers/<stem>/`을 만든다.
 
-이 폴더는 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다) 아래 `<메인 체크아웃 루트>/docs/minipowers/<stem>/`에 만든다. 승인 전까지 spec.md 초안은 여기에 커밋하지 않은 채로 둔다. 승인 뒤 8절에서 worktree로 옮긴다.
+이 폴더는 프로젝트 루트(conventions.md "폴더 구조")의 `docs/minipowers/<stem>/`이다. 승인 전까지 spec.md 초안은 여기에 커밋하지 않은 채로 둔다. 승인 뒤 8절에서 새 브랜치에 커밋한다.
 
 ## 3. 프로젝트에서 읽는 것
 
 spec 초안을 쓰기 전에 다음을 읽는다.
 
-- **지시 파일.** 프로젝트 루트와 작업 디렉터리의 `CLAUDE.md`, `AGENTS.md`. 코딩 규칙, 테스트 위치, 테스트 명령, 브랜치 이름 규칙이 여기 있다.
+- **지시 파일.** 프로젝트 루트와 저장소 루트의 `CLAUDE.md`, `AGENTS.md`. 코딩 규칙, 테스트 위치, 테스트 명령, 브랜치 이름 규칙이 여기 있다.
 - **전체 테스트 명령.** 지시 파일에 있으면 그것을 쓴다. 없으면 프로젝트 종류로 정해지는 표준 명령(`dotnet test`, `pnpm test`, `pytest`, `go test ./...` 등)을 쓴다.
 - **관련 코드.** 요구가 건드리는 파일, 그 파일을 부르는 곳, 비슷한 일을 하는 기존 코드, 관련 테스트.
 - **이전 spec.** `docs/minipowers/` 안에 같은 영역을 다룬 spec 폴더가 있으면 그 spec.md와 digest.md.
@@ -104,37 +105,28 @@ spec.md를 파일로 저장하고 경로를 알려 사용자에게 검토를 요
 - 결정의 요지
 - 슬라이스 개수
 - "검증된 전제" 표에서 "확인 방법"이 "미확인"인 행. 없으면 "없음"
-- 현재 브랜치 이름과 HEAD 해시. 승인하면 이 HEAD가 기준 커밋이 된다. 프로젝트 지시 파일이 feature 브랜치의 기반 브랜치를 정했으면(예: `dev`) 그 이름과 동기화 명령도 적어, 사용자가 승인 전에 기반 브랜치를 최신으로 맞출 수 있게 한다
+- 현재 브랜치 이름과 HEAD 해시. 승인하면 이 HEAD가 기준 커밋이 되고, 메인 체크아웃이 새 feature 브랜치로 전환된다. 프로젝트 지시 파일이 feature 브랜치의 기반 브랜치를 정했으면(예: `dev`) 그 이름과 동기화 명령도 적어, 사용자가 승인 전에 기반 브랜치를 최신으로 맞출 수 있게 한다
+- `git status --short`에 spec.md 초안 외의 변경이 있으면 그 목록. 이 변경은 브랜치 전환 때 새 브랜치로 함께 넘어간다
 
 사용자가 승인하기 전에는 브랜치를 만들지 않고 코드를 쓰지 않는다. 사용자가 고칠 곳을 말하면 spec을 고치고 다시 검토를 요청한다.
 
 ## 8. 승인 뒤
 
-사용자가 승인하면 다음을 순서대로 한다. 메인 체크아웃은 이 절차 내내 지금 브랜치에 남는다. 메인 체크아웃에서 브랜치를 전환하는 명령은 쓰지 않는다. git 명령과 파일 이동은 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다)에서 실행한다. 아래 경로는 모두 그 루트 기준이다.
+사용자가 승인하면 다음을 순서대로 한다. git 명령은 프로젝트 루트에서 실행한다. 아래 경로는 모두 프로젝트 루트 기준이다.
 
-1. 현재 브랜치를 `git rev-parse --abbrev-ref HEAD`로 확인한다. 프로젝트 지시 파일이 feature 브랜치의 기반 브랜치를 정했는데 현재 브랜치가 그것과 다르면, 브랜치를 만들지 않고 두 이름을 보고하고 끝낸다. 사용자가 기반 브랜치로 옮긴 뒤 다시 승인한다.
+1. 현재 브랜치를 `git rev-parse --abbrev-ref HEAD`로 확인한다. 프로젝트 지시 파일이 feature 브랜치의 기반 브랜치를 정했는데 현재 브랜치가 그것과 다르면, 브랜치를 만들지 않고 두 이름을 보고하고 끝낸다. 사용자가 기반 브랜치로 옮긴 뒤 다시 승인한다. 지시 파일이 기반 브랜치를 정하지 않았으면 현재 브랜치가 기반 브랜치다.
 2. 현재 HEAD를 기준 커밋으로 정한다. `git rev-parse HEAD`의 전체 해시와 현재 브랜치 이름을 spec 머리말의 "기준 커밋"에 적는다.
 3. 브랜치 이름을 정한다. 프로젝트 지시 파일에 브랜치 이름 규칙이 있으면 그 규칙을 따르고, 없으면 stem을 그대로 쓴다. 이름을 머리말의 "브랜치"에 적는다.
-4. 기준 커밋에서 feature 브랜치를 만들기만 한다. checkout하지 않는다.
+4. 기준 커밋에서 feature 브랜치를 만들고 메인 체크아웃을 그 브랜치로 전환한다. 커밋되지 않은 변경은 그대로 따라온다.
    ```bash
-   git branch <브랜치> <기준 커밋>
+   git switch -c <브랜치>
    ```
-5. 그 브랜치로 worktree를 만든다. `.worktrees/`를 처음 만들 때는 conventions.md "gitignore 처리"를 따른다.
+5. spec.md 하나만 스테이징해 첫 커밋으로 넣는다. 커밋 메시지 형식은 지시 파일이 정한 것을 따른다.
    ```bash
-   git worktree add .worktrees/<stem> <브랜치>
+   git add docs/minipowers/<stem>/spec.md
+   git commit
    ```
-6. 메인 체크아웃의 초안 `docs/minipowers/<stem>/spec.md`를 worktree의 같은 경로로 옮긴다. 메인 체크아웃에 남은 빈 `docs/minipowers/<stem>/` 폴더는 지운다. 2절에서 이 스킬이 `docs/minipowers/`를 새로 만들었고 그 폴더가 비었으면 함께 지운다.
-   ```bash
-   mkdir -p .worktrees/<stem>/docs/minipowers/<stem>
-   mv docs/minipowers/<stem>/spec.md .worktrees/<stem>/docs/minipowers/<stem>/spec.md
-   rmdir docs/minipowers/<stem>
-   ```
-7. worktree에서 spec.md 하나만 스테이징해 첫 커밋으로 넣는다. 커밋 메시지 형식은 지시 파일이 정한 것을 따른다.
-   ```bash
-   git -C .worktrees/<stem> add docs/minipowers/<stem>/spec.md
-   git -C .worktrees/<stem> commit
-   ```
-8. 브랜치 이름, 커밋 해시, worktree의 절대경로(`<메인 체크아웃 루트>/.worktrees/<stem>`)를 보고한다. 인자가 todo 파일이었으면 다음 단계 줄 바로 위에 아래 한 줄을 쓴다. todo 파일은 커밋하지도 지우지도 않는다.
+6. 브랜치 이름, 커밋 해시, 기반 브랜치 이름을 보고한다. "메인 체크아웃이 `<브랜치>`로 전환됐다. 기반 브랜치로 돌아가려면 `git switch <기반 브랜치>`"를 한 줄로 쓴다. 인자가 todo 파일이었으면 다음 단계 줄 바로 위에 아래 한 줄을 쓴다. todo 파일은 커밋하지도 지우지도 않는다.
    ```
    todo 원문은 spec.md "원 요구"에 인용했다. <todo 경로>는 지워도 된다.
    ```
@@ -147,23 +139,18 @@ spec.md를 파일로 저장하고 경로를 알려 사용자에게 검토를 요
 
 ## `--amend` 모드
 
-인자는 `--amend <작업 폴더>`다. 폴더 안의 `spec.md` 경로를 받으면 그 폴더로 해석한다. `--amend` 뒤에 폴더가 없으면 "개정할 작업 폴더를 `--amend` 뒤에 넣어 다시 호출한다"고 한 줄로 안내하고 끝낸다. `<stem>`은 작업 폴더 이름이다. 승인된 spec은 대개 `.worktrees/<stem>`에만 있고 메인 체크아웃에는 없으므로, 폴더가 현재 위치에 없다는 이유로 끝내지 않는다. 1단계에서 찾는다.
+인자는 `--amend <작업 폴더>`다. 폴더 안의 `spec.md` 경로를 받으면 그 폴더로 해석한다. `--amend` 뒤에 폴더가 없으면 "개정할 작업 폴더를 `--amend` 뒤에 넣어 다시 호출한다"고 한 줄로 안내하고 끝낸다. `<stem>`은 작업 폴더 이름이다.
 
 승인된 spec의 개정을 같은 폴더의 `amendment-<N>.md`로 쓴다. N은 폴더에 있는 amendment의 가장 큰 번호에 1을 더한 값이고, 처음이면 1이다. 형식은 `${CLAUDE_SKILL_DIR}/amendment-template.md`다. 머리말 네 줄과 첫 절 `## 개정 이유`는 템플릿 문자열 그대로 쓴다.
 
-1. 작업 위치를 정한다. 먼저 spec.md를 찾아 머리말의 브랜치를 읽는다.
-   - 현재 위치의 `docs/minipowers/<stem>/spec.md`를 먼저 본다.
-   - 없으면 `<메인 체크아웃 루트>/.worktrees/<stem>/docs/minipowers/<stem>/spec.md`를 본다. 메인 체크아웃 루트는 `git worktree list --porcelain | head -1`의 `worktree <경로>`다.
-   - 둘 다 없으면 conventions.md "인자 해석"대로 안내하고 끝낸다.
-
-   그 브랜치로 위치를 확정한다. spec-review와 같은 규칙이다. 현재 브랜치(`git rev-parse --abbrev-ref HEAD`)가 spec 머리말의 브랜치이면 그 자리다. 아니면 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다)의 `.worktrees/<stem>`이 있고 그 안의 브랜치가 spec의 브랜치이면 그 안이다. 둘 다 아니면 현재 브랜치와 spec의 브랜치를 보고하고 끝낸다. 이하 파일 읽기, 쓰기, 커밋은 모두 그 위치에서(`git -C <경로>`) 한다.
+1. 작업 위치를 정한다. conventions.md "인자 해석"의 순서로 spec.md를 찾고, 머리말의 브랜치를 읽어 그 브랜치를 checkout한 체크아웃의 프로젝트 루트를 작업 위치로 잡는다. 어느 체크아웃에도 없으면 같은 절의 안내 문구를 쓰고 끝낸다. 브랜치를 전환하거나 worktree를 만들지 않는다. 이하 파일 읽기, 쓰기, 커밋은 모두 그 위치에서(`git -C <경로>`) 한다.
 2. 작업 폴더의 spec.md, 기존 `amendment-<N>.md`, progress.md, findings.md를 읽는다. 없는 파일은 건너뛴다. 유효 spec은 conventions.md `## 유효 spec`대로 만든다. 개정을 부른 것(finding ID, progress.md의 `spec 결함:` 줄, 사용자 문장)을 대화에서 찾는다. 찾지 못하면 사용자에게 묻는다.
 3. 바뀌는 절만 amendment에 둔다. `##` 절은 유효 spec의 같은 제목 절 전체를 대체하므로, 그 절에서 바뀌지 않는 내용도 옮겨 적는다. `## 구현 슬라이스`는 바꾸거나 더하는 `### 슬라이스 N:` 블록만 쓴다.
    - progress.md에 `슬라이스 N: complete` 줄이 있는 슬라이스는 대체하지 않는다.
    - 끝난 슬라이스의 결과를 바꿔야 하면 새 슬라이스를 추가한다.
    - 새 슬라이스 번호는 유효 spec의 가장 큰 슬라이스 번호에 1을 더한 값이다.
 4. amendment가 `## 검증된 전제`를 바꾸면 유효 spec의 표 전체를 옮기고 행을 더하거나 고친다. 절 전체를 대체하는 규칙 때문이다. 새 단언은 5절대로 확인한다.
-5. 질문은 6절과 같다. 검토 요청은 7절의 항목에서 기준 커밋과 브랜치에 관한 항목(현재 브랜치와 HEAD 해시, 기반 브랜치 동기화)을 빼고 쓴다. 대신 개정 대상 절 목록을 넣는다. 사용자가 승인하기 전에는 amendment를 커밋하지 않는다. 머리말의 "개정 시점 HEAD"에는 작업 위치의 `git rev-parse HEAD`와 그 브랜치를 적는다.
+5. 질문은 6절과 같다. 검토 요청은 7절의 항목에서 기준 커밋과 브랜치에 관한 항목(현재 브랜치와 HEAD 해시, 기반 브랜치 동기화, 커밋되지 않은 변경)을 빼고 쓴다. 대신 개정 대상 절 목록을 넣는다. 사용자가 승인하기 전에는 amendment를 커밋하지 않는다. 머리말의 "개정 시점 HEAD"에는 작업 위치의 `git rev-parse HEAD`와 그 브랜치를 적는다.
 6. 승인 뒤에는 브랜치를 만들지 않는다. `amendment-<N>.md` 한 파일만 스테이징해 작업 위치의 현재 브랜치에 커밋한다. 커밋 해시와 amendment 경로를 보고하고, 마지막 줄에 다음 단계를 적고 끝낸다.
    ```
    다음 단계: `/spec-implement docs/minipowers/<stem>/`

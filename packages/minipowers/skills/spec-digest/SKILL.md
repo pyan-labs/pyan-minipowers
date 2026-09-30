@@ -25,7 +25,7 @@ digest에는 소스를 열어 확인한 것만 쓴다. 문서와 소스가 다�
 ## 1. 시작
 
 1. `${CLAUDE_PLUGIN_ROOT}/skills/_shared/conventions.md`를 읽는다. 인자 해석, 폴더 구조, 정지 조건, 문체 규칙은 거기 있는 대로 따른다. 템플릿은 `${CLAUDE_SKILL_DIR}/digest-template.md`와 `${CLAUDE_SKILL_DIR}/index-template.md`다.
-2. 인자로 작업 폴더를 정한다. 이하 `<폴더>`, 폴더 이름을 `<stem>`이라 부른다. 현재 체크아웃에 `<폴더>/spec.md`가 없고 메인 체크아웃 루트(conventions.md "폴더 구조"의 명령으로 얻는다)의 `.worktrees/<stem>`에 있으면, 이하 모든 명령과 파일 읽기와 쓰기를 그 안에서 한다. 둘 다 없으면 conventions.md "인자 해석"대로 안내하고 끝낸다.
+2. 인자로 작업 폴더를 정한다. 이하 `<폴더>`, 폴더 이름을 `<stem>`이라 부른다. `<폴더>/spec.md`를 conventions.md "인자 해석"의 순서로 찾는다. 현재 체크아웃에 있으면 그 자리에서, 다른 체크아웃에 있으면 그 안의 프로젝트 루트(`<체크아웃 경로>/<prefix>`)에서 이하 모든 명령과 파일 읽기와 쓰기를 한다. 브랜치에만 있거나 어디에도 없으면 conventions.md "인자 해석"대로 안내하고 끝낸다. worktree를 만들거나 브랜치를 전환하지 않는다.
 3. `<폴더>/spec.md`를 읽는다. 머리말에서 다음 세 줄을 찾는다.
    - `- 기준 커밋: <sha>`
    - `- 브랜치: <이름>`
@@ -197,9 +197,9 @@ git rev-parse --abbrev-ref HEAD
 상태가 ready to merge이면 다음 단계 줄 바로 위에 병합 뒤 정리 명령을 적는다. 스킬이 직접 지우지는 않고 안내만 한다.
 
 ```
-병합 뒤 정리: git worktree remove .worktrees/<stem>
+병합 뒤 정리: git switch <기반 브랜치>   (메인 체크아웃이 spec 브랜치에 있을 때)
               git branch -d <브랜치>
-              <메인 체크아웃>/.minipowers/<stem>/ 삭제
+              <프로젝트 루트>/.minipowers/<stem>/ 삭제
 ```
 
 위에서부터 처음 성립하는 행 하나를 쓴다.

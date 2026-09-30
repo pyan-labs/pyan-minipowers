@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # spec 하나의 subagent 작업물(brief · report · diff 패키지)이 사는
-# 디렉터리를 만들고 절대경로를 찍는다: <repo-root>/.minipowers/<spec-stem>/work/
-# spec 경로는 docs/minipowers/<stem>/spec.md이므로 stem은 파일명이 아니라 부모 폴더 이름이다.
+# 디렉터리를 만들고 절대경로를 찍는다: <프로젝트 루트>/.minipowers/<spec-stem>/work/
+# spec 경로는 <프로젝트 루트>/docs/minipowers/<stem>/spec.md이므로 stem은 파일명이 아니라 부모 폴더 이름이고,
+# 프로젝트 루트는 spec 파일에서 세 단계 위 폴더다. 저장소 루트와 다를 수 있다(한 저장소에 프로젝트가 여럿일 때).
+# 경로가 그 모양이 아니면 git 저장소 루트를 쓴다.
 #
 # spec마다 디렉터리를 따로 두는 이유: 다른 spec의 작업물을 현재 진행으로 잘못 읽지 않게
 # 구조적으로 막는다. 같은 stem이 다른 폴더에 있을 수 있으므로 spec-path 마커로 소유자를 확인한다.
@@ -21,14 +23,20 @@ fi
 spec=$1
 [ -f "$spec" ] || { echo "no such spec file: $spec" >&2; exit 2; }
 
-top=$(git rev-parse --show-toplevel 2>/dev/null) \
-  || { echo "not inside a git repository: $(pwd)" >&2; exit 2; }
-# Windows의 git은 C:/… 형식을 돌려주므로 pwd -P와 같은 형식으로 맞춘다. 다르면 spec-path가 절대경로가 된다.
-root=$(CDPATH= cd -- "$top" && pwd -P)
-base="$root/.minipowers"
-
 spec_dir=$(CDPATH= cd -- "$(dirname "$spec")" && pwd -P)
 spec_abs="$spec_dir/$(basename "$spec")"
+
+# 프로젝트 루트: <루트>/docs/minipowers/<stem>/spec.md 모양이면 spec_dir의 두 단계 위 폴더.
+# 그 모양이 아니면 git 저장소 루트. Windows의 git은 C:/… 형식을 돌려주므로 pwd -P와 같은 형식으로 맞춘다.
+if [ "$(basename "$(dirname "$spec_dir")")" = "minipowers" ] \
+   && [ "$(basename "$(dirname "$(dirname "$spec_dir")")")" = "docs" ]; then
+  root=$(CDPATH= cd -- "$spec_dir/../../.." && pwd -P)
+else
+  top=$(git -C "$spec_dir" rev-parse --show-toplevel 2>/dev/null) \
+    || { echo "not inside a git repository: $spec_dir" >&2; exit 2; }
+  root=$(CDPATH= cd -- "$top" && pwd -P)
+fi
+base="$root/.minipowers"
 case "$spec_abs" in
   "$root"/*) spec_id=${spec_abs#"$root"/} ;;
   *)         spec_id=$spec_abs ;;

@@ -7,7 +7,7 @@ orchestrator.md "2. 구현 subagent를 띄운다"에서 쓴다. `[ ]` 자리를 
 | 자리표시자 | 넣는 것 |
 |---|---|
 | `[N]`, `[이름]` | 유효 spec의 슬라이스 번호와 제목 |
-| `[worktree 절대경로]` | 이 슬라이스가 작업할 worktree의 절대경로 |
+| `[worktree 절대경로]` | 이 슬라이스의 작업 위치 절대경로. orchestrator.md "경로 표기"의 `<슬라이스 worktree>`다. 저장소 루트가 아니라 프로젝트 루트(`<SPEC_WT>/.worktrees/<stem>-slice-N/<PREFIX>`)를 넘긴다 |
 | `[BASE_SHA]` | 띄우기 직전에 기록한 그 worktree의 `git rev-parse HEAD` 값 |
 | `[BRIEF_FILE]` | `slice-brief`가 출력한 경로 |
 | `[REPORT_FILE]` | `<워크스페이스>/slice-N-report.md` |
