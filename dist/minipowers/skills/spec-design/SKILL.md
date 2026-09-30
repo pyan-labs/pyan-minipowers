@@ -21,7 +21,7 @@ disable-model-invocation: true
 
 브랜치의 모든 커밋은 spec.md만 담는다. 마지막 커밋은 머리말의 "기준 커밋"과 "브랜치"가 채워진 승인본이다. 그 뒤 spec.md는 고치지 않는다.
 
-spec.md는 뒤 단계(spec-implement, spec-review, spec-digest)가 받는 유일한 입력이다. 뒤 단계는 이 대화를 볼 수 없다. 구현에 필요한 코드베이스 맥락은 전부 spec에 적는다.
+spec.md는 이 스킬이 뒤 단계에 넘기는 유일한 산출물이다. 뒤 단계(spec-implement, spec-review, spec-digest)는 이 대화를 볼 수 없고, 앞 단계들의 산출물과 소스코드만 읽는다. 설계 결정과 구현에 필요한 코드베이스 맥락은 전부 spec.md에 적는다.
 
 ## 1. 인자 해석
 
