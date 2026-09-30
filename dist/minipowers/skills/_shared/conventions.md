@@ -53,7 +53,8 @@ docs/minipowers/
     └── digest.md                     spec-digest가 쓴다
 
 .minipowers/<stem>/work/              subagent에게 넘기는 brief · report · diff 패키지. 일회용
-.worktrees/<stem>[-slice-N]           격리 작업 공간
+.worktrees/<stem>                     spec 브랜치의 체크아웃. spec-design이 만들고 네 스킬이 "작업 위치 결정"으로 같은 곳을 쓴다
+.worktrees/<stem>-slice-N             orchestrator가 슬라이스마다 만드는 격리 작업 공간. 병합 뒤 지운다
 ```
 
 `docs/minipowers/`가 없으면 spec-design이 만든다. `.minipowers/`와 `.worktrees/`는 **메인 체크아웃의 루트**에 둔다. 그 경로는 어디서 실행하든 아래 명령의 첫 줄 `worktree <경로>`에서 얻고, subagent에게는 절대경로로 넘긴다. worktree 안에서 실행한 `git rev-parse --show-toplevel`은 그 worktree의 루트를 돌려주므로 쓰지 않는다.
