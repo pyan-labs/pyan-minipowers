@@ -19,9 +19,10 @@ disable-model-invocation: true
 | worktree | `<메인 체크아웃 루트>/.worktrees/<stem>` | `<브랜치>`를 checkout한 것 |
 | spec.md | worktree 안 `docs/minipowers/<stem>/spec.md` | 형식은 `./spec-template.md`. 절을 지우거나 비우지 않는다. 변경이 작으면 절마다 한 줄이다 |
 
-브랜치의 모든 커밋은 spec.md만 담는다. 마지막 커밋은 머리말의 "기준 커밋"과 "브랜치"가 채워진 승인본이다. 그 뒤 spec.md는 고치지 않는다.
-
-spec.md는 이 스킬이 뒤 단계에 넘기는 유일한 산출물이다. 뒤 단계(spec-implement, spec-review, spec-digest)는 이 대화를 볼 수 없고, 앞 단계들의 산출물과 소스코드만 읽는다. 설계 결정과 구현에 필요한 코드베이스 맥락은 전부 spec.md에 적는다.
+- 브랜치의 커밋은 spec.md만 담는다.
+- 이 스킬이 끝난 시점의 브랜치 HEAD가 승인된 spec.md다.
+- 승인된 spec.md는 그 뒤 어느 단계도 고치지 않는다.
+- 뒤 단계는 이 대화를 볼 수 없다. 설계 결정과 구현에 필요한 코드베이스 맥락은 전부 spec.md에 적는다.
 
 ## 1. 인자 해석
 
@@ -151,4 +152,3 @@ spec.md만 스테이징해 커밋한다. 커밋 메시지 형식은 프로젝트
 
 승인 커밋 뒤에는 spec.md를 고치지 않는다. 그 뒤 spec에 결함이 드러나거나 요구가 달라지면 그 내용을 새 todo로 적어 이 스킬을 다시 호출해 새 spec을 쓴다. 그 spec의 "원 요구"에는 기존 spec 경로를 적는다. 사이클이 spec 결함으로 멈췄으면 spec-implement가 그 todo를 `docs/minipowers/todo/<stem>-followup.md`로 이미 써 두었다(conventions.md "중단 todo").
 
-이 스킬은 병합, push, Pull Request 생성을 하지 않는다.
