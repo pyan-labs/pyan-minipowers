@@ -12,7 +12,7 @@ spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마
 ## 시작
 
 1. 이 SKILL.md가 있는 폴더를 기준으로 `../_shared/conventions.md`를 읽는다. 스킬에 딸린 파일의 상대경로는 프로젝트의 현재 작업 디렉터리 기준이 아니다. 네 스킬이 공유하는 규칙(작업 위치 결정, 폴더 구조, 정지 조건, 중단 todo, gitignore 처리, worktree 준비, 증거 규칙, 스킬 파일 경로)은 거기 있고, 이 문서는 그것을 가리키기만 한다.
-2. conventions.md "작업 위치 결정"대로 `<폴더>`, spec.md, 작업 위치를 정한다. 이하 `<폴더>`는 `docs/minipowers/<stem>/`, `<stem>`은 폴더 이름이다. 작업 위치가 나오지 않으면 그 절의 문제 시나리오를 따른다. worktree를 만드는 경우도 거기 있다. 이후 파일 읽기, 쓰기, 명령, 커밋은 모두 작업 위치에서 한다.
+2. conventions.md "작업 위치 결정"대로 `<폴더>`, spec.md, 작업 위치를 정한다. 이하 `<폴더>`는 `docs/minipowers/<stem>/`, `<stem>`은 폴더 이름이다. 작업 위치가 나오지 않으면 그 절의 문제 시나리오를 따른다. 이후 파일 읽기, 쓰기, 명령, 커밋은 모두 작업 위치에서 한다.
 3. 작업 위치의 spec.md를 전부 읽는다. 머리말의 `- 기준 커밋:`과 `- 브랜치:` 값은 "작업 위치 결정"에서 읽은 것이다. 모드 결정에서 읽는 progress.md와 findings.md도 작업 위치의 것이다.
 4. 프로젝트 지시 파일(CLAUDE.md, AGENTS.md 등)에서 전체 테스트 명령, 테스트 위치, 코딩 규칙, 준비 명령(의존성 설치 등), worktree 복사 목록(`minipowers worktree 복사:` 줄)을 찾는다. spec 머리말의 전체 테스트 명령과 다르면 spec 머리말을 쓴다.
 5. 스크립트는 `bash "<SKILL_DIR>/scripts/<name>" ...`으로 부른다. `<SKILL_DIR>`는 conventions.md "스킬 파일 경로"대로 실제 절대경로로 바꾼다. 보조 문서(orchestrator.md, implementer-prompt.md, checker-prompt.md)와 `progress-template.md`도 같은 폴더에 있다.
@@ -58,12 +58,10 @@ spec의 `## 구현 슬라이스` 절에서 `### 슬라이스 N: 이름` 제목�
 
 progress.md가 없을 때만 한다. 실행 방식을 정한 직후, 첫 슬라이스를 시작하기 전이다. inline과 orchestrator 공통이다. progress.md가 이미 있으면(이전 세션을 이어받으면) 준비도 기준 테스트도 다시 하지 않는다.
 
-예외가 하나 있다. 이번 실행에서 worktree를 새로 만들었으면 progress.md가 있어도 1의 준비를 한 번 한다. 기준 테스트와 머리말은 다시 쓰지 않는다. 구현 모드의 이어서 하기와 수정 모드 모두 같다.
-
 1. 작업 위치에서 conventions.md "worktree 준비"의 두 단계(파일 복사, 준비 명령)를 한다.
 2. spec 머리말의 전체 테스트 명령을 한 번 돌린다. 이것이 기준 테스트다. 여기서 나온 실패는 구현을 시작하기 전 HEAD에서 이미 있던 것이므로 고치지 않는다.
-3. 기준 테스트의 실패가 worktree에 없는 파일 때문이면 기존 실패로 기록하지 않는다. conventions.md "worktree 준비"의 마지막 문단대로 멈춘다. 이때 progress.md 머리말을 쓰지 않으므로, 사용자가 파일을 채운 뒤 다시 부르면 1부터 다시 한다.
-4. progress.md 머리말 전체를 `./progress-template.md`대로 쓴다. `- 준비:` 줄에는 1에서 복사한 경로와 돌린 명령을, `- 기준 테스트:` 줄에는 2의 결과를 적는다. orchestrator 방식이면 `- 묶음:` 줄은 orchestrator.md "실행 순서"대로 정한다.
+3. 기준 테스트의 실패가 작업 위치에 없는 파일(gitignore된 설정 파일 등) 때문이면 기존 실패로 기록하지 않는다. conventions.md "worktree 준비"의 마지막 문단대로 멈춘다. 이때 progress.md 머리말을 쓰지 않으므로, 사용자가 파일을 채운 뒤 다시 부르면 1부터 다시 한다.
+4. progress.md 머리말 전체를 `./progress-template.md`대로 쓴다. `- 준비:` 줄에는 복사 목록과 1에서 돌린 명령을, `- 기준 테스트:` 줄에는 2의 결과를 적는다. orchestrator 방식이면 `- 묶음:` 줄은 orchestrator.md "실행 순서"대로 정한다.
 
 ### inline 방식
 
@@ -108,11 +106,11 @@ RED 증거는 슬라이스마다 progress.md에 `슬라이스 N: RED` 줄로 남
    다음 단계: todo의 "사용자가 할 일"을 정한 뒤 `/spec-design docs/minipowers/todo/<파일 이름>`
    ```
 
-worktree와 브랜치는 그대로 둔다. 끝난 슬라이스의 커밋은 그 브랜치에만 있고, 이어받을지는 사용자가 todo를 보고 정한다.
+브랜치는 그대로 두고 메인 체크아웃도 옮기지 않는다. 끝난 슬라이스의 커밋은 그 브랜치에만 있고, 이어받을지는 사용자가 todo를 보고 정한다.
 
 ## 수정 모드
 
-1. 작업 위치는 "시작"에서 정한 곳이다. 구현 모드의 "기준 커밋 확인" 1을 한다. 이번 실행에서 worktree를 새로 만들었으면 "준비와 기준 테스트"의 예외대로 준비를 한 번 한다.
+1. 작업 위치는 "시작"에서 정한 곳이다. 구현 모드의 "기준 커밋 확인" 1을 한다.
 2. `Verdict: needs fixes — ` 뒤 목록의 항목만 목록 순서대로 하나씩 처리한다. 항목의 내용은 findings.md의 `#### <ID>` 제목(예: `#### I1`) 아래에 있다. 목록에 없는 항목은 그대로 둔다.
 3. 항목마다 고치기 전에 finding이 가리키는 `file:line`을 열어, 지적이 지금 코드 기준으로 맞는지 확인한다.
    - 틀렸다고 판단하면 고치지 않는다. progress.md에 `finding <ID>: 반박 — <근거 file:line>`을 적고 progress.md만 스테이징해 커밋한다.
@@ -135,7 +133,7 @@ findings.md는 읽기만 한다. ADDRESSED와 WITHDRAWN 판정은 spec-review가
    - Ruling 목록: progress.md의 `Ruling:` 줄 전부
 5. 보고의 마지막 줄은 `다음 단계: /spec-review <폴더>`다.
 
-worktree는 그대로 둔다.
+브랜치는 그대로 두고 메인 체크아웃도 옮기지 않는다.
 
 ## progress.md 형식
 

@@ -8,7 +8,7 @@
 
 | skill | 산출물 |
 |---|---|
-| `spec-design` | feature 브랜치와 worktree, 그 안의 `spec.md`. 브랜치의 커밋은 spec.md만 담고 마지막이 승인본 |
+| `spec-design` | `spec.md`와 feature 브랜치. 초안은 메인 체크아웃에 커밋하지 않은 채 쓰고, 승인 때 메인 체크아웃을 그 브랜치로 옮겨 승인본 하나를 커밋한다 |
 | `spec-implement` | 슬라이스별 커밋, `progress.md`. spec 결함으로 멈추면 후속 todo |
 | `spec-review` | `findings.md` |
 | `spec-digest` | `digest.md`, `docs/minipowers/index.md` |
@@ -33,7 +33,6 @@ docs/minipowers/
     └── digest.md                     spec-digest가 쓴다
 
 .minipowers/<stem>/work/              subagent에게 넘기는 brief · report · diff 패키지. 일회용
-.worktrees/<stem>                     spec 브랜치의 체크아웃. spec-design이 만들고 네 스킬이 "작업 위치 결정"으로 같은 곳을 쓴다
 .worktrees/<stem>-slice-N             orchestrator가 슬라이스마다 만드는 격리 작업 공간. 병합 뒤 지운다
 ```
 

@@ -6,14 +6,14 @@ minipowers의 네 스킬(spec-design · spec-implement · spec-review · spec-di
 
 ## 작업 위치 결정
 
-spec-implement · spec-review · spec-digest는 시작할 때 이 절로 읽을 spec.md와 작업 위치를 정한다. spec-design은 인자가 spec 폴더일 때만 이 절을 쓰고, 문제 시나리오에서는 spec-review와 같이 행동한다. todo나 문장을 받으면 작업 폴더를 스스로 만든다. 어느 경우든 메인 체크아웃의 브랜치를 바꾸거나 바꾸라고 안내하지 않는다.
+spec-implement · spec-review · spec-digest는 시작할 때 이 절로 읽을 spec.md와 작업 위치를 정한다. spec-design은 이 절을 쓰지 않는다. 초안은 메인 체크아웃에 쓰고, 승인 때 메인 체크아웃을 spec의 브랜치로 옮긴다(spec-design/SKILL.md 8절). 그래서 작업 위치는 보통 메인 체크아웃이다. 이 세 스킬은 브랜치를 바꾸지 않는다. 바꿔야 하면 안내만 한다.
 
 ### 정상 시나리오
 
 인자는 작업 폴더 `docs/minipowers/<stem>/` 하나다. `spec.md` 경로를 받으면 그 폴더로 본다. 인자가 없으면 넣을 것을 한 줄로 안내하고 끝낸다.
 
-1. **spec.md를 읽는다.** 현재 체크아웃의 `docs/minipowers/<stem>/spec.md`, 없으면 `<메인 체크아웃 루트>/.worktrees/<stem>/docs/minipowers/<stem>/spec.md`다. 루트는 "폴더 구조" 절의 명령으로 얻는다. 머리말에서 `- 브랜치:`와 `- 기준 커밋:` 값을 얻는다. 백틱과 괄호 설명은 뗀다.
-2. **작업 위치를 정한다.** spec의 브랜치가 checkout된 폴더다. 현재 체크아웃의 브랜치가 spec의 브랜치이면 현재 체크아웃, 아니면 `<메인 체크아웃 루트>/.worktrees/<stem>`이다.
+1. **spec.md를 읽는다.** 현재 체크아웃의 `docs/minipowers/<stem>/spec.md`다. 없으면 문제 시나리오 1로 간다. 머리말에서 `- 브랜치:`와 `- 기준 커밋:` 값을 얻는다. 백틱과 괄호 설명은 뗀다.
+2. **작업 위치를 정한다.** spec의 브랜치가 checkout된 폴더다. 현재 체크아웃의 브랜치가 spec의 브랜치이면 현재 체크아웃이다. 아니면 `git worktree list --porcelain`에서 `branch refs/heads/<브랜치>` 줄이 있는 항목의 `worktree` 경로다. 어디에도 없으면 문제 시나리오 2로 간다.
 3. **이후 모든 읽기, 쓰기, 명령, 커밋은 작업 위치에서 한다.** spec.md, progress.md, findings.md도 작업 위치의 것이다.
 
 예외: spec-digest는 병합 뒤에도 부른다. spec의 브랜치가 어디에도 checkout되어 있지 않으면 1에서 spec.md를 읽은 폴더가 작업 위치이고, 커밋하지 않는다.
@@ -22,7 +22,7 @@ spec-implement · spec-review · spec-digest는 시작할 때 이 절로 읽을 
 
 정상 시나리오로 작업 위치가 나오지 않는 경우다. 해당하는 것 하나를 따른다.
 
-1. **spec.md가 어느 체크아웃에도 없다.** `.worktrees/<stem>`이 아직 없거나 지워진 경우다. `docs/minipowers/<stem>/spec.md`를 가진 로컬 브랜치를 찾는다.
+1. **현재 체크아웃에 spec.md가 없다.** 메인 체크아웃이 spec의 브랜치가 아닌 곳(기반 브랜치 등)에 있는 경우다. `docs/minipowers/<stem>/spec.md`를 가진 로컬 브랜치를 찾는다.
    ```bash
    for b in $(git for-each-ref --format='%(refname:short)' refs/heads); do
      git cat-file -e "$b:docs/minipowers/<stem>/spec.md" 2>/dev/null && echo "$b"
@@ -30,10 +30,8 @@ spec-implement · spec-review · spec-digest는 시작할 때 이 절로 읽을 
    ```
    - 없으면 현재 브랜치 이름과 함께 "`/spec-design`을 먼저 실행한다"고 안내하고 끝낸다.
    - 여럿이면 목록을 보고하고 끝낸다.
-   - 하나면 `git show <브랜치>:docs/minipowers/<stem>/spec.md`로 머리말의 `- 브랜치:` 값을 읽어 찾은 브랜치와 같은지 확인한다. 다르면 두 이름을 보고하고 끝낸다. 같으면 2로 간다.
-2. **spec의 브랜치는 있는데 어디에도 checkout되어 있지 않다.**
-   - spec-implement: 메인 체크아웃 루트에서 `git worktree add .worktrees/<stem> <브랜치>`로 만들어 작업 위치로 삼는다. `.worktrees/`를 처음 만들면 "gitignore 처리"를 따른다. 이번 실행에서 worktree를 만들었으므로 progress.md가 있어도 "worktree 준비"를 한 번 한다. `git worktree add`가 실패하면(브랜치가 이미 다른 경로에 checkout되어 있거나, `.worktrees/<stem>` 폴더가 다른 브랜치로 남아 있는 경우 등) 그 출력과 함께 보고하고 끝낸다.
-   - spec-review, spec-digest: 현재 브랜치 이름과 spec의 브랜치를 넣어 "`/spec-implement docs/minipowers/<stem>/`를 먼저 부르거나, 메인 체크아웃 루트에서 `git worktree add .worktrees/<stem> <브랜치>`로 만든 뒤 다시 실행한다"고 안내하고 끝낸다. findings.md와 digest.md는 쓰지 않는다.
+   - 하나면 `git show <브랜치>:docs/minipowers/<stem>/spec.md`로 머리말의 `- 브랜치:` 값을 읽어 찾은 브랜치와 같은지 확인한다. 다르면 두 이름을 보고하고 끝낸다. 같으면 정상 시나리오 2로 작업 위치를 찾는다. 그 브랜치가 어디에도 checkout되어 있지 않으면 2로 간다.
+2. **spec의 브랜치는 있는데 어디에도 checkout되어 있지 않다.** spec-digest가 정상 시나리오 1에서 spec.md를 읽었으면 정상 시나리오의 예외대로 진행한다. 그 밖에는 세 스킬 모두 현재 브랜치 이름과 spec의 브랜치를 넣어 "메인 체크아웃에서 `git switch <브랜치>`로 옮긴 뒤 다시 실행한다"고 안내하고 끝낸다. 스킬이 직접 옮기지 않는다. progress.md, findings.md, digest.md는 쓰지 않는다.
 3. **spec.md는 있는데 spec의 브랜치가 없다.**
    - spec-implement: spec-design이 승인 단계를 끝내지 않은 것이다. 그렇게 안내하고 끝낸다.
    - spec-review: 현재 브랜치 이름과 spec의 브랜치를 보고하고 끝낸다. findings.md는 쓰지 않는다. spec의 브랜치가 아닌 곳에서 `<기준 커밋>..HEAD`는 다른 작업의 커밋을 담기 때문이다.
@@ -60,17 +58,16 @@ docs/minipowers/
     └── digest.md                     spec-digest가 쓴다
 
 .minipowers/<stem>/work/              subagent에게 넘기는 brief · report · diff 패키지. 일회용
-.worktrees/<stem>                     spec 브랜치의 체크아웃. spec-design이 만들고 네 스킬이 "작업 위치 결정"으로 같은 곳을 쓴다
 .worktrees/<stem>-slice-N             orchestrator가 슬라이스마다 만드는 격리 작업 공간. 병합 뒤 지운다
 ```
 
-`docs/minipowers/`가 없으면 spec-design이 만든다. `.minipowers/`와 `.worktrees/`는 **메인 체크아웃의 루트**에 둔다. 그 경로는 어디서 실행하든 아래 명령의 첫 줄 `worktree <경로>`에서 얻고, subagent에게는 절대경로로 넘긴다. worktree 안에서 실행한 `git rev-parse --show-toplevel`은 그 worktree의 루트를 돌려주므로 쓰지 않는다.
+`docs/minipowers/`가 없으면 spec-design이 만든다. spec 브랜치는 메인 체크아웃에 checkout되므로 `docs/minipowers/<stem>/`도 메인 체크아웃 안에 있다. `.minipowers/`와 `.worktrees/`는 **메인 체크아웃의 루트**에 둔다. 그 경로는 어디서 실행하든 아래 명령의 첫 줄 `worktree <경로>`에서 얻고, subagent에게는 절대경로로 넘긴다. worktree 안에서 실행한 `git rev-parse --show-toplevel`은 그 worktree의 루트를 돌려주므로 쓰지 않는다.
 
 ```bash
 git worktree list --porcelain | head -1
 ```
 
-`index.md`는 spec-digest가 브랜치마다 전체를 다시 생성하므로, 작업 둘이 나란히 진행되면 병합 때 충돌할 수 있다. 충돌하면 병합 뒤 `/spec-digest`를 다시 불러 재생성한다.
+`index.md`는 spec-digest가 브랜치마다 전체를 다시 생성하므로, 병합하지 않은 브랜치가 둘 이상 남아 있으면 병합 때 충돌할 수 있다. 충돌하면 병합 뒤 `/spec-digest`를 다시 불러 재생성한다.
 
 | 파일 | 쓰는 스킬 | 읽는 스킬 |
 |---|---|---|
@@ -93,7 +90,12 @@ git worktree list --porcelain | head -1
   ```powershell
   (Get-Date).ToString('yyyy-MM-dd')
   ```
-- `##`는 그날의 2자리 일련번호다. 병합 전 spec은 worktree에만 있으므로, 메인 체크아웃의 `docs/minipowers/`와 `git worktree list --porcelain`에 나오는 모든 worktree의 `docs/minipowers/`에서 같은 날짜로 시작하는 폴더를 모두 찾아 가장 큰 번호에 1을 더한다. 그날 첫 폴더면 `01`이다.
+- `##`는 그날의 2자리 일련번호다. 병합 전 spec은 feature 브랜치에만 있으므로, 메인 체크아웃의 `docs/minipowers/`(커밋하지 않은 초안 포함)와 모든 로컬 브랜치의 `docs/minipowers/`에서 같은 날짜로 시작하는 폴더를 모두 찾아 가장 큰 번호에 1을 더한다. 그날 첫 폴더면 `01`이다.
+  ```bash
+  for b in $(git for-each-ref --format='%(refname:short)' refs/heads); do
+    git ls-tree -d --name-only "$b" docs/minipowers/ 2>/dev/null
+  done | sort -u
+  ```
 - `subject`는 소문자와 하이픈으로 된 짧은 주제어다.
 
 feature 브랜치 이름은 프로젝트 지시 파일의 규칙을 따른다. 규칙이 없으면 stem을 그대로 쓴다.
@@ -145,8 +147,8 @@ complete가 아닌 슬라이스의 제목과 Files. 없으면 "없음".
 ## 사용자가 할 일
 
 새 사이클을 시작하기 전에 사용자가 결정하고 실행할 것. "끝난 것"이 있으면 다음 두 줄을 그대로 쓴다. 없으면 "없음".
-- 끝난 슬라이스의 커밋을 이어받으려면 브랜치 `<브랜치>`를 프로젝트의 git 규칙대로 기반 브랜치에 병합한 뒤 `/spec-design <이 파일>`을 부른다. 새 spec의 기준 커밋은 승인 시점의 HEAD다.
-- 이어받지 않으면 병합하지 않고 `/spec-design <이 파일>`을 부른다. 새 사이클이 끝난 슬라이스를 다시 만든다. 브랜치 `<브랜치>`와 `.worktrees/<stem>`은 새 spec이 승인된 뒤 지운다. 새 spec을 쓸 때 그 브랜치의 spec.md를 읽기 때문이다.
+- 끝난 슬라이스의 커밋을 이어받으려면 브랜치 `<브랜치>`를 프로젝트의 git 규칙대로 기반 브랜치에 병합하고, 메인 체크아웃을 기반 브랜치로 옮긴 뒤 `/spec-design <이 파일>`을 부른다. 새 spec의 기준 커밋은 승인 시점의 HEAD다.
+- 이어받지 않으면 병합하지 않고 메인 체크아웃을 기반 브랜치로 옮긴 뒤 `/spec-design <이 파일>`을 부른다. 새 사이클이 끝난 슬라이스를 다시 만든다. 브랜치 `<브랜치>`는 새 spec이 승인된 뒤 지운다. 새 spec을 쓸 때 그 브랜치의 spec.md를 읽기 때문이다.
 ```
 
 이 todo로 시작하는 사이클은 독립된 사이클이다. spec-design은 이 파일을 다른 todo와 같게 다루고, 앞 사이클의 브랜치를 기준 커밋으로 쓰지 않는다. 그 브랜치의 spec.md는 읽는다(spec-design/SKILL.md 3절). 이어받을지는 사용자가 "사용자가 할 일"을 보고 정한다.
@@ -161,16 +163,16 @@ complete가 아닌 슬라이스의 제목과 Files. 없으면 "없음".
 
 ## worktree 준비
 
-새로 만든 worktree에는 gitignore된 파일이 없다. 의존성 폴더, 로컬 설정 파일, 비밀 값이 여기 든다. 다음 두 단계를 합쳐 "준비"라고 부르고, 준비를 하는 때는 spec-implement/SKILL.md "준비와 기준 테스트"와 orchestrator.md가 정한다.
+새로 만든 worktree(orchestrator의 슬라이스 worktree)에는 gitignore된 파일이 없다. 의존성 폴더, 로컬 설정 파일, 비밀 값이 여기 든다. 작업 위치가 메인 체크아웃이면 이 파일들이 이미 있으므로 복사할 것이 없다. 다음 두 단계를 합쳐 "준비"라고 부르고, 준비를 하는 때는 spec-implement/SKILL.md "준비와 기준 테스트"와 orchestrator.md가 정한다.
 
-1. **파일 복사.** 프로젝트 지시 파일에 `minipowers worktree 복사:`로 시작하는 줄이 있으면, 그 뒤에 쉼표로 나열한 경로(메인 체크아웃 루트 기준)를 메인 체크아웃에서 worktree의 같은 경로로 복사한다.
+1. **파일 복사.** 프로젝트 지시 파일에 `minipowers worktree 복사:`로 시작하는 줄이 있으면, 그 뒤에 쉼표로 나열한 경로(메인 체크아웃 루트 기준)를 메인 체크아웃에서 worktree의 같은 경로로 복사한다. 이 목록을 "복사 목록"이라 부른다. 대상이 메인 체크아웃 자신이면 복사하지 않고 메인 체크아웃에 없는 경로만 확인한다.
    - 목록에 있는 파일만 복사한다. 목록은 사용자가 미리 허락한 것이므로 정지 조건 2에 해당하지 않는다. 목록 밖의 gitignore된 파일은 복사하지 않는다.
    - worktree에 같은 경로의 파일이 이미 있으면 덮어쓰지 않는다.
    - 메인 체크아웃에 없는 경로는 건너뛰고, 건너뛴 경로를 마무리 보고의 수동 확인 항목에 적는다.
    - 예: `minipowers worktree 복사: .env, src/backend/appsettings.Development.json`
 2. **준비 명령.** 프로젝트 지시 파일에 준비 명령(의존성 설치 등)이 있으면 그것을, 없으면 저장소의 lock 파일로 정해지는 표준 설치 명령(`pnpm install`, `npm ci`, `dotnet restore` 등)을 worktree에서 한 번 돌린다. 해당하는 것이 없으면 건너뛴다.
 
-준비 뒤에 테스트가 worktree에 없는 파일 때문에 실패하면 그 실패를 기존 실패로 넘기지 않는다. 목록에 없는 설정 파일, 연결 문자열, 인증서가 여기 해당한다. 그대로 두면 그 테스트가 기준 테스트부터 리뷰까지 전부 제외되어 아무것도 검증되지 않기 때문이다. 정지 조건 2로 멈추고, 빠진 것으로 보이는 파일과 함께 "프로젝트 지시 파일에 `minipowers worktree 복사:` 줄을 추가하거나 파일을 직접 worktree에 복사한 뒤 다시 실행한다"고 보고한다.
+준비 뒤에 테스트가 작업 위치나 worktree에 없는 파일 때문에 실패하면 그 실패를 기존 실패로 넘기지 않는다. 목록에 없는 설정 파일, 연결 문자열, 인증서가 여기 해당한다. 그대로 두면 그 테스트가 기준 테스트부터 리뷰까지 전부 제외되어 아무것도 검증되지 않기 때문이다. 정지 조건 2로 멈추고, 빠진 것으로 보이는 파일과 함께 "파일을 메인 체크아웃에 만들고, 슬라이스 worktree에도 필요하면 프로젝트 지시 파일에 `minipowers worktree 복사:` 줄을 추가한 뒤 다시 실행한다"고 보고한다.
 
 ## 문체 규칙
 

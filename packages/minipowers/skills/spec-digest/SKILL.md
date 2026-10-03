@@ -155,7 +155,7 @@ git rev-parse --abbrev-ref HEAD
 상태가 ready to merge이면 다음 단계 줄 바로 위에 병합 뒤 정리 명령을 적는다. 스킬이 직접 지우지는 않고 안내만 한다.
 
 ```
-병합 뒤 정리: git worktree remove .worktrees/<stem>
+병합 뒤 정리: git switch <기반 브랜치>   (spec 머리말 "기준 커밋"의 브랜치)
               git branch -d <브랜치>
               <메인 체크아웃>/.minipowers/<stem>/ 삭제
 ```

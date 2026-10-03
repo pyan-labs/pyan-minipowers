@@ -25,7 +25,7 @@ SKILL.md "실행 방식"에서 orchestrator를 골랐을 때의 절차다. 이 �
 ## 경로 표기
 
 - `<ROOT>`: 메인 체크아웃의 절대경로. conventions.md "폴더 구조"의 명령(`git worktree list --porcelain | head -1`)으로 얻는다
-- `<SPEC_WT>`: conventions.md "작업 위치 결정"으로 정한 작업 위치의 절대경로. 대개 `<ROOT>/.worktrees/<stem>`이고, 사용자가 spec 브랜치를 직접 checkout해 둔 경우에는 현재 체크아웃이다
+- `<SPEC_WT>`: conventions.md "작업 위치 결정"으로 정한 작업 위치의 절대경로. spec-design이 승인 때 메인 체크아웃을 spec 브랜치로 옮기므로 대개 `<ROOT>`와 같다
 - `<SPEC>`: `<SPEC_WT>/docs/minipowers/<stem>/spec.md`의 절대경로. 워크스페이스는 spec 경로로 소유를 확인하므로 같은 경로를 계속 써야 같은 워크스페이스가 나온다
 - `<SKILL_DIR>`: conventions.md "스킬 파일 경로"대로 실제 절대경로로 바꾼다
 
@@ -156,7 +156,7 @@ SKILL.md "실행 방식"의 두 규칙으로 의존 관계를 만든다. 서로 
    ```bash
    cd <ROOT> && git worktree remove .worktrees/<stem>-slice-N && git -C <SPEC_WT> branch -d <브랜치>-slice-N
    ```
-   브랜치 삭제는 `<SPEC_WT>`에서 한다. `git branch -d`는 명령을 실행한 체크아웃의 HEAD로 병합 여부를 본다. 메인 체크아웃은 기반 브랜치에 남아 있으므로 `<ROOT>`에서 지우면 "not fully merged"로 실패한다.
+   브랜치 삭제는 `<SPEC_WT>`에서 한다. `git branch -d`는 명령을 실행한 체크아웃의 HEAD로 병합 여부를 본다. `<SPEC_WT>`가 `<ROOT>`와 다르면 `<ROOT>`에서 지울 때 "not fully merged"로 실패한다.
 8. 묶음의 슬라이스가 전부 병합되면 `묶음 W: 병합 완료 (head <sha>)`를 적고 progress.md만 스테이징해 커밋한다. 다음 묶음의 시작점은 이 커밋이다.
 
 ## 멈추지 않고 판정한다
