@@ -8,7 +8,7 @@
 
 | skill | 산출물 |
 |---|---|
-| `spec-design` | `spec.md`와 feature 브랜치. 초안은 메인 체크아웃에 커밋하지 않은 채 쓰고, 승인 때 메인 체크아웃을 그 브랜치로 옮겨 승인본 하나를 커밋한다 |
+| `spec-design` | `spec.md`, `todo.md`, feature 브랜치. 초안은 메인 체크아웃에 커밋하지 않은 채 쓰고, 승인 때 메인 체크아웃을 그 브랜치로 옮긴 뒤 todo를 spec 폴더의 `todo.md`로 옮겨(문장 입력이면 만들어) 승인본과 함께 하나로 커밋한다 |
 | `spec-implement` | 슬라이스별 커밋, `progress.md`. spec 결함으로 멈추면 후속 todo |
 | `spec-review` | `findings.md` |
 | `spec-digest` | `digest.md`, `docs/minipowers/index.md` |
@@ -27,7 +27,8 @@ docs/minipowers/
 ├── index.md                          spec-digest가 매번 다시 생성하는 누적 목록
 ├── todo/<이름>.md                    사용자가 쓰는 todo. 형식은 자유. spec-design의 입력. spec 결함으로 멈춘 사이클의 todo는 spec-implement가 쓴다("중단 todo" 절)
 └── <stem>/                           작업 하나 = 폴더 하나
-    ├── spec.md                       spec-design이 쓴다. 승인 뒤에는 고치지 않는다. 바꿀 것이 생기면 새 todo로 새 사이클을 돈다
+    ├── todo.md                       이 사이클의 원 요구. spec-design이 승인 때 todo 파일을 옮겨 오거나 요구 문장으로 만든다
+    ├── spec.md                       spec-design이 쓴다. "원 요구"가 todo.md를 링크한다. 승인 뒤에는 고치지 않는다. 바꿀 것이 생기면 새 todo로 새 사이클을 돈다
     ├── progress.md                   spec-implement가 쓴다
     ├── findings.md                   spec-review가 쓴다. spec-implement 수정 모드가 읽는다
     └── digest.md                     spec-digest가 쓴다

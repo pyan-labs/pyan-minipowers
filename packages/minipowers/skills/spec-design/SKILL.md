@@ -1,6 +1,6 @@
 ---
 name: spec-design
-description: todo 파일이나 요구 문장 하나를 승인된 docs/minipowers/<stem>/spec.md와 그것을 커밋한 feature 브랜치로 만든다. 초안은 메인 체크아웃에 커밋하지 않은 채 쓰고 그 폴더 경로로 이어받는다.
+description: todo 파일이나 요구 문장 하나를 승인된 docs/minipowers/<stem>/spec.md와 그 폴더로 옮긴 todo.md, 둘을 커밋한 feature 브랜치로 만든다. 초안은 메인 체크아웃에 커밋하지 않은 채 쓰고 그 폴더 경로로 이어받는다.
 argument-hint: "<todo 파일 | 요구 문장 | 승인 전 spec 폴더 docs/minipowers/<stem>/>"
 disable-model-invocation: true
 ---
@@ -11,23 +11,26 @@ disable-model-invocation: true
 
 ## 이 스킬이 남기는 것
 
-변경의 크기와 관계없이 항상 다음 둘이다.
+변경의 크기와 관계없이 항상 다음 셋이다.
 
 | 산출물 | 위치 | 조건 |
 |---|---|---|
 | feature 브랜치 | `<브랜치>` | 승인 시점의 메인 체크아웃 HEAD에서 갈라진다. 이 스킬이 끝나면 메인 체크아웃에 checkout되어 있다 |
 | spec.md | 메인 체크아웃의 `docs/minipowers/<stem>/spec.md` | 형식은 `./spec-template.md`. 절을 지우거나 비우지 않는다. 변경이 작으면 절마다 한 줄이다 |
+| todo.md | 메인 체크아웃의 `docs/minipowers/<stem>/todo.md` | 이 사이클의 원 요구. 인자가 todo 파일이면 승인 때 그 파일을 옮겨 온 것이고, 문장이면 승인 때 그 문장으로 만든 것이다. spec.md "원 요구"가 이 파일을 링크한다 |
 
-- 승인 전 초안은 커밋하지 않은 파일이고, 메인 체크아웃의 브랜치는 기반 브랜치 그대로다.
-- 브랜치의 커밋은 승인된 spec.md를 담은 승인 커밋 하나다.
+- 승인 전 초안은 커밋하지 않은 파일이고, 메인 체크아웃의 브랜치는 기반 브랜치 그대로다. todo 파일은 승인 전까지 원래 자리에 둔다. 초안을 버리려고 spec 폴더를 지워도 todo가 남게 하려는 것이다.
+- 브랜치의 커밋은 승인된 spec.md와 todo.md를 담은 승인 커밋 하나다. 사이클 하나의 입력과 산출물이 `docs/minipowers/<stem>/` 한 폴더에 모인다.
 - 이 스킬이 끝나면 메인 체크아웃은 `<브랜치>`에 있고, 사이클이 끝나 병합할 때까지 그 브랜치에 둔다. 한 번에 사이클 하나만 돈다.
 - 승인된 spec.md는 그 뒤 어느 단계도 고치지 않는다.
 - 뒤 단계는 이 대화를 볼 수 없다. 설계 결정과 구현에 필요한 코드베이스 맥락은 전부 spec.md에 적는다.
 
 ## 1. 인자 해석
 
-- **todo 파일 경로.** 파일을 읽고 원문을 spec 머리말의 "원 요구"에 경로와 함께 `>` 인용으로 옮긴다.
-- **요구를 적은 문장.** 그 문장을 "원 요구"에 인용한다.
+- **todo 파일 경로.** 파일을 읽는다. 초안의 "원 요구"에는 그 파일의 경로(메인 체크아웃 루트 기준)를 적는다. 끊긴 세션을 이어받을 때 8절이 이 경로로 todo를 찾는다.
+- **요구를 적은 문장.** 초안의 "원 요구"에 그 문장을 `>` 인용으로 적는다.
+
+어느 쪽이든 8절의 승인 때 원 요구를 `docs/minipowers/<stem>/todo.md`로 옮기고 "원 요구"를 그 파일의 링크로 바꾼다.
 - 인자가 없으면 "todo 파일 경로나 요구 문장을 넣어 다시 호출한다"고 한 줄로 안내하고 끝낸다.
 
 예외로 승인 전 spec 폴더 `docs/minipowers/<stem>/`를 받으면 끊긴 세션을 이어받는 것이다. 메인 체크아웃 루트의 `docs/minipowers/<stem>/spec.md`를 읽는다. 없으면 그렇게 보고하고 끝낸다. 머리말의 기준 커밋이 "승인 시 기록"이면 2절의 2를 확인한 뒤 5절부터 이어가고, 실제 해시이면 승인된 spec이므로 새 todo로 부르라고 안내하고 끝낸다.
@@ -120,7 +123,7 @@ spec 전체에서 단언을 전부 뽑아 하나씩 grep이나 파일 읽기로 
 - 브랜치 이름과 전제를 확인한 커밋. 승인하면 메인 체크아웃에서 이 브랜치를 만들어 옮기고 spec.md를 커밋한다. 그때 HEAD가 확인한 커밋과 다르면 전제를 다시 확인하고, 달라진 것이 있으면 다시 검토를 요청한다
 - 승인 조건: "승인할 때 메인 체크아웃에 이 spec 폴더와 `docs/minipowers/todo/` 밖의 변경이 없어야 한다"
 - 이어가는 법: "세션이 끊기면 `/spec-design docs/minipowers/<stem>/`로 이어간다"
-- 버리는 법: "이 spec을 버리려면 `docs/minipowers/<stem>/` 폴더를 지운다"
+- 버리는 법: "이 spec을 버리려면 `docs/minipowers/<stem>/` 폴더를 지운다. todo 파일은 승인 전까지 원래 자리에 있다"
 
 사용자가 승인하기 전에는 코드를 쓰지 않는다. 사용자가 고칠 곳을 말하면 spec을 고친 뒤 다시 검토를 요청한다.
 
@@ -134,20 +137,27 @@ spec 전체에서 단언을 전부 뽑아 하나씩 grep이나 파일 읽기로 
    git status --porcelain -- . ':(exclude)docs/minipowers/todo' ':(exclude)docs/minipowers/<stem>'
    ```
 3. 메인 체크아웃 HEAD를 기준 커밋으로 정한다(`BASE=$(git rev-parse HEAD)`). "검증된 전제" 표의 확인 커밋 가운데 `$BASE`와 다른 것이 있으면 5절 전제 확인을 다시 한다. 모두 맞으면 확인 커밋을 `$BASE`로 고치고 4로 간다. 하나라도 틀리면 spec을 고치고 7절 검토 요청으로 돌아간다.
-4. spec 머리말의 "기준 커밋"에 `$BASE`의 전체 해시와 현재 브랜치 이름을 적는다. "브랜치"는 초안에 이미 적혀 있으므로 그대로 둔다. 브랜치를 만들어 옮기고 spec.md만 스테이징해 커밋한다. 이것이 승인 커밋이다. 커밋 메시지 형식은 프로젝트 지시 파일이 정한 것을 따른다. `git switch`는 커밋하지 않은 파일(spec 초안, todo, gitignore된 설정 파일)을 그대로 둔다.
+4. spec 머리말의 "기준 커밋"에 `$BASE`의 전체 해시와 현재 브랜치 이름을 적는다. "브랜치"는 초안에 이미 적혀 있으므로 그대로 둔다. 브랜치를 만들어 옮긴다. `git switch`는 커밋하지 않은 파일(spec 초안, todo, gitignore된 설정 파일)을 그대로 둔다.
    ```bash
    git switch -c <브랜치>
-   git add docs/minipowers/<stem>/spec.md
+   ```
+5. 원 요구를 `docs/minipowers/<stem>/todo.md`로 옮긴다.
+   - 초안의 "원 요구"가 todo 파일 경로이면 그 파일을 `todo.md`로 옮긴다. 파일이 git이 추적하는 파일이면 `git mv <todo 경로> docs/minipowers/<stem>/todo.md`로, 아니면 파일 이동으로 옮긴다. 그 경로에 파일이 없으면 보고하고 끝낸다. 사용자가 파일을 되돌린 뒤 다시 승인한다.
+   - 초안의 "원 요구"가 문장 인용이면 그 문장을 본문으로 `todo.md`를 만든다.
+   - spec 머리말의 "원 요구"를 `- 원 요구: [todo.md](todo.md)`로 바꾼다. 인용이 있었으면 지운다. 원문은 todo.md 하나에만 둔다.
+6. spec.md와 todo.md를 스테이징해 커밋한다. todo를 `git mv`로 옮겼으면 원래 경로의 삭제도 이미 스테이징되어 함께 커밋된다. 이것이 승인 커밋이다. 커밋 메시지 형식은 프로젝트 지시 파일이 정한 것을 따른다.
+   ```bash
+   git add docs/minipowers/<stem>/spec.md docs/minipowers/<stem>/todo.md
    git commit
    ```
-5. 브랜치 이름, 승인 커밋 해시, 메인 체크아웃이 이제 `<브랜치>`에 있다는 것을 보고한다. "구현이 끝나 병합할 때까지 메인 체크아웃에서 다른 작업을 하지 않는다"를 한 줄로 적는다. 인자가 todo 파일이었으면 다음 단계 줄 바로 위에 아래 한 줄을 쓴다. todo 파일은 커밋하지도 지우지도 않는다.
+7. 브랜치 이름, 승인 커밋 해시, 메인 체크아웃이 이제 `<브랜치>`에 있다는 것을 보고한다. "구현이 끝나 병합할 때까지 메인 체크아웃에서 다른 작업을 하지 않는다"를 한 줄로 적는다. 인자가 todo 파일이었으면 다음 단계 줄 바로 위에 아래 한 줄을 쓴다.
    ```
-   todo 원문은 spec.md "원 요구"에 인용했다. <todo 경로>는 지워도 된다.
+   todo를 docs/minipowers/<stem>/todo.md로 옮겨 승인 커밋에 넣었다. 원래 경로: <todo 경로>
    ```
    마지막 줄에 다음 단계를 적고 끝낸다.
    ```
    다음 단계: `/spec-implement docs/minipowers/<stem>/`
    ```
 
-승인 커밋 뒤에는 spec.md를 고치지 않는다. 그 뒤 spec에 결함이 드러나거나 요구가 달라지면 그 내용을 새 todo로 적어 이 스킬을 다시 호출해 새 spec을 쓴다. 그 spec의 "원 요구"에는 기존 spec 경로를 적는다. 사이클이 spec 결함으로 멈췄으면 spec-implement가 그 todo를 `docs/minipowers/todo/<stem>-followup.md`로 이미 써 두었다(conventions.md "중단 todo").
+승인 커밋 뒤에는 spec.md를 고치지 않는다. 그 뒤 spec에 결함이 드러나거나 요구가 달라지면 그 내용을 새 todo로 적어 이 스킬을 다시 호출해 새 spec을 쓴다. 그 todo에는 기존 spec 경로를 적는다. 사이클이 spec 결함으로 멈췄으면 spec-implement가 그 todo를 `docs/minipowers/todo/<stem>-followup.md`로 이미 써 두었다(conventions.md "중단 todo").
 

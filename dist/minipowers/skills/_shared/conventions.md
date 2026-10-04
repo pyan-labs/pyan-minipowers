@@ -52,7 +52,8 @@ docs/minipowers/
 ├── index.md                          spec-digest가 매번 다시 생성하는 누적 목록
 ├── todo/<이름>.md                    사용자가 쓰는 todo. 형식은 자유. spec-design의 입력. spec 결함으로 멈춘 사이클의 todo는 spec-implement가 쓴다("중단 todo" 절)
 └── <stem>/                           작업 하나 = 폴더 하나
-    ├── spec.md                       spec-design이 쓴다. 승인 뒤에는 고치지 않는다. 바꿀 것이 생기면 새 todo로 새 사이클을 돈다
+    ├── todo.md                       이 사이클의 원 요구. spec-design이 승인 때 todo 파일을 옮겨 오거나 요구 문장으로 만든다
+    ├── spec.md                       spec-design이 쓴다. "원 요구"가 todo.md를 링크한다. 승인 뒤에는 고치지 않는다. 바꿀 것이 생기면 새 todo로 새 사이클을 돈다
     ├── progress.md                   spec-implement가 쓴다
     ├── findings.md                   spec-review가 쓴다. spec-implement 수정 모드가 읽는다
     └── digest.md                     spec-digest가 쓴다
@@ -72,6 +73,7 @@ git worktree list --porcelain | head -1
 | 파일 | 쓰는 스킬 | 읽는 스킬 |
 |---|---|---|
 | `spec.md` | spec-design | spec-implement · spec-review · spec-digest |
+| `<stem>/todo.md` | spec-design(승인 때 옮기거나 만든다) | 사람 |
 | `todo/<stem>-followup.md` | spec-implement(spec 결함으로 멈출 때) | spec-design |
 | `progress.md` | spec-implement | spec-review · spec-digest |
 | `findings.md` | spec-review | spec-implement(수정 모드) · spec-digest |
@@ -118,8 +120,8 @@ spec-implement · spec-review · spec-digest는 진행 중에 설계에 관한 �
 사이클이 spec 결함(정지 조건 4)으로 멈추면 spec-implement가 다음 사이클의 입력으로 todo 하나를 쓴다. spec을 고치는 대신 새 사이클로 고친다. 정지 조건 1~3은 사용자가 허락하거나 조건을 채운 뒤 같은 작업 폴더로 이어 가는 것이므로 todo를 쓰지 않는다. 사용자의 허락은 progress.md의 `승인:` 줄로 남긴다.
 
 - 위치: `<메인 체크아웃 루트>/docs/minipowers/todo/<stem>-followup.md`. 폴더가 없으면 만든다. 같은 이름이 이미 있으면 덮어쓰지 않고 `<stem>-followup-2.md`, `-3.md`처럼 처음 비는 번호를 쓴다.
-- 커밋하지 않는다. todo는 브랜치 밖의 사용자 파일이다.
-- 형식은 아래 그대로다. spec-design이 이 파일을 읽어 새 spec의 "원 요구"로 옮긴다.
+- 커밋하지 않는다. todo는 브랜치 밖의 사용자 파일이다. 다음 사이클의 spec-design이 승인 때 이 파일을 새 작업 폴더의 `todo.md`로 옮겨 커밋한다.
+- 형식은 아래 그대로다. spec-design이 이 파일을 읽어 새 spec의 입력으로 쓴다.
 
 ```markdown
 # <해결할 것을 한 줄로> (spec 결함으로 중단된 <stem>의 후속)

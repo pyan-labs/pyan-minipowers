@@ -34,7 +34,7 @@ spec을 계약서로 삼아 브랜치 안에서 코드를 쓰고 슬라이스마
 작업 위치에서 한다.
 
 1. `git merge-base --is-ancestor <기준 커밋> HEAD`가 실패하면 progress.md에 `spec 결함:` 줄을 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 사용자에게 보고하고 끝낸다.
-2. `git diff --name-only <기준 커밋> HEAD`에 `<폴더>` 밖의 파일이 있고, progress.md에 `슬라이스 N: complete` 줄이 하나도 없으면, HEAD가 기준 커밋에서 움직인 것이다. spec의 `## 검증된 전제` 절 항목을 하나씩 적힌 방법으로 다시 확인한다. 하나라도 틀리면 progress.md에 `spec 결함:` 줄로 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 사용자에게 보고하고 끝낸다. `슬라이스 N: complete` 줄이 하나라도 있으면 이 확인을 건너뛴다. 끝난 슬라이스의 커밋이 전제를 바꾼 것이기 때문이다.
+2. `git diff --name-only <기준 커밋> HEAD`에 `<폴더>`와 `docs/minipowers/todo/` 밖의 파일이 있고(승인 커밋이 todo를 `<폴더>/todo.md`로 옮기며 원래 경로를 지웠을 수 있다), progress.md에 `슬라이스 N: complete` 줄이 하나도 없으면, HEAD가 기준 커밋에서 움직인 것이다. spec의 `## 검증된 전제` 절 항목을 하나씩 적힌 방법으로 다시 확인한다. 하나라도 틀리면 progress.md에 `spec 결함:` 줄로 적고, "spec 결함으로 멈출 때" 절대로 todo를 쓰고, 사용자에게 보고하고 끝낸다. `슬라이스 N: complete` 줄이 하나라도 있으면 이 확인을 건너뛴다. 끝난 슬라이스의 커밋이 전제를 바꾼 것이기 때문이다.
 
 ### 이어서 하기
 
