@@ -11,7 +11,7 @@
 | `spec-design` | `spec.md`, `todo.md`, feature 브랜치. 초안은 메인 체크아웃에 커밋하지 않은 채 쓰고, 승인 때 메인 체크아웃을 그 브랜치로 옮긴 뒤 todo를 spec 폴더의 `todo.md`로 옮겨(문장 입력이면 만들어) 승인본과 함께 하나로 커밋한다 |
 | `spec-implement` | 슬라이스별 커밋, `progress.md`. spec 결함으로 멈추면 후속 todo |
 | `spec-review` | `findings.md` |
-| `spec-digest` | `digest.md`, `docs/minipowers/index.md` |
+| `spec-digest` | `digest.md`, `docs/minipowers/index.md`. ready to merge이면 승인받아 기반 브랜치에 병합하고 feature 브랜치를 지운다 |
 
 **각 skill은 대화 context를 이어받지 않고, 앞 단계들의 산출물만 받아 독립적으로 진행할 수 있어야 한다.** 이것이 이 플러그인의 핵심이다. 앞 단계와 같은 세션이 아니어도, 다른 모델이어도 같게 동작해야 한다.
 

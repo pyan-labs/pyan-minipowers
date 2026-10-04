@@ -49,7 +49,7 @@ flowchart TB
 
 - **산출물이 쌓인다.** 뒤 단계는 앞 단계들의 산출물을 모두 넘겨받습니다. 예를 들어 리뷰는 `spec.md`, `progress.md`, 구현 커밋의 diff를 함께 읽고, 기록은 여기에 `findings.md`와 소스코드를 더해 읽습니다.
 - **분기는 두 곳이다.** 구현 중 spec의 결함으로 더 나아갈 수 없으면 승인된 spec을 고치지 않고 멈춰서 후속 todo(`docs/minipowers/todo/<stem>-followup.md`)를 남깁니다. 그 todo로 `/spec-design`부터 새 사이클을 돕니다. 리뷰가 `needs fixes`이면 구현의 수정 모드로 돌아가 고치고 다시 리뷰합니다. 수정 라운드는 최대 2회이고, 그 뒤에 남은 항목은 사용자가 판정합니다.
-- **끝맺음은 사람이 한다.** 병합, push, PR은 어느 단계도 하지 않습니다. `ready to merge` 판정 뒤의 일은 프로젝트의 git 규칙대로 사용자가 합니다.
+- **끝맺음은 사람이 정한다.** push와 PR은 어느 단계도 하지 않습니다. 병합은 `ready to merge` 판정 뒤 `/spec-digest`가 사용자에게 물어 승인받았을 때만 로컬에서 합니다.
 
 | 단계 | 호출 | 입력 | 산출물 |
 | --- | --- | --- | --- |
@@ -101,9 +101,9 @@ docs/minipowers/
 1. `/spec-design`은 시작할 때 메인 체크아웃이 깨끗하고 기반 브랜치(예: `dev`)에 있는지 확인한 뒤, spec 초안을 `docs/minipowers/<stem>/spec.md`에 커밋하지 않은 채 씁니다. 승인하면 초안 밖에 변경이 없는지 다시 확인하고 `git switch -c <브랜치>`로 옮긴 뒤 spec.md를 커밋합니다. 이 승인 커밋이 브랜치의 유일한 커밋입니다. 이후 메인 체크아웃은 feature 브랜치에 있습니다.
 2. `/spec-implement`, `/spec-review`, `/spec-digest`는 spec의 브랜치가 checkout된 폴더에서 작업합니다. 보통 메인 체크아웃입니다. 브랜치가 어디에도 checkout되어 있지 않으면 `git switch <브랜치>` 뒤 다시 부르라고 안내합니다.
 3. 메인 체크아웃을 그대로 쓰므로 gitignore된 파일(의존성, `.env`나 `appsettings.json` 같은 로컬 설정)도 그대로 있습니다. 병렬 구현이 만드는 슬라이스 worktree(`.worktrees/<stem>-slice-N`)에만 없습니다. `/spec-implement`는 프로젝트 지시 파일(CLAUDE.md 등)에 `minipowers worktree 복사: .env, src/appsettings.Development.json`처럼 적은 파일을 그 worktree에 복사하고, 의존성 설치 명령을 돌립니다. 없는 파일 때문에 테스트가 실패하면 기존 실패로 넘기지 않고 멈춥니다.
-4. 병합은 프로젝트의 git 규칙대로 사용자가 합니다.
+4. `/spec-digest`는 판정이 `ready to merge`이면 브랜치를 정리할지 묻습니다. 승인하면 bash 스크립트 하나로 추적 중인 `docs/minipowers/` 변경(todo · spec)을 feature 브랜치에 커밋하고, 기반 브랜치로 옮겨 `--no-ff`로 병합한 뒤, feature 브랜치와 `.minipowers/<stem>/`을 지웁니다. push는 하지 않습니다.
 
-병합 뒤에는 메인 체크아웃에서 정리합니다. skill은 안내만 하고 지우지 않습니다.
+거절하면 병합은 프로젝트의 git 규칙대로 사용자가 하고, 병합 뒤 메인 체크아웃에서 직접 정리합니다.
 
 ```bash
 git switch <기반 브랜치>

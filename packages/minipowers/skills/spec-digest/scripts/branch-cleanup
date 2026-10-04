@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# ready to merge인 사이클의 feature 브랜치를 기반 브랜치에 병합하고 정리한다.
+# spec-digest 6절에서 사용자가 승인한 뒤에만 부른다. 메인 체크아웃 루트에서 실행한다.
+#
+# 순서:
+#   1. 추적 중인 docs/minipowers/ 아래 변경(todo · spec 폴더)이 있으면 feature 브랜치에 커밋한다.
+#      기반 브랜치로 옮기기 전에 커밋해 두어야 switch와 merge가 로컬 변경 때문에 멈추지 않는다.
+#      추적하지 않는 파일(새 todo 등)은 건드리지 않는다.
+#   2. 기반 브랜치로 옮겨 feature 브랜치를 --no-ff로 병합한다. 충돌하면 병합을 되돌리고
+#      feature 브랜치로 돌아가 멈춘다.
+#   3. feature 브랜치를 git branch -d로 지우고 <root>/.minipowers/<stem>/을 지운다.
+#
+# Usage: branch-cleanup STEM BRANCH BASE [MERGE_MSG] [DOCS_MSG]
+#   MERGE_MSG가 없으면 git 기본 병합 메시지, DOCS_MSG가 없으면 "docs(STEM): todo · spec 변경".
+set -euo pipefail
+
+if [ $# -lt 3 ] || [ $# -gt 5 ]; then
+  echo "usage: branch-cleanup STEM BRANCH BASE [MERGE_MSG] [DOCS_MSG]" >&2
+  exit 2
+fi
+
+stem=$1 branch=$2 base=$3
+merge_msg=${4:-}
+docs_msg=${5:-"docs($stem): todo · spec 변경"}
+
+root=$(git worktree list --porcelain | head -1 | sed 's/^worktree //')
+here=$(git rev-parse --show-toplevel)
+[ "$(CDPATH= cd -- "$root" && pwd -P)" = "$(CDPATH= cd -- "$here" && pwd -P)" ] \
+  || { echo "메인 체크아웃 루트에서 실행해야 한다: $root" >&2; exit 2; }
+cd -- "$root"
+
+current=$(git rev-parse --abbrev-ref HEAD)
+[ "$current" = "$branch" ] \
+  || { echo "현재 브랜치($current)가 spec의 브랜치($branch)가 아니다" >&2; exit 2; }
+git rev-parse --verify --quiet "refs/heads/$base" >/dev/null \
+  || { echo "기반 브랜치가 없다: $base" >&2; exit 2; }
+
+outside=$(git status --porcelain --untracked-files=no -- . ':(exclude)docs/minipowers')
+if [ -n "$outside" ]; then
+  echo "docs/minipowers/ 밖에 커밋하지 않은 변경이 있어 멈춘다:" >&2
+  echo "$outside" >&2
+  exit 1
+fi
+
+# 1. 추적 중인 todo · spec 변경 커밋
+docs_commit="없음"
+git add -u -- docs/minipowers
+if ! git diff --cached --quiet; then
+  git commit -q -m "$docs_msg"
+  docs_commit=$(git rev-parse --short HEAD)
+fi
+
+# 2. 기반 브랜치로 옮겨 병합
+git switch -q "$base"
+if [ -n "$merge_msg" ]; then
+  merge_args=(-m "$merge_msg")
+else
+  merge_args=(--no-edit)
+fi
+if ! git merge -q --no-ff "${merge_args[@]}" "$branch"; then
+  git merge --abort 2>/dev/null || true
+  git switch -q "$branch"
+  echo "병합이 충돌해 되돌리고 $branch 로 돌아왔다" >&2
+  exit 1
+fi
+merge_commit=$(git rev-parse --short HEAD)
+
+# 3. 브랜치와 작업물 정리
+git branch -q -d "$branch"
+work="$root/.minipowers/$stem"
+removed="없음"
+if [ -d "$work" ]; then
+  rm -rf -- "$work"
+  removed=".minipowers/$stem/"
+fi
+
+echo "todo · spec 커밋: $docs_commit"
+echo "병합: $branch → $base ($merge_commit)"
+echo "삭제한 브랜치: $branch"
+echo "삭제한 작업물: $removed"
+echo "현재 브랜치: $(git rev-parse --abbrev-ref HEAD)"

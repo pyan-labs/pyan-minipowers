@@ -1,13 +1,13 @@
 ---
 name: spec-digest
-description: minipowers 작업 폴더(docs/minipowers/<stem>/)의 spec.md, progress.md, findings.md를 소스코드로 확인해 결과 중심 기록 digest.md를 쓰고 docs/minipowers/index.md를 다시 생성한다.
+description: minipowers 작업 폴더(docs/minipowers/<stem>/)의 spec.md, progress.md, findings.md를 소스코드로 확인해 결과 중심 기록 digest.md를 쓰고 docs/minipowers/index.md를 다시 생성한다. ready to merge이면 사용자 승인을 받아 feature 브랜치를 기반 브랜치에 병합하고 정리한다.
 argument-hint: "<작업 폴더 docs/minipowers/<stem>/>"
 disable-model-invocation: true
 ---
 
 # spec-digest — 결과 중심 기록
 
-작업 폴더 하나의 spec.md, progress.md, findings.md를 읽고, 소스코드로 확인해 `digest.md`를 쓴다. 이어서 `docs/minipowers/index.md`를 다시 생성한다.
+작업 폴더 하나의 spec.md, progress.md, findings.md를 읽고, 소스코드로 확인해 `digest.md`를 쓴다. 이어서 `docs/minipowers/index.md`를 다시 생성한다. 상태가 ready to merge이면 브랜치를 정리할지 묻고, 승인하면 기반 브랜치에 병합한 뒤 feature 브랜치를 지운다.
 
 독자는 그 작업을 지켜보지 않은 개발자다. digest 하나만 읽고 무엇이 바뀌었고 어떻게 동작하는지 알 수 있어야 한다.
 
@@ -139,7 +139,7 @@ spec 수용 기준마다 소절을 하나 두고, 사용자 행동 → 진입점
 
 `docs/minipowers/*/` 폴더 중 `todo/`와 `spec.md`가 없는 폴더를 뺀 전부가 한 행씩 된다. 상태는 2절의 표로 정하고 "(리뷰 전)" 같은 표시는 붙이지 않는다.
 
-## 6. 커밋과 마무리
+## 6. 커밋
 
 두 파일을 쓴 뒤 작업 위치의 브랜치를 확인한다.
 
@@ -150,9 +150,36 @@ git rev-parse --abbrev-ref HEAD
 - 작업 위치의 브랜치가 spec 머리말의 브랜치와 같으면 `<폴더>/digest.md`와 `docs/minipowers/index.md`를 한 커밋으로 넣는다. 커밋 메시지 형식은 프로젝트 지시 파일이 정한다. 정하지 않았으면 `docs(<stem>): digest`를 쓴다.
 - 다르면 커밋하지 않는다. 공유 브랜치에 직접 커밋하는 일을 막기 위해서다.
 
-마무리 보고에는 digest.md 경로, 상태, 커밋 범위, index.md의 행 수를 적는다. 커밋하지 않았으면 "digest.md와 index.md를 썼고 커밋하지 않았다. 작업 위치의 브랜치가 spec의 브랜치와 다르다"를 마지막 줄로 적는다. 커밋했으면 마지막 줄은 상태에 따른 다음 단계 하나다.
+## 7. 브랜치 정리
 
-상태가 ready to merge이면 다음 단계 줄 바로 위에 병합 뒤 정리 명령을 적는다. 스킬이 직접 지우지는 않고 안내만 한다.
+다음이 모두 성립하면 브랜치를 정리할지 사용자에게 묻는다. 병합은 정지 조건 3(worktree 밖으로 나가는 부작용)이므로 승인 없이 하지 않는다.
+
+- 6절에서 커밋했다.
+- 상태가 ready to merge다.
+- 작업 위치가 메인 체크아웃 루트다(conventions.md "폴더 구조"의 명령).
+- spec 머리말 "기준 커밋" 줄에 브랜치 이름(이하 `<기반 브랜치>`)이 있고, 그 로컬 브랜치가 있다(`git rev-parse --verify --quiet refs/heads/<기반 브랜치>`).
+
+질문에는 할 일을 그대로 적는다.
+
+- 추적 중인 `docs/minipowers/` 아래 변경(todo · spec 폴더)이 있으면 `<브랜치>`에 커밋한다
+- `<기반 브랜치>`로 옮겨 `<브랜치>`를 `--no-ff`로 병합한다
+- `<브랜치>`를 지우고 `<메인 체크아웃>/.minipowers/<stem>/`을 지운다
+
+승인하면 아래 스크립트 하나로 실행한다. 병합 커밋과 todo · spec 커밋의 메시지 형식은 프로젝트 지시 파일이 정한다. 정하지 않았으면 두 메시지 인자를 빼서 스크립트 기본값을 쓴다. `<SKILL_DIR>`는 conventions.md "스킬 파일 경로"대로 바꾼다.
+
+```bash
+cd "<메인 체크아웃>" && bash "<SKILL_DIR>/scripts/branch-cleanup" "<stem>" "<브랜치>" "<기반 브랜치>" ["<병합 메시지>"] ["<todo · spec 커밋 메시지>"]
+```
+
+스크립트는 `docs/minipowers/` 밖에 커밋하지 않은 추적 변경이 있거나 병합이 충돌하면 아무것도 병합하지 않고 `<브랜치>`에 둔 채 종료 코드 1로 끝난다. 그 전에 만든 todo · spec 커밋은 `<브랜치>`에 남는다. 그때는 출력을 그대로 보고하고 정리하지 않은 것으로 마무리한다. push는 하지 않는다.
+
+조건이 성립하지 않거나 사용자가 거절했으면 정리하지 않는다.
+
+## 8. 마무리 보고
+
+마무리 보고에는 digest.md 경로, 상태, 커밋 범위, index.md의 행 수를 적는다. 7절에서 정리했으면 스크립트 출력도 적는다. 커밋하지 않았으면 "digest.md와 index.md를 썼고 커밋하지 않았다. 작업 위치의 브랜치가 spec의 브랜치와 다르다"를 마지막 줄로 적는다. 커밋했으면 마지막 줄은 상태에 따른 다음 단계 하나다.
+
+상태가 ready to merge인데 정리하지 않았으면 다음 단계 줄 바로 위에 병합 뒤 정리 명령을 적는다.
 
 ```
 병합 뒤 정리: git switch <기반 브랜치>   (spec 머리말 "기준 커밋"의 브랜치)
@@ -164,6 +191,7 @@ git rev-parse --abbrev-ref HEAD
 
 | 조건 | 마지막 줄 |
 |---|---|
+| 7절에서 정리했다 | 다음 단계: 프로젝트 지시 파일의 git 규칙대로 `<기반 브랜치>`를 push한다 |
 | 상태가 ready to merge | 다음 단계: 프로젝트 지시 파일의 git 규칙대로 브랜치 `<브랜치>`의 Pull Request를 만든다 |
 | findings.md `## Verdict` 절에 `Rounds: 2/2` 줄이 있다 | 다음 단계: findings.md `## Verdict` 절의 남은 항목을 판정한다 |
 | findings.md `## Verdict` 절에 `Verdict: needs fixes` 줄이 있다 | 다음 단계: `/spec-implement <폴더>`로 남은 finding을 고친 뒤 `/spec-review <폴더>` |

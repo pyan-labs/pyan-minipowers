@@ -185,4 +185,4 @@ subagent를 띄운 뒤에는 progress.md 기록이나 다음 diff 패키지 준�
 
 ## 마무리
 
-모든 묶음이 끝나면 SKILL.md "마무리 (구현 모드)"로 간다. 워크스페이스(`<ROOT>/.minipowers/<stem>/work/`)는 일회용이라 뒤 단계가 읽지 않는다. 지우는 것은 spec-digest의 병합 뒤 정리 안내다.
+모든 묶음이 끝나면 SKILL.md "마무리 (구현 모드)"로 간다. 워크스페이스(`<ROOT>/.minipowers/<stem>/work/`)는 일회용이라 뒤 단계가 읽지 않는다. 지우는 것은 spec-digest의 브랜치 정리(spec-digest/SKILL.md 7절)다.

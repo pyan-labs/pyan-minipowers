@@ -49,7 +49,7 @@ Solid arrows are the execution order; dashed arrows are the artifact each stage 
 
 - **Artifacts accumulate.** Each later stage receives all the earlier artifacts. For example, the review reads `spec.md`, `progress.md`, and the diff of the implementation commits together, and the record adds `findings.md` and the source code to those.
 - **There are two branch points.** If a spec defect stops the implementation, it does not edit the approved spec; it stops and leaves a follow-up todo (`docs/minipowers/todo/<stem>-followup.md`), and a new cycle runs from `/spec-design` with that todo. If the review says `needs fixes`, work returns to the implementation's fix mode and is reviewed again. There are at most two fix rounds, after which the user decides on what remains.
-- **A human closes it out.** No stage merges, pushes, or opens a PR. What comes after a `ready to merge` verdict is up to the user, following the project's git rules.
+- **A human decides the close-out.** No stage pushes or opens a PR. Merging happens only locally, when `/spec-digest` asks after a `ready to merge` verdict and the user approves.
 
 | Stage | Invocation | Input | Output |
 | --- | --- | --- | --- |
@@ -101,9 +101,9 @@ Everything happens in the main checkout, one cycle at a time. While a cycle is r
 1. `/spec-design` first checks that the main checkout is clean and on the base branch (for example `dev`), then writes the spec draft at `docs/minipowers/<stem>/spec.md` without committing it. On approval it checks again that nothing outside the draft has changed, runs `git switch -c <branch>`, and commits spec.md. That approval commit is the only commit on the branch. From then on the main checkout stays on the feature branch.
 2. `/spec-implement`, `/spec-review`, and `/spec-digest` work in the folder where the spec's branch is checked out, which is normally the main checkout. If the branch is not checked out anywhere, they ask you to run `git switch <branch>` and call them again.
 3. Gitignored files (dependencies, local settings such as `.env` or `appsettings.json`) stay in place because the main checkout is used directly. Only the per-slice worktrees that parallel implementation creates (`.worktrees/<stem>-slice-N`) lack them; `/spec-implement` copies into those the files listed in a line of the project instruction file (CLAUDE.md and the like) such as `minipowers worktree 복사: .env, src/appsettings.Development.json` (복사 = "copy"), and runs the dependency install command. If a test fails because of a missing file, it stops instead of writing the failure off as pre-existing.
-4. Merging is done by the user, following the project's git rules.
+4. When the verdict is `ready to merge`, `/spec-digest` asks whether to clean up the branch. On approval a single bash script commits tracked `docs/minipowers/` changes (todo, spec) to the feature branch, switches to the base branch, merges with `--no-ff`, and deletes the feature branch and `.minipowers/<stem>/`. It does not push.
 
-After merging, clean up in the main checkout. The skills only tell you what to do; they delete nothing.
+If you decline, merge following the project's git rules and clean up in the main checkout yourself.
 
 ```bash
 git switch <base branch>

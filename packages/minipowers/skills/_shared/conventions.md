@@ -6,7 +6,7 @@ minipowers의 네 스킬(spec-design · spec-implement · spec-review · spec-di
 
 ## 작업 위치 결정
 
-spec-implement · spec-review · spec-digest는 시작할 때 이 절로 읽을 spec.md와 작업 위치를 정한다. spec-design은 이 절을 쓰지 않는다. 초안은 메인 체크아웃에 쓰고, 승인 때 메인 체크아웃을 spec의 브랜치로 옮긴다(spec-design/SKILL.md 8절). 그래서 작업 위치는 보통 메인 체크아웃이다. 이 세 스킬은 브랜치를 바꾸지 않는다. 바꿔야 하면 안내만 한다.
+spec-implement · spec-review · spec-digest는 시작할 때 이 절로 읽을 spec.md와 작업 위치를 정한다. spec-design은 이 절을 쓰지 않는다. 초안은 메인 체크아웃에 쓰고, 승인 때 메인 체크아웃을 spec의 브랜치로 옮긴다(spec-design/SKILL.md 8절). 그래서 작업 위치는 보통 메인 체크아웃이다. 이 세 스킬은 작업 위치를 찾으려고 브랜치를 바꾸지 않는다. 바꿔야 하면 안내만 한다.
 
 ### 정상 시나리오
 
@@ -113,7 +113,7 @@ spec-implement · spec-review · spec-digest는 진행 중에 설계에 관한 �
 3. worktree 밖으로 나가는 부작용이 생길 때. 병합, 공유 브랜치로 push, 배포가 여기 해당한다
 4. spec이 틀려서 어느 방향으로 가도 추측일 때. 이 경우 spec 결함을 보고하고 끝낸다. spec-implement는 끝내기 전에 "중단 todo" 절대로 todo를 쓴다. 승인된 spec은 고치지 않는다. 고치는 일은 그 todo로 도는 새 사이클(spec-design)의 몫이다
 
-네 스킬 모두 병합 · push · Pull Request 생성을 하지 않는다. 마무리 보고의 마지막 줄에 사용자가 할 다음 단계 하나를 적는다.
+네 스킬 모두 push · Pull Request 생성을 하지 않는다. 사이클을 기반 브랜치에 병합하는 것은 spec-digest가 사용자 승인을 받아 한다(spec-digest/SKILL.md 7절). 마무리 보고의 마지막 줄에 사용자가 할 다음 단계 하나를 적는다.
 
 ## 중단 todo
 
